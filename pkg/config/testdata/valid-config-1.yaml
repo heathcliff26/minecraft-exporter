@@ -1,0 +1,9 @@
+logLevel: "warn"
+port: 80
+interval: "5m"
+world: "/path/to/world"
+rcon:
+  enable: true
+  host: "localhost"
+  port: 25575
+  password: "password"

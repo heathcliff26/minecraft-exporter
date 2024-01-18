@@ -1,0 +1,4 @@
+# This should fail because of an invalid interval
+logLevel: "info"
+port: 80
+interval: "not-a-time"
