@@ -3,7 +3,7 @@ package rcon
 import (
 	"log/slog"
 
-	"github.com/heathcliff26/containers/apps/minecraft-exporter/pkg/config"
+	"github.com/heathcliff26/minecraft-exporter/pkg/config"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

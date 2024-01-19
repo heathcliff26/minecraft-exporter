@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/heathcliff26/containers/apps/minecraft-exporter/pkg/uuid"
+	"github.com/heathcliff26/minecraft-exporter/pkg/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

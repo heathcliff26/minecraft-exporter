@@ -1,4 +1,4 @@
-module github.com/heathcliff26/containers/apps/minecraft-exporter
+module github.com/heathcliff26/minecraft-exporter
 
 go 1.21
 
