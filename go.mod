@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/Tnze/go-mc v1.20.1
 	github.com/hashicorp/go-version v1.6.0
-	github.com/heathcliff26/promremote v1.0.0
+	github.com/heathcliff26/promremote v1.0.1
 	github.com/jedib0t/go-pretty/v6 v6.5.2
 	github.com/prometheus/client_golang v1.18.0
 	github.com/stretchr/testify v1.8.4
