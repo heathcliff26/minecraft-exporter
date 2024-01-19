@@ -9,17 +9,17 @@ GO_BUILD_FLAGS ?= -ldflags="-w -s"
 default: build
 
 build:
-	podman build -t $(REPOSITORY)/$(CONTAINER_NAME):$(TAG) .
-
-go-build:
 	go build $(GO_BUILD_FLAGS) -o bin/minecraft-exporter ./cmd/
 
-go-test:
+build-image:
+	podman build -t $(REPOSITORY)/$(CONTAINER_NAME):$(TAG) .
+
+test:
 	go test -v ./...
 
 .PHONY: \
 	default \
 	build \
-	go-build \
-	go-test \
+	build-image \
+	test \
 	$(NULL)
