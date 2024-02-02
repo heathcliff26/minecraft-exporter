@@ -20,7 +20,7 @@ github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 # github.com/golang/snappy v0.0.4
 ## explicit
 github.com/golang/snappy
-# github.com/google/uuid v1.5.0
+# github.com/google/uuid v1.3.1
 ## explicit
 github.com/google/uuid
 # github.com/hashicorp/go-version v1.6.0
@@ -63,8 +63,8 @@ github.com/prometheus/procfs/internal/util
 ## explicit; go 1.20
 github.com/prometheus/prometheus/model/timestamp
 github.com/prometheus/prometheus/prompb
-# github.com/rivo/uniseg v0.4.4
-## explicit; go 1.18
+# github.com/rivo/uniseg v0.2.0
+## explicit; go 1.12
 github.com/rivo/uniseg
 # github.com/stretchr/testify v1.8.4
 ## explicit; go 1.20
