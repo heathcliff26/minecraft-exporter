@@ -8,7 +8,7 @@ require (
 	github.com/heathcliff26/promremote v1.0.1
 	github.com/jedib0t/go-pretty/v6 v6.5.4
 	github.com/prometheus/client_golang v1.19.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
