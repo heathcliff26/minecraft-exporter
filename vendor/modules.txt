@@ -29,7 +29,7 @@ github.com/hashicorp/go-version
 # github.com/heathcliff26/promremote v1.0.1
 ## explicit; go 1.21
 github.com/heathcliff26/promremote/promremote
-# github.com/jedib0t/go-pretty/v6 v6.5.6
+# github.com/jedib0t/go-pretty/v6 v6.5.7
 ## explicit; go 1.17
 github.com/jedib0t/go-pretty/v6/text
 # github.com/mattn/go-runewidth v0.0.15
@@ -66,7 +66,7 @@ github.com/rivo/uniseg
 # github.com/stretchr/testify v1.9.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
-# golang.org/x/sys v0.16.0
+# golang.org/x/sys v0.17.0
 ## explicit; go 1.18
 golang.org/x/sys/unix
 golang.org/x/sys/windows
