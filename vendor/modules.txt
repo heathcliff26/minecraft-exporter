@@ -1,5 +1,5 @@
-# github.com/Tnze/go-mc v1.20.1
-## explicit; go 1.19
+# github.com/Tnze/go-mc v1.20.2
+## explicit; go 1.20
 github.com/Tnze/go-mc/nbt
 github.com/Tnze/go-mc/net
 github.com/Tnze/go-mc/net/packet
