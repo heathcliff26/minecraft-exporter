@@ -3,6 +3,22 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Use to set tag, default: rolling"
+        type: string
+        default: "rolling"
+        required: false
+      dry-run:
+        description: "Do not push image"
+        type: boolean
+        default: false
+        required: false
+      latest:
+        description: "Tag latest"
+        type: boolean
+        default: false
+        required: false
   push:
     branches: ["main"]
     paths:
@@ -33,6 +49,8 @@ jobs:
       packages: write
     with:
       dockerfile: Dockerfile
-      tag: rolling
-      dry-run: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+      tag: "${{ inputs.tag == '' && 'rolling' || inputs.tag }}"
+      tags: "${{ inputs.latest == true && 'type=raw,value=latest' || '' }}"
+      dry-run: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.dry-run == 'true' }}
+      build-args: "RELEASE_VERSION=${{ inputs.tag == '' && 'rolling' || inputs.tag }}"
     secrets: inherit
