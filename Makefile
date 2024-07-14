@@ -4,12 +4,10 @@ REPOSITORY ?= localhost
 CONTAINER_NAME ?= minecraft-exporter
 TAG ?= latest
 
-GO_BUILD_FLAGS ?= -ldflags="-w -s"
-
 default: build
 
 build:
-	go build $(GO_BUILD_FLAGS) -o bin/minecraft-exporter ./cmd/
+	hack/build.sh
 
 build-image:
 	podman build -t $(REPOSITORY)/$(CONTAINER_NAME):$(TAG) .
@@ -17,9 +15,13 @@ build-image:
 test:
 	go test -v ./...
 
+update-deps:
+	hack/update-deps.sh
+
 .PHONY: \
 	default \
 	build \
 	build-image \
 	test \
+	update-deps \
 	$(NULL)
