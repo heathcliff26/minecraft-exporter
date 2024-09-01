@@ -1,11 +1,13 @@
 module github.com/heathcliff26/minecraft-exporter
 
-go 1.21
+go 1.21.0
+
+toolchain go1.23.0
 
 require (
 	github.com/Tnze/go-mc v1.20.2
 	github.com/hashicorp/go-version v1.7.0
-	github.com/heathcliff26/promremote v1.0.4
+	github.com/heathcliff26/promremote v1.0.5
 	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/prometheus/client_golang v1.20.2
 	github.com/stretchr/testify v1.9.0
@@ -19,6 +21,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -26,8 +29,9 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.55.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/prometheus/prometheus v0.53.1 // indirect
+	github.com/prometheus/prometheus v0.54.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 )
