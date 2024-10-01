@@ -30,8 +30,8 @@ github.com/grafana/regexp/syntax
 # github.com/hashicorp/go-version v1.7.0
 ## explicit
 github.com/hashicorp/go-version
-# github.com/heathcliff26/promremote v1.0.5
-## explicit; go 1.21.0
+# github.com/heathcliff26/promremote v1.0.6
+## explicit; go 1.22
 github.com/heathcliff26/promremote/promremote
 # github.com/jedib0t/go-pretty/v6 v6.5.9
 ## explicit; go 1.17
@@ -54,7 +54,7 @@ github.com/munnerz/goautoneg
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 ## explicit
 github.com/pmezard/go-difflib/difflib
-# github.com/prometheus/client_golang v1.20.2
+# github.com/prometheus/client_golang v1.20.4
 ## explicit; go 1.20
 github.com/prometheus/client_golang/internal/github.com/golang/gddo/httputil
 github.com/prometheus/client_golang/internal/github.com/golang/gddo/httputil/header
