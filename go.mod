@@ -1,15 +1,15 @@
 module github.com/heathcliff26/minecraft-exporter
 
-go 1.21.0
+go 1.22
 
-toolchain go1.23.0
+toolchain go1.23.1
 
 require (
 	github.com/Tnze/go-mc v1.20.2
 	github.com/hashicorp/go-version v1.7.0
-	github.com/heathcliff26/promremote v1.0.5
+	github.com/heathcliff26/promremote v1.0.6
 	github.com/jedib0t/go-pretty/v6 v6.5.9
-	github.com/prometheus/client_golang v1.20.2
+	github.com/prometheus/client_golang v1.20.4
 	github.com/stretchr/testify v1.9.0
 	gopkg.in/yaml.v3 v3.0.1
 )
