@@ -2,8 +2,6 @@ module github.com/heathcliff26/minecraft-exporter
 
 go 1.22
 
-toolchain go1.23.1
-
 require (
 	github.com/Tnze/go-mc v1.20.2
 	github.com/hashicorp/go-version v1.7.0
