@@ -15,6 +15,15 @@ build-image:
 test:
 	go test -v ./...
 
+lint:
+	golangci-lint run -v
+
+fmt:
+	gofmt -s -w ./cmd ./pkg
+
+validate:
+	hack/validate.sh
+
 update-deps:
 	hack/update-deps.sh
 
@@ -23,5 +32,8 @@ update-deps:
 	build \
 	build-image \
 	test \
+	lint \
+	fmt \
+	validate \
 	update-deps \
 	$(NULL)
