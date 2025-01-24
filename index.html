@@ -65,7 +65,7 @@
 				
 				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (0.0%)</option>
 				
-				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (60.3%)</option>
+				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (61.8%)</option>
 				
 				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (73.6%)</option>
 				
@@ -81,7 +81,7 @@
 				
 				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/uuid/errors.go (71.4%)</option>
 				
-				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/uuid.go (84.2%)</option>
+				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/uuid.go (87.0%)</option>
 				
 				<option value="file14">github.com/heathcliff26/minecraft-exporter/pkg/version/version.go (73.3%)</option>
 				
@@ -708,7 +708,7 @@ func (c *RCONClient) CloseConn() error <span class="cov8" title="1">{
                 c.conn = nil
                 return err
         }</span>
-        <span class="cov0" title="0">return nil</span>
+        <span class="cov8" title="1">return nil</span>
 }
 
 // Close the RCON connection if necessary
@@ -1562,6 +1562,7 @@ func (e *ErrHttpRequestFailed) Error() string <span class="cov0" title="0">{
 
 import (
         "encoding/json"
+        "log/slog"
         "net/http"
         "time"
 )
@@ -1591,6 +1592,7 @@ func NewUUIDCache(cacheTime time.Duration) *UUIDCache <span class="cov8" title="
 
 // Either return the name from cache or fetch from the server if the name is either
 // not cached or the cache expired.
+// If the uuid is not known to mojang, return the uuid instead
 func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) <span class="cov8" title="1">{
         now := time.Now()
 
@@ -1608,21 +1610,29 @@ func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) <span class="co
                 return "", err
         }</span>
         <span class="cov8" title="1">defer res.Body.Close()
-        if res.StatusCode != 200 </span><span class="cov0" title="0">{
-                return "", NewErrHttpRequestFailed(res.StatusCode, res.Body)
-        }</span>
-        <span class="cov8" title="1">var result MojanUUIDToProfileResponse
-        err = json.NewDecoder(res.Body).Decode(&amp;result)
-        if err != nil </span><span class="cov0" title="0">{
-                return "", err
-        }</span>
+
+        var name string
+        switch res.StatusCode </span>{
+        case http.StatusOK:<span class="cov8" title="1">
+                var result MojanUUIDToProfileResponse
+                err = json.NewDecoder(res.Body).Decode(&amp;result)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov8" title="1">name = result.Name</span>
+        case http.StatusNoContent:<span class="cov8" title="1">
+                name = uuid
+                slog.Warn("Found no minecraft account for the uuid, falling back to using uuid as name", slog.String("uuid", uuid))</span>
+        default:<span class="cov0" title="0">
+                return "", NewErrHttpRequestFailed(res.StatusCode, res.Body)</span>
+        }
 
         <span class="cov8" title="1">c.Items[uuid] = UUIDCacheItem{
-                Name:      result.Name,
+                Name:      name,
                 Timestamp: now,
         }
 
-        return result.Name, nil</span>
+        return name, nil</span>
 }
 </pre>
 		
