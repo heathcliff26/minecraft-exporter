@@ -2,6 +2,7 @@ package uuid
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -31,6 +32,7 @@ func NewUUIDCache(cacheTime time.Duration) *UUIDCache {
 
 // Either return the name from cache or fetch from the server if the name is either
 // not cached or the cache expired.
+// If the uuid is not known to mojang, return the uuid instead
 func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) {
 	now := time.Now()
 
@@ -48,19 +50,27 @@ func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) {
 		return "", err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != 200 {
+
+	var name string
+	switch res.StatusCode {
+	case http.StatusOK:
+		var result MojanUUIDToProfileResponse
+		err = json.NewDecoder(res.Body).Decode(&result)
+		if err != nil {
+			return "", err
+		}
+		name = result.Name
+	case http.StatusNoContent:
+		name = uuid
+		slog.Warn("Found no minecraft account for the uuid, falling back to using uuid as name", slog.String("uuid", uuid))
+	default:
 		return "", NewErrHttpRequestFailed(res.StatusCode, res.Body)
-	}
-	var result MojanUUIDToProfileResponse
-	err = json.NewDecoder(res.Body).Decode(&result)
-	if err != nil {
-		return "", err
 	}
 
 	c.Items[uuid] = UUIDCacheItem{
-		Name:      result.Name,
+		Name:      name,
 		Timestamp: now,
 	}
 
-	return result.Name, nil
+	return name, nil
 }
