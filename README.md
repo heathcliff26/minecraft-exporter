@@ -40,7 +40,7 @@ There is zero compatibility to the other exporter.
 | Container Registry                                                                                      | Image                                       |
 | ------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | [Github Container](https://github.com/users/heathcliff26/packages/container/package/minecraft-exporter) | `ghcr.io/heathcliff26/minecraft-exporter`   |
-| [Docker Hub](https://hub.docker.com/repository/docker/heathcliff26/minecraft-exporter)                  | `docker.io/heathcliff26/minecraft-exporter` |
+| [Docker Hub](https://hub.docker.com/r/heathcliff26/minecraft-exporter)                  | `docker.io/heathcliff26/minecraft-exporter` |
 
 ### Tags
 
