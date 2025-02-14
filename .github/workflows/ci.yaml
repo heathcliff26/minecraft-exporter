@@ -66,5 +66,4 @@ jobs:
       tag: "${{ inputs.tag == '' && 'rolling' || inputs.tag }}"
       tags: "${{ inputs.latest == true && 'type=raw,value=latest' || '' }}"
       dry-run: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.dry-run == 'true' }}
-      build-args: "RELEASE_VERSION=${{ inputs.tag == '' && 'rolling' || inputs.tag }}"
     secrets: inherit
