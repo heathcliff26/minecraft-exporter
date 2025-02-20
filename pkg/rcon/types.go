@@ -21,3 +21,9 @@ type DynmapChunkloadingStat struct {
 	Count    int
 	Duration float64
 }
+
+type TickStats struct {
+	Target        float64
+	Average       float64
+	P50, P95, P99 float64
+}

@@ -154,3 +154,42 @@ func TestTimeout(t *testing.T) {
 	_, err = c.cmd("Test")
 	assert.Equal("rcon.ErrRCONConnectionTimeout", reflect.TypeOf(err).String())
 }
+
+func TestUpdateVersion(t *testing.T) {
+	c := &RCONClient{}
+
+	c.UpdateVersion("1.21.0")
+	assert.Equal(t, "1.21.0", c.version, "Should update version")
+
+	c.versionLock.RLock()
+	t.Cleanup(c.versionLock.RUnlock)
+
+	ch := make(chan struct{}, 1)
+	go func() {
+		c.UpdateVersion("1.21.1")
+		ch <- struct{}{}
+	}()
+
+	select {
+	case <-ch:
+		t.Fail()
+	case <-time.After(time.Second):
+	}
+}
+
+func TestV120(t *testing.T) {
+	assert := assert.New(t)
+
+	c := &RCONClient{}
+
+	assert.False(c.V120(), "Should return false when version is empty")
+
+	for _, version := range []string{"1.19.0", "1.20.0", "1.20.2", "1.20.3-pre2"} {
+		c.UpdateVersion(version)
+		assert.Falsef(c.V120(), "Should return false if version is %s", version)
+	}
+	for _, version := range []string{"1.20.3", "1.20.4-pre1", "1.20.4", "1.21.0"} {
+		c.UpdateVersion(version)
+		assert.Truef(c.V120(), "Should return true if version is %s", version)
+	}
+}

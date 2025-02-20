@@ -164,3 +164,62 @@ func parseDynmapStats(input string) ([]DynmapRenderStat, []DynmapChunkloadingSta
 
 	return renderStats, chunkloadingStats, nil
 }
+
+// Parse the stats returned by "tick query"
+func parseTickQuery(input string) (TickStats, error) {
+	input = strings.ReplaceAll(input, ",", ".")
+
+	reg := regexp.MustCompile(`Target tick rate: (\d*.\d*) per second.`)
+	res := reg.FindStringSubmatch(input)
+	if len(res) != 2 {
+		slog.Error("Failed to find match for tick target", "out", input)
+		return TickStats{}, ErrVanillaTick{}
+	}
+	target, err := strconv.ParseFloat(res[1], 64)
+	if err != nil {
+		slog.Error("Failed to parse tick target rate", "err", err, "out", input)
+		return TickStats{}, err
+	}
+
+	reg = regexp.MustCompile(`Average time per tick: (\d*.\d*)ms`)
+	res = reg.FindStringSubmatch(input)
+	if len(res) != 2 {
+		slog.Error("Failed to find match for time per tick", "out", input)
+		return TickStats{}, ErrVanillaTick{}
+	}
+	average, err := strconv.ParseFloat(res[1], 64)
+	if err != nil {
+		slog.Error("Failed to parse average time per tick", "err", err, "out", input)
+		return TickStats{}, err
+	}
+
+	reg = regexp.MustCompile(`Percentiles: P50: (\d*.\d*)ms P95: (\d*.\d*)ms P99: (\d*.\d*)ms[,|.] sample: 100`)
+	res = reg.FindStringSubmatch(input)
+	if len(res) != 4 {
+		slog.Error("Failed to find match for tick time percentiles", "out", input)
+		return TickStats{}, ErrVanillaTick{}
+	}
+	p50, err := strconv.ParseFloat(res[1], 64)
+	if err != nil {
+		slog.Error("Failed to parse percentile p50 from the tick stats", "err", err, "out", input)
+		return TickStats{}, err
+	}
+	p95, err := strconv.ParseFloat(res[2], 64)
+	if err != nil {
+		slog.Error("Failed to parse percentile p95 from the tick stats", "err", err, "out", input)
+		return TickStats{}, err
+	}
+	p99, err := strconv.ParseFloat(res[3], 64)
+	if err != nil {
+		slog.Error("Failed to parse percentile p99 from the tick stats", "err", err, "out", input)
+		return TickStats{}, err
+	}
+
+	return TickStats{
+		Target:  target,
+		Average: average,
+		P50:     p50,
+		P95:     p95,
+		P99:     p99,
+	}, nil
+}

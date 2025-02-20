@@ -185,3 +185,68 @@ func TestParseDynmapStats(t *testing.T) {
 		})
 	}
 }
+
+func TestParseTickQuery(t *testing.T) {
+	tMatrix := []struct {
+		Name, Input string
+		Result      TickStats
+	}{
+		{
+
+			Name:  "1.20.6",
+			Input: "The game is running normallyTarget tick rate: 20,0 per second.\nAverage time per tick: 0,4ms (Target: 50,0ms)Percentiles: P50: 0,3ms P95: 0,6ms P99: 2,5ms, sample: 100",
+			Result: TickStats{
+				Target:  20.0,
+				Average: 0.4,
+				P50:     0.3,
+				P95:     0.6,
+				P99:     2.5,
+			},
+		},
+		{
+			Name:  "1.21.1",
+			Input: "The game is running normallyTarget tick rate: 20,0 per second.\nAverage time per tick: 0,1ms (Target: 50,0ms)Percentiles: P50: 0,1ms P95: 0,1ms P99: 0,2ms, sample: 100",
+			Result: TickStats{
+				Target:  20.0,
+				Average: 0.1,
+				P50:     0.1,
+				P95:     0.1,
+				P99:     0.2,
+			},
+		},
+		{
+
+			Name:  "1.21.1-neoforge",
+			Input: "The game is running normally\nTarget tick rate: 20.0 per second.\nAverage time per tick: 34.2ms (Target: 50.0ms)\nPercentiles: P50: 30.9ms P95: 49.6ms P99: 63.2ms, sample: 100\n",
+			Result: TickStats{
+				Target:  20.0,
+				Average: 34.2,
+				P50:     30.9,
+				P95:     49.6,
+				P99:     63.2,
+			},
+		},
+		{
+			Name:  "1.21.4",
+			Input: "The game is running normallyTarget tick rate: 20.0 per second.\nAverage time per tick: 7.7ms (Target: 50.0ms)Percentiles: P50: 7.4ms P95: 9.9ms P99: 11.1ms, sample: 100",
+			Result: TickStats{
+				Target:  20.0,
+				Average: 7.7,
+				P50:     7.4,
+				P95:     9.9,
+				P99:     11.1,
+			},
+		},
+	}
+
+	for _, tCase := range tMatrix {
+		t.Run(tCase.Name, func(t *testing.T) {
+			assert := assert.New(t)
+
+			res, err := parseTickQuery(tCase.Input)
+
+			assert.NoError(err)
+			assert.Equal(tCase.Result, res)
+		})
+	}
+}

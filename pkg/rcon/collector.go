@@ -29,6 +29,12 @@ var (
 	dynmapTileRenderStatDesc       = prometheus.NewDesc("dynmap_tile_render_stat", "Tile Render Statistics reported by Dynmap", []string{"type", "file"}, nil)
 	dynmapChunkLoadingCountDesc    = prometheus.NewDesc("dynmap_chunk_loading_count", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, nil)
 	dynmapChunkLoadingDurationDesc = prometheus.NewDesc("dynmap_chunk_loading_duration", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, nil)
+
+	tickTargetDesc  = prometheus.NewDesc("minecraft_tick_target", "Targeted number of ticks per second", nil, nil)
+	tickAverageDesc = prometheus.NewDesc("minecraft_tick_average", "Average time per tick in milliseconds", nil, nil)
+	tickP50Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "50"})
+	tickP95Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "95"})
+	tickP99Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "99"})
 )
 
 // Create new instance of collector, returns error if RCON is not correctly configured not provided
@@ -112,7 +118,25 @@ func (c *RCONCollector) Collect(ch chan<- prometheus.Metric) {
 			}
 		}
 	}
+
+	if c.rcon.V120() {
+		tickStats, err := c.rcon.GetTickQuery()
+		if err != nil {
+			slog.Error("Failed to collect tick stats", "err", err)
+		}
+
+		ch <- prometheus.MustNewConstMetric(tickTargetDesc, prometheus.CounterValue, tickStats.Target)
+		ch <- prometheus.MustNewConstMetric(tickAverageDesc, prometheus.CounterValue, tickStats.Average)
+		ch <- prometheus.MustNewConstMetric(tickP50Desc, prometheus.CounterValue, tickStats.P50)
+		ch <- prometheus.MustNewConstMetric(tickP95Desc, prometheus.CounterValue, tickStats.P95)
+		ch <- prometheus.MustNewConstMetric(tickP99Desc, prometheus.CounterValue, tickStats.P99)
+	}
 	slog.Debug("Finished collection of minecraft metrics via RCON")
+}
+
+// Expose the RCON client
+func (c *RCONCollector) Client() *RCONClient {
+	return c.rcon
 }
 
 // Close the RCON connection
