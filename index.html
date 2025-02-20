@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/heathcliff26/minecraft-exporter/cmd/main.go (8.2%)</option>
+				<option value="file0">github.com/heathcliff26/minecraft-exporter/cmd/main.go (8.0%)</option>
 				
 				<option value="file1">github.com/heathcliff26/minecraft-exporter/pkg/config/config.go (81.0%)</option>
 				
@@ -65,9 +65,9 @@
 				
 				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (0.0%)</option>
 				
-				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (60.3%)</option>
+				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (62.8%)</option>
 				
-				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (73.6%)</option>
+				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (68.5%)</option>
 				
 				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (0.0%)</option>
 				
@@ -152,6 +152,13 @@ func main() <span class="cov0" title="0">{
 
         <span class="cov0" title="0">reg := prometheus.NewRegistry()
 
+        sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.ReduceMetrics)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("Failed to create save collector", "err", err)
+                os.Exit(1)
+        }</span>
+        <span class="cov0" title="0">reg.MustRegister(sc)
+
         if cfg.RCON.Enable </span><span class="cov0" title="0">{
                 rc, err := rcon.NewRCONCollector(cfg)
                 if err != nil </span><span class="cov0" title="0">{
@@ -159,17 +166,11 @@ func main() <span class="cov0" title="0">{
                         os.Exit(1)
                 }</span>
                 <span class="cov0" title="0">defer rc.Close()
-                reg.MustRegister(rc)</span>
+                reg.MustRegister(rc)
+                sc.RCON = rc.Client()</span>
         }
 
-        <span class="cov0" title="0">sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.ReduceMetrics)
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to create save collector", "err", err)
-                os.Exit(1)
-        }</span>
-        <span class="cov0" title="0">reg.MustRegister(sc)
-
-        if cfg.Remote.Enable </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">if cfg.Remote.Enable </span><span class="cov0" title="0">{
                 rwClient, err := promremote.NewWriteClient(cfg.Remote.URL, cfg.Remote.Instance, "integrations/minecraft-exporter", reg)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to create remote write client", "err", err)
@@ -413,6 +414,12 @@ var (
         dynmapTileRenderStatDesc       = prometheus.NewDesc("dynmap_tile_render_stat", "Tile Render Statistics reported by Dynmap", []string{"type", "file"}, nil)
         dynmapChunkLoadingCountDesc    = prometheus.NewDesc("dynmap_chunk_loading_count", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, nil)
         dynmapChunkLoadingDurationDesc = prometheus.NewDesc("dynmap_chunk_loading_duration", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, nil)
+
+        tickTargetDesc  = prometheus.NewDesc("minecraft_tick_target", "Targeted number of ticks per second", nil, nil)
+        tickAverageDesc = prometheus.NewDesc("minecraft_tick_average", "Average time per tick in milliseconds", nil, nil)
+        tickP50Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "50"})
+        tickP95Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "95"})
+        tickP99Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "99"})
 )
 
 // Create new instance of collector, returns error if RCON is not correctly configured not provided
@@ -496,8 +503,26 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         }</span>
                 }
         }
+
+        <span class="cov0" title="0">if c.rcon.V120() </span><span class="cov0" title="0">{
+                tickStats, err := c.rcon.GetTickQuery()
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("Failed to collect tick stats", "err", err)
+                }</span>
+
+                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(tickTargetDesc, prometheus.CounterValue, tickStats.Target)
+                ch &lt;- prometheus.MustNewConstMetric(tickAverageDesc, prometheus.CounterValue, tickStats.Average)
+                ch &lt;- prometheus.MustNewConstMetric(tickP50Desc, prometheus.CounterValue, tickStats.P50)
+                ch &lt;- prometheus.MustNewConstMetric(tickP95Desc, prometheus.CounterValue, tickStats.P95)
+                ch &lt;- prometheus.MustNewConstMetric(tickP99Desc, prometheus.CounterValue, tickStats.P99)</span>
+        }
         <span class="cov0" title="0">slog.Debug("Finished collection of minecraft metrics via RCON")</span>
 }
+
+// Expose the RCON client
+func (c *RCONCollector) Client() *RCONClient <span class="cov0" title="0">{
+        return c.rcon
+}</span>
 
 // Close the RCON connection
 func (c *RCONCollector) Close() error <span class="cov0" title="0">{
@@ -554,6 +579,12 @@ func NewErrPaperTPS(text string, count int) error <span class="cov0" title="0">{
 func (e *ErrPaperTPS) Error() string <span class="cov0" title="0">{
         return fmt.Sprintf("Expected at 3 values, got %d. Input: \"%s\"", e.Count, e.Text)
 }</span>
+
+type ErrVanillaTick struct{}
+
+func (e ErrVanillaTick) Error() string <span class="cov0" title="0">{
+        return "Failed to retrieve the tick statistics"
+}</span>
 </pre>
 		
 		<pre class="file" id="file5" style="display: none">package rcon
@@ -561,15 +592,20 @@ func (e *ErrPaperTPS) Error() string <span class="cov0" title="0">{
 import (
         "log/slog"
         "strconv"
+        "sync"
         "time"
 
         "github.com/Tnze/go-mc/net"
+        "github.com/hashicorp/go-version"
 )
 
 type RCONClient struct {
         addr     string
         password string
         conn     net.RCONClientConn
+
+        version     string
+        versionLock sync.RWMutex
 }
 
 // Creates an RCON client, does not create a connection immediatly
@@ -699,6 +735,51 @@ func (c *RCONClient) GetDynmapStats() ([]DynmapRenderStat, []DynmapChunkloadingS
         }</span>
 
         <span class="cov0" title="0">return parseDynmapStats(res)</span>
+}
+
+// Get the tick statistics returned from the "tick query" command.
+// The command has been added to Minecraft Java Edition in 1.20.3
+func (c *RCONClient) GetTickQuery() (TickStats, error) <span class="cov0" title="0">{
+        res, err := c.cmd("tick query")
+        if err != nil </span><span class="cov0" title="0">{
+                return TickStats{}, err
+        }</span>
+
+        <span class="cov0" title="0">return parseTickQuery(res)</span>
+}
+
+// Update the minecraft server version
+// Is concurrency safe
+func (c *RCONClient) UpdateVersion(new string) <span class="cov8" title="1">{
+        c.versionLock.Lock()
+        defer c.versionLock.Unlock()
+
+        c.version = new
+}</span>
+
+func (c *RCONClient) Version() string <span class="cov8" title="1">{
+        c.versionLock.RLock()
+        defer c.versionLock.RUnlock()
+
+        return c.version
+}</span>
+
+// Returns if the version is greater or equal 1.20.3
+func (c *RCONClient) V120() bool <span class="cov8" title="1">{
+        versionStr := c.Version()
+
+        if versionStr == "" </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">v120 := version.Must(version.NewSemver("1.20.3"))
+
+        v, err := version.NewSemver(versionStr)
+        if err != nil </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">return v120.LessThanOrEqual(v)</span>
 }
 
 // Closes the RCON Connection and sets it to nil
@@ -883,6 +964,65 @@ func parseDynmapStats(input string) ([]DynmapRenderStat, []DynmapChunkloadingSta
 
         <span class="cov8" title="1">return renderStats, chunkloadingStats, nil</span>
 }
+
+// Parse the stats returned by "tick query"
+func parseTickQuery(input string) (TickStats, error) <span class="cov8" title="1">{
+        input = strings.ReplaceAll(input, ",", ".")
+
+        reg := regexp.MustCompile(`Target tick rate: (\d*.\d*) per second.`)
+        res := reg.FindStringSubmatch(input)
+        if len(res) != 2 </span><span class="cov0" title="0">{
+                slog.Error("Failed to find match for tick target", "out", input)
+                return TickStats{}, ErrVanillaTick{}
+        }</span>
+        <span class="cov8" title="1">target, err := strconv.ParseFloat(res[1], 64)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("Failed to parse tick target rate", "err", err, "out", input)
+                return TickStats{}, err
+        }</span>
+
+        <span class="cov8" title="1">reg = regexp.MustCompile(`Average time per tick: (\d*.\d*)ms`)
+        res = reg.FindStringSubmatch(input)
+        if len(res) != 2 </span><span class="cov0" title="0">{
+                slog.Error("Failed to find match for time per tick", "out", input)
+                return TickStats{}, ErrVanillaTick{}
+        }</span>
+        <span class="cov8" title="1">average, err := strconv.ParseFloat(res[1], 64)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("Failed to parse average time per tick", "err", err, "out", input)
+                return TickStats{}, err
+        }</span>
+
+        <span class="cov8" title="1">reg = regexp.MustCompile(`Percentiles: P50: (\d*.\d*)ms P95: (\d*.\d*)ms P99: (\d*.\d*)ms[,|.] sample: 100`)
+        res = reg.FindStringSubmatch(input)
+        if len(res) != 4 </span><span class="cov0" title="0">{
+                slog.Error("Failed to find match for tick time percentiles", "out", input)
+                return TickStats{}, ErrVanillaTick{}
+        }</span>
+        <span class="cov8" title="1">p50, err := strconv.ParseFloat(res[1], 64)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("Failed to parse percentile p50 from the tick stats", "err", err, "out", input)
+                return TickStats{}, err
+        }</span>
+        <span class="cov8" title="1">p95, err := strconv.ParseFloat(res[2], 64)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("Failed to parse percentile p95 from the tick stats", "err", err, "out", input)
+                return TickStats{}, err
+        }</span>
+        <span class="cov8" title="1">p99, err := strconv.ParseFloat(res[3], 64)
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("Failed to parse percentile p99 from the tick stats", "err", err, "out", input)
+                return TickStats{}, err
+        }</span>
+
+        <span class="cov8" title="1">return TickStats{
+                Target:  target,
+                Average: average,
+                P50:     p50,
+                P95:     p95,
+                P99:     p99,
+        }, nil</span>
+}
 </pre>
 		
 		<pre class="file" id="file7" style="display: none">package save
@@ -891,6 +1031,7 @@ import (
         "log/slog"
         "time"
 
+        "github.com/heathcliff26/minecraft-exporter/pkg/rcon"
         "github.com/heathcliff26/minecraft-exporter/pkg/uuid"
         "github.com/prometheus/client_golang/prometheus"
 )
@@ -899,6 +1040,8 @@ type SaveCollector struct {
         save          *Save
         uuidCache     *uuid.UUIDCache
         ReduceMetrics bool
+
+        RCON *rcon.RCONClient
 }
 
 var (
@@ -1022,6 +1165,12 @@ func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         ch &lt;- prometheus.MustNewConstMetric(mcStatCustomDesc, prometheus.CounterValue, float64(value), name, key)
                 }</span>
         }
+
+        // Update the game version in the rcon client
+        <span class="cov0" title="0">if c.RCON != nil &amp;&amp; c.RCON.Version() != c.save.Version.Name </span><span class="cov0" title="0">{
+                slog.Info("Minecraft Version", "version", c.save.Version.Name)
+                c.RCON.UpdateVersion(c.save.Version.Name)
+        }</span>
 
         <span class="cov0" title="0">slog.Debug("Finished collection of minecraft metrics from savedata")</span>
 }
