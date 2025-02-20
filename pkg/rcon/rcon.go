@@ -3,15 +3,20 @@ package rcon
 import (
 	"log/slog"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/Tnze/go-mc/net"
+	"github.com/hashicorp/go-version"
 )
 
 type RCONClient struct {
 	addr     string
 	password string
 	conn     net.RCONClientConn
+
+	version     string
+	versionLock sync.RWMutex
 }
 
 // Creates an RCON client, does not create a connection immediatly
@@ -141,6 +146,51 @@ func (c *RCONClient) GetDynmapStats() ([]DynmapRenderStat, []DynmapChunkloadingS
 	}
 
 	return parseDynmapStats(res)
+}
+
+// Get the tick statistics returned from the "tick query" command.
+// The command has been added to Minecraft Java Edition in 1.20.3
+func (c *RCONClient) GetTickQuery() (TickStats, error) {
+	res, err := c.cmd("tick query")
+	if err != nil {
+		return TickStats{}, err
+	}
+
+	return parseTickQuery(res)
+}
+
+// Update the minecraft server version
+// Is concurrency safe
+func (c *RCONClient) UpdateVersion(new string) {
+	c.versionLock.Lock()
+	defer c.versionLock.Unlock()
+
+	c.version = new
+}
+
+func (c *RCONClient) Version() string {
+	c.versionLock.RLock()
+	defer c.versionLock.RUnlock()
+
+	return c.version
+}
+
+// Returns if the version is greater or equal 1.20.3
+func (c *RCONClient) V120() bool {
+	versionStr := c.Version()
+
+	if versionStr == "" {
+		return false
+	}
+
+	v120 := version.Must(version.NewSemver("1.20.3"))
+
+	v, err := version.NewSemver(versionStr)
+	if err != nil {
+		return false
+	}
+
+	return v120.LessThanOrEqual(v)
 }
 
 // Closes the RCON Connection and sets it to nil

@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/heathcliff26/minecraft-exporter/pkg/rcon"
 	"github.com/heathcliff26/minecraft-exporter/pkg/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -12,6 +13,8 @@ type SaveCollector struct {
 	save          *Save
 	uuidCache     *uuid.UUIDCache
 	ReduceMetrics bool
+
+	RCON *rcon.RCONClient
 }
 
 var (
@@ -134,6 +137,12 @@ func (c *SaveCollector) Collect(ch chan<- prometheus.Metric) {
 		for key, value := range d.Stats.Custom.Custom {
 			ch <- prometheus.MustNewConstMetric(mcStatCustomDesc, prometheus.CounterValue, float64(value), name, key)
 		}
+	}
+
+	// Update the game version in the rcon client
+	if c.RCON != nil && c.RCON.Version() != c.save.Version.Name {
+		slog.Info("Minecraft Version", "version", c.save.Version.Name)
+		c.RCON.UpdateVersion(c.save.Version.Name)
 	}
 
 	slog.Debug("Finished collection of minecraft metrics from savedata")

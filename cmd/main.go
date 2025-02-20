@@ -53,6 +53,13 @@ func main() {
 
 	reg := prometheus.NewRegistry()
 
+	sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.ReduceMetrics)
+	if err != nil {
+		slog.Error("Failed to create save collector", "err", err)
+		os.Exit(1)
+	}
+	reg.MustRegister(sc)
+
 	if cfg.RCON.Enable {
 		rc, err := rcon.NewRCONCollector(cfg)
 		if err != nil {
@@ -61,14 +68,8 @@ func main() {
 		}
 		defer rc.Close()
 		reg.MustRegister(rc)
+		sc.RCON = rc.Client()
 	}
-
-	sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.ReduceMetrics)
-	if err != nil {
-		slog.Error("Failed to create save collector", "err", err)
-		os.Exit(1)
-	}
-	reg.MustRegister(sc)
 
 	if cfg.Remote.Enable {
 		rwClient, err := promremote.NewWriteClient(cfg.Remote.URL, cfg.Remote.Instance, "integrations/minecraft-exporter", reg)

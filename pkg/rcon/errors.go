@@ -47,3 +47,9 @@ func NewErrPaperTPS(text string, count int) error {
 func (e *ErrPaperTPS) Error() string {
 	return fmt.Sprintf("Expected at 3 values, got %d. Input: \"%s\"", e.Count, e.Text)
 }
+
+type ErrVanillaTick struct{}
+
+func (e ErrVanillaTick) Error() string {
+	return "Failed to retrieve the tick statistics"
+}
