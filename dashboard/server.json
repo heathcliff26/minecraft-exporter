@@ -307,6 +307,36 @@
           "legendFormat": "Overall",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "minecraft_tick_average{instance=~\"$instance\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "C",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "builder",
+          "expr": "minecraft_tick_percentile{instance=~\"$instance\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "D"
         }
       ],
       "title": "Ticktime",
@@ -1088,6 +1118,6 @@
   "timezone": "",
   "title": "Minecraft - Server",
   "uid": "b2388800-911a-4f53-9a48-95bef5addb10",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }
