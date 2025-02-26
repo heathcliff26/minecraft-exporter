@@ -14,7 +14,7 @@ func TestValidConfigs(t *testing.T) {
 	c1 := Config{
 		LogLevel:   "warn",
 		Port:       80,
-		Interval:   time.Duration(5 * time.Minute),
+		Interval:   Duration(5 * time.Minute),
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   "/path/to/world",
 		RCON: RCONConfig{
@@ -27,7 +27,7 @@ func TestValidConfigs(t *testing.T) {
 	c2 := Config{
 		LogLevel:   "debug",
 		Port:       2080,
-		Interval:   time.Duration(30 * time.Minute),
+		Interval:   Duration(30 * time.Minute),
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   DEFAULT_WORLD_DIR,
 		Remote: RemoteConfig{
@@ -102,12 +102,12 @@ func TestInvalidConfig(t *testing.T) {
 		{
 			Name:  "NotYaml",
 			Path:  "testdata/not-a-config.txt",
-			Error: "*yaml.TypeError",
+			Error: "*fmt.wrapError",
 		},
 		{
 			Name:  "InvalidInterval",
 			Path:  "testdata/invalid-config-1.yaml",
-			Error: "*yaml.TypeError",
+			Error: "*fmt.wrapError",
 		},
 		{
 			Name:  "MissingRemoteEndpoint",
@@ -139,7 +139,7 @@ func TestEnvSubstitution(t *testing.T) {
 	c := Config{
 		LogLevel:   "debug",
 		Port:       2080,
-		Interval:   time.Duration(time.Minute),
+		Interval:   Duration(time.Minute),
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   "/some/server/world",
 	}
