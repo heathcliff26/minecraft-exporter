@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/heathcliff26/minecraft-exporter/pkg/config"
 	"github.com/heathcliff26/minecraft-exporter/pkg/rcon"
@@ -87,7 +88,7 @@ func main() {
 
 		slog.Info("Starting remote_write client")
 		rwQuit := make(chan bool)
-		rwClient.Run(cfg.Interval, rwQuit)
+		rwClient.Run(time.Duration(cfg.Interval), rwQuit)
 		defer func() {
 			rwQuit <- true
 			close(rwQuit)

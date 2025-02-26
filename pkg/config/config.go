@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/heathcliff26/promremote/promremote"
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/yaml"
 )
 
 const (
 	DEFAULT_LOG_LEVEL   = "info"
 	DEFAULT_PORT        = 8080
-	DEFAULT_INTERVAL    = time.Duration(1 * time.Minute)
+	DEFAULT_INTERVAL    = Duration(1 * time.Minute)
 	DEFAULT_WORLD_DIR   = "/world"
 	SERVER_TYPE_VANILLA = "vanilla"
 	SERVER_TYPE_FORGE   = "forge"
@@ -33,30 +33,30 @@ func init() {
 }
 
 type Config struct {
-	LogLevel      string        `yaml:"logLevel,omitempty"`
-	Port          int           `yaml:"port,omitempty"`
-	Interval      time.Duration `yaml:"interval,omitempty"`
-	ReduceMetrics bool          `yaml:"reduceMetrics,omitempty"`
-	ServerType    string        `yaml:"server,omitempty"`
-	DynmapEnabled bool          `yaml:"dynmap,omitempty"`
-	WorldDir      string        `yaml:"world,omitempty"`
-	RCON          RCONConfig    `yaml:"rcon,omitempty"`
-	Remote        RemoteConfig  `yaml:"remote,omitempty"`
+	LogLevel      string       `json:"logLevel,omitempty"`
+	Port          int          `json:"port,omitempty"`
+	Interval      Duration     `json:"interval,omitempty"`
+	ReduceMetrics bool         `json:"reduceMetrics,omitempty"`
+	ServerType    string       `json:"server,omitempty"`
+	DynmapEnabled bool         `json:"dynmap,omitempty"`
+	WorldDir      string       `json:"world,omitempty"`
+	RCON          RCONConfig   `json:"rcon,omitempty"`
+	Remote        RemoteConfig `json:"remote,omitempty"`
 }
 
 type RCONConfig struct {
-	Enable   bool   `yaml:"enable"`
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	Password string `yaml:"password"`
+	Enable   bool   `json:"enable"`
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Password string `json:"password"`
 }
 
 type RemoteConfig struct {
-	Enable   bool   `yaml:"enable"`
-	URL      string `yaml:"url"`
-	Instance string `yaml:"instance"`
-	Username string `yaml:"username,omitempty"`
-	Password string `yaml:"password,omitempty"`
+	Enable   bool   `json:"enable"`
+	URL      string `json:"url"`
+	Instance string `json:"instance"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 // Returns a Config with default values set
