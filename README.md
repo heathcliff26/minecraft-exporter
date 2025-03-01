@@ -26,6 +26,7 @@ There is zero compatibility to the other exporter.
   - [Metrics](#metrics)
     - [Reduced Metrics](#reduced-metrics)
     - [RCON Metrics](#rcon-metrics)
+      - [Since minecraft version 1.20.3](#since-minecraft-version-1203)
     - [Forge Metrics](#forge-metrics)
     - [Paper Metrics](#paper-metrics)
     - [Dynmap Metrics](#dynmap-metrics)
@@ -40,7 +41,7 @@ There is zero compatibility to the other exporter.
 | Container Registry                                                                                      | Image                                       |
 | ------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | [Github Container](https://github.com/users/heathcliff26/packages/container/package/minecraft-exporter) | `ghcr.io/heathcliff26/minecraft-exporter`   |
-| [Docker Hub](https://hub.docker.com/r/heathcliff26/minecraft-exporter)                  | `docker.io/heathcliff26/minecraft-exporter` |
+| [Docker Hub](https://hub.docker.com/r/heathcliff26/minecraft-exporter)                                  | `docker.io/heathcliff26/minecraft-exporter` |
 
 ### Tags
 
@@ -116,6 +117,15 @@ The following metrics will be exposed when RCON is enabled:
 | Metric                    | Description                                      |
 | ------------------------- | ------------------------------------------------ |
 | `minecraft_player_online` | Show currently online players. Value is always 1 |
+
+#### Since minecraft version 1.20.3
+
+| Metric                      | Description                           |
+| --------------------------- | ------------------------------------- |
+| `minecraft_tick_target`     | Targeted number of ticks per second   |
+| `minecraft_tick_average`    | Average time per tick in milliseconds |
+| `minecraft_tick_percentile` | Time per tick in percentiles          |
+
 
 ### Forge Metrics
 
