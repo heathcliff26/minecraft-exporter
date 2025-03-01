@@ -6,7 +6,7 @@ require (
 	github.com/Tnze/go-mc v1.20.2
 	github.com/hashicorp/go-version v1.7.0
 	github.com/heathcliff26/promremote v1.0.10
-	github.com/jedib0t/go-pretty/v6 v6.6.6
+	github.com/jedib0t/go-pretty/v6 v6.6.7
 	github.com/prometheus/client_golang v1.21.0
 	github.com/stretchr/testify v1.10.0
 	sigs.k8s.io/yaml v1.4.0
