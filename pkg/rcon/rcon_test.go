@@ -52,14 +52,14 @@ func TestCloseConnectionOnError(t *testing.T) {
 
 	go func() {
 		conn, err := s.Accept()
-		if !assert.Nil(err) {
+		if !assert.NoError(err) {
 			t.Logf("[Server] Failed to accept connection: %v", err)
 			return
 		}
 		defer conn.Close()
 
 		err = conn.AcceptLogin(pwd)
-		if !assert.Nil(err) {
+		if !assert.NoError(err) {
 			t.Logf("[Server] Failed to accept login: %v", err)
 			return
 		}
@@ -71,7 +71,7 @@ func TestCloseConnectionOnError(t *testing.T) {
 			}
 
 			cmd, err := conn.AcceptCmd()
-			if !assert.Nil(err) {
+			if !assert.NoError(err) {
 				continue
 			}
 			var resp string
@@ -81,7 +81,7 @@ func TestCloseConnectionOnError(t *testing.T) {
 				resp = "fail"
 			}
 			err = conn.RespCmd(resp)
-			assert.Nil(err)
+			assert.NoError(err)
 		}
 		t.Log("Closed the goroutine") // TODO: remove
 	}()
@@ -101,7 +101,7 @@ func TestCloseConnectionOnError(t *testing.T) {
 
 	ch <- "First cmd"
 	res, err := c.cmd("First cmd")
-	assert.Nil(err)
+	assert.NoError(err)
 	assert.Equal("success", res)
 	assert.NotNil(c.conn, "Should create connection if none exists")
 
@@ -123,14 +123,14 @@ func TestTimeout(t *testing.T) {
 
 	go func() {
 		conn, err := s.Accept()
-		if !assert.Nil(err) {
+		if !assert.NoError(err) {
 			t.Logf("[Server] Failed to accept connection: %v", err)
 			return
 		}
 		defer conn.Close()
 
 		err = conn.AcceptLogin(pwd)
-		if !assert.Nil(err) {
+		if !assert.NoError(err) {
 			t.Logf("[Server] Failed to accept login: %v", err)
 			return
 		}

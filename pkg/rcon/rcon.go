@@ -109,8 +109,8 @@ func (c *RCONClient) GetPlayersOnline() []string {
 }
 
 // Get the TPS statistics returned from forge
-func (c *RCONClient) GetForgeTPS() ([]TPSStat, TPSStat, error) {
-	res, err := c.cmd("forge tps")
+func (c *RCONClient) GetForgeTPS(variant string) ([]TPSStat, TPSStat, error) {
+	res, err := c.cmd(variant + " tps")
 	if err != nil {
 		return nil, TPSStat{}, err
 	}
@@ -119,8 +119,8 @@ func (c *RCONClient) GetForgeTPS() ([]TPSStat, TPSStat, error) {
 }
 
 // Get the count and name of all loaded forge entities
-func (c *RCONClient) GetForgeEntities() ([]EntityCount, error) {
-	list, err := c.cmd("forge entity list")
+func (c *RCONClient) GetForgeEntities(variant string) ([]EntityCount, error) {
+	list, err := c.cmd(variant + " entity list")
 	if err != nil {
 		return nil, err
 	}

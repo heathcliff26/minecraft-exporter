@@ -7,7 +7,7 @@ port: 8080
 interval: "5m"
 # Indicate if the number of metrics should be reduced (Useful when using grafana cloud)
 reduceMetrics: false
-# Set the server type (vanilla, forge, paper), used for RCON collection
+# Set the server type (vanilla, forge, paper, neoforge), used for RCON collection
 server: "vanilla"
 # Enable dynmap metrics collection
 dynmap: false
