@@ -66,9 +66,9 @@ func (c *RCONCollector) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.MustNewConstMetric(mcPlayerOnlineDesc, prometheus.GaugeValue, 1, player)
 	}
 	switch c.ServerType {
-	case config.SERVER_TYPE_FORGE:
+	case config.SERVER_TYPE_FORGE, config.SERVER_TYPE_NEOFORGE:
 		slog.Debug("Gathering forge metrics")
-		dimStats, overallStat, err := c.rcon.GetForgeTPS()
+		dimStats, overallStat, err := c.rcon.GetForgeTPS(c.ServerType)
 		if err != nil {
 			slog.Error("Failed to collect forge tps stats", "err", err)
 		} else {
@@ -79,7 +79,7 @@ func (c *RCONCollector) Collect(ch chan<- prometheus.Metric) {
 			ch <- prometheus.MustNewConstMetric(forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS)
 			ch <- prometheus.MustNewConstMetric(forgeTicktimeOverallDesc, prometheus.CounterValue, overallStat.Ticktime)
 		}
-		entities, err := c.rcon.GetForgeEntities()
+		entities, err := c.rcon.GetForgeEntities(c.ServerType)
 		if err != nil {
 			slog.Error("Failed to retrieve forge entity list", "err", err)
 		} else {

@@ -33,7 +33,7 @@ func TestParseForgeTPS(t *testing.T) {
 		Total       TPSStat
 	}{
 		{
-			Name:  "1.12",
+			Name:  "Forge-1.12",
 			Input: "Dim  0 (DIM_0) : Mean tick time: 7.672 ms. Mean TPS: 20.000Dim 144 (CompactMachines) : Mean tick time: 0.294 ms. Mean TPS: 20.000Dim  2 (Storage Cell) : Mean tick time: 0.022 ms. Mean TPS: 20.000Overall : Mean tick time: 8.037 ms. Mean TPS: 20.000",
 			Stats: []TPSStat{
 				{
@@ -60,6 +60,90 @@ func TestParseForgeTPS(t *testing.T) {
 				TPS:      20,
 			},
 		},
+		{
+			Name: "NeoForge-1.21",
+			//lint:ignore ST1018 I need this string
+			Input: `Overworld: 20.000 TPS (16.387 ms/tick)[0m
+Nether Mining: 20.000 TPS (0.078 ms/tick)[0m
+The End: 20.000 TPS (0.033 ms/tick)[0m
+compactmachines:compact_world: 20.000 TPS (7.352 ms/tick)[0m
+The Bumblezone: 20.000 TPS (0.054 ms/tick)[0m
+The Void: 20.000 TPS (0.028 ms/tick)[0m
+End Mining: 20.000 TPS (0.025 ms/tick)[0m
+The Nether: 20.000 TPS (0.025 ms/tick)[0m
+Mining: 20.000 TPS (0.024 ms/tick)[0m
+the_afterdark:afterdark: 20.000 TPS (0.024 ms/tick)[0m
+Eternal Starlight: 20.000 TPS (0.026 ms/tick)[0m
+AE2 Spatial Storage: 20.000 TPS (0.025 ms/tick)[0m
+Overall: 20.000 TPS (24.329 ms/tick)[0m
+[0m`,
+			Stats: []TPSStat{
+				{
+					Name:     "Overworld",
+					Ticktime: 16.387,
+					TPS:      20,
+				},
+				{
+					Name:     "Nether Mining",
+					Ticktime: 0.078,
+					TPS:      20,
+				},
+				{
+					Name:     "The End",
+					Ticktime: 0.033,
+					TPS:      20,
+				},
+				{
+					Name:     "compactmachines:compact_world",
+					Ticktime: 7.352,
+					TPS:      20,
+				},
+				{
+					Name:     "The Bumblezone",
+					Ticktime: 0.054,
+					TPS:      20,
+				},
+				{
+					Name:     "The Void",
+					Ticktime: 0.028,
+					TPS:      20,
+				},
+				{
+					Name:     "End Mining",
+					Ticktime: 0.025,
+					TPS:      20,
+				},
+				{
+					Name:     "The Nether",
+					Ticktime: 0.025,
+					TPS:      20,
+				},
+				{
+					Name:     "Mining",
+					Ticktime: 0.024,
+					TPS:      20,
+				},
+				{
+					Name:     "the_afterdark:afterdark",
+					Ticktime: 0.024,
+					TPS:      20,
+				},
+				{
+					Name:     "Eternal Starlight",
+					Ticktime: 0.026,
+					TPS:      20,
+				},
+				{
+					Name:     "AE2 Spatial Storage",
+					Ticktime: 0.025,
+					TPS:      20,
+				},
+			},
+			Total: TPSStat{
+				Ticktime: 24.329,
+				TPS:      20,
+			},
+		},
 	}
 
 	for _, tCase := range tMatrix {
@@ -68,7 +152,7 @@ func TestParseForgeTPS(t *testing.T) {
 
 			assert := assert.New(t)
 
-			assert.Nil(err)
+			assert.NoError(err)
 			assert.Equal(tCase.Stats, stats)
 			assert.Equal(tCase.Total, total)
 		})
@@ -80,7 +164,8 @@ func TestParseForgeEntities(t *testing.T) {
 		Name, Input string
 		Count       []EntityCount
 	}{
-		{Name: "1.12",
+		{
+			Name:  "Forge-1.12",
 			Input: "Total: 24  12: minecraft:chicken  5: minecraft:cow  2: minecraft:item  2: minecraft:item_frame  2: minecraft:squid  1: farmingforblockheads:merchant",
 			Count: []EntityCount{
 				{
@@ -109,6 +194,34 @@ func TestParseForgeEntities(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name: "NeoForge-1.21",
+			//lint:ignore ST1018 I need this string
+			Input: `Total: 105[0m
+  31: minecraft:chicken[0m
+  15: minecraft:bat[0m
+  12: minecraft:sheep[0m
+  1: minecraft:horse[0m
+[0m`,
+			Count: []EntityCount{
+				{
+					Name:  "minecraft:chicken",
+					Count: 31,
+				},
+				{
+					Name:  "minecraft:bat",
+					Count: 15,
+				},
+				{
+					Name:  "minecraft:sheep",
+					Count: 12,
+				},
+				{
+					Name:  "minecraft:horse",
+					Count: 1,
+				},
+			},
+		},
 	}
 
 	for _, tCase := range tMatrix {
@@ -117,7 +230,7 @@ func TestParseForgeEntities(t *testing.T) {
 
 			assert := assert.New(t)
 
-			assert.Nil(err)
+			assert.NoError(err)
 			assert.Equal(tCase.Count, c)
 		})
 	}
@@ -145,7 +258,7 @@ func TestParsePaperTPS(t *testing.T) {
 
 			assert := assert.New(t)
 
-			assert.Nil(err)
+			assert.NoError(err)
 			assert.Equal(tCase.TPS, tps)
 		})
 	}
@@ -179,7 +292,7 @@ func TestParseDynmapStats(t *testing.T) {
 
 			assert := assert.New(t)
 
-			assert.Nil(err)
+			assert.NoError(err)
 			assert.Equal(tCase.Render, r)
 			assert.Equal(tCase.Chunk, c)
 		})

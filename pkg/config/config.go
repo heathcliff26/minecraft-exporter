@@ -11,13 +11,14 @@ import (
 )
 
 const (
-	DEFAULT_LOG_LEVEL   = "info"
-	DEFAULT_PORT        = 8080
-	DEFAULT_INTERVAL    = Duration(1 * time.Minute)
-	DEFAULT_WORLD_DIR   = "/world"
-	SERVER_TYPE_VANILLA = "vanilla"
-	SERVER_TYPE_FORGE   = "forge"
-	SERVER_TYPE_PAPER   = "paper"
+	DEFAULT_LOG_LEVEL    = "info"
+	DEFAULT_PORT         = 8080
+	DEFAULT_INTERVAL     = Duration(1 * time.Minute)
+	DEFAULT_WORLD_DIR    = "/world"
+	SERVER_TYPE_VANILLA  = "vanilla"
+	SERVER_TYPE_FORGE    = "forge"
+	SERVER_TYPE_PAPER    = "paper"
+	SERVER_TYPE_NEOFORGE = "neoforge"
 )
 
 var logLevel *slog.LevelVar
@@ -103,7 +104,7 @@ func LoadConfig(path string, env bool) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-	if c.ServerType != SERVER_TYPE_VANILLA && c.ServerType != SERVER_TYPE_FORGE && c.ServerType != SERVER_TYPE_PAPER {
+	if c.ServerType != SERVER_TYPE_VANILLA && c.ServerType != SERVER_TYPE_FORGE && c.ServerType != SERVER_TYPE_PAPER && c.ServerType != SERVER_TYPE_NEOFORGE {
 		return Config{}, &ErrUnknownServerType{Type: c.ServerType}
 	}
 

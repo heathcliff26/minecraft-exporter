@@ -82,7 +82,7 @@ func TestValidConfigs(t *testing.T) {
 
 			assert := assert.New(t)
 
-			if !assert.Nil(err) {
+			if !assert.NoError(err) {
 				t.Fatalf("Failed to load config: %v", err)
 			}
 			assert.Equal(tCase.Result, c)
@@ -152,7 +152,7 @@ func TestEnvSubstitution(t *testing.T) {
 
 	assert := assert.New(t)
 
-	assert.Nil(err)
+	assert.NoError(err)
 	assert.Equal(c, res)
 }
 

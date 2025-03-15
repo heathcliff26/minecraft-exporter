@@ -26,10 +26,21 @@ func parsePlayersOnline(input string) []string {
 
 // Parse the TPS statistics returned from forge
 func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) {
+	input = text.StripEscape(input)
+
 	reg := regexp.MustCompile(`Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)`)
 	stats := reg.FindAllStringSubmatch(input, -1)
+	if len(stats) == 0 {
+		// Different regex for newer versions
+		reg = regexp.MustCompile(`(.*):\s(.*?)\sTPS\s\((\d*\.\d*)\sms/tick\)`)
+		stats = reg.FindAllStringSubmatch(input, -1)
+	}
 	dimStats := make([]TPSStat, len(stats))
 	for i, stat := range stats {
+		if len(stat) == 4 {
+			// When matching the 2nd regex need to re-order
+			stat = []string{stat[0], "", stat[1], stat[3], stat[2]}
+		}
 		ticktime, err := strconv.ParseFloat(stat[3], 64)
 		if err != nil {
 			slog.Error("Failed to parse ticktime", "err", err, "value", stat[3])
@@ -46,6 +57,12 @@ func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) {
 			Ticktime: ticktime,
 			TPS:      tps,
 		}
+	}
+
+	if len(dimStats) > 0 && dimStats[len(dimStats)-1].Name == "Overall" {
+		overallTPS := dimStats[len(dimStats)-1]
+		overallTPS.Name = ""
+		return dimStats[:len(dimStats)-1], overallTPS, nil
 	}
 
 	reg = regexp.MustCompile(`Overall\s?: Mean tick time: (.*) ms. Mean TPS: (.*)`)
@@ -69,6 +86,8 @@ func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) {
 
 // Parse the count and name of all loaded forge entities
 func parseForgeEntities(input string) ([]EntityCount, error) {
+	input = text.StripEscape(input)
+
 	reg := regexp.MustCompile(`(\d+): (.*?:.*?)\s`)
 	matches := reg.FindAllStringSubmatch(input+" ", -1)
 	res := make([]EntityCount, len(matches))

@@ -40,13 +40,13 @@ func TestGetVersion(t *testing.T) {
 			assert := assert.New(t)
 
 			s, err := NewSave("./testdata/" + tCase.Name)
-			if !assert.Nil(err) {
+			if !assert.NoError(err) {
 				t.FailNow()
 			}
 
 			err = s.GetVersion()
 
-			if !assert.Nil(err) {
+			if !assert.NoError(err) {
 				t.FailNow()
 			}
 			assert.Equal(tCase.Version, s.Version)
@@ -62,13 +62,13 @@ func TestGetPlayers(t *testing.T) {
 			assert := assert.New(t)
 
 			s, err := NewSave("./testdata/" + tCase)
-			if !assert.Nil(err) {
+			if !assert.NoError(err) {
 				t.FailNow()
 			}
 
 			players, err := s.GetPlayers()
 
-			if !assert.Nil(err) {
+			if !assert.NoError(err) {
 				t.FailNow()
 			}
 			assert.Equal([]string{testUUID}, players)
@@ -153,12 +153,12 @@ func TestLoadPlayerData(t *testing.T) {
 			assert := assert.New(t)
 
 			s, err := NewSave("./testdata/" + tCase.Name)
-			if !assert.Nil(err) {
+			if !assert.NoError(err) {
 				t.FailNow()
 			}
 
 			d, err := s.LoadPlayerData(testUUID)
-			if !assert.Nil(err) {
+			if !assert.NoError(err) {
 				t.Fatalf("Failed to load data: %v", err)
 			}
 

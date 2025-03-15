@@ -27,7 +27,7 @@ There is zero compatibility to the other exporter.
     - [Reduced Metrics](#reduced-metrics)
     - [RCON Metrics](#rcon-metrics)
       - [Since minecraft version 1.20.3](#since-minecraft-version-1203)
-    - [Forge Metrics](#forge-metrics)
+    - [(Neo)Forge Metrics](#neoforge-metrics)
     - [Paper Metrics](#paper-metrics)
     - [Dynmap Metrics](#dynmap-metrics)
   - [Dashboard](#dashboard)
@@ -127,9 +127,9 @@ The following metrics will be exposed when RCON is enabled:
 | `minecraft_tick_percentile` | Time per tick in percentiles          |
 
 
-### Forge Metrics
+### (Neo)Forge Metrics
 
-These metrics will be exposed when the server is forge:
+These metrics will be exposed when the server is forge or neoforge:
 
 | Metric                   | Description                      |
 | ------------------------ | -------------------------------- |
