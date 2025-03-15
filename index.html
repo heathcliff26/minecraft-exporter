@@ -67,9 +67,9 @@
 				
 				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (0.0%)</option>
 				
-				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (62.8%)</option>
+				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (64.0%)</option>
 				
-				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (68.5%)</option>
+				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (71.1%)</option>
 				
 				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (0.0%)</option>
 				
@@ -222,13 +222,14 @@ import (
 )
 
 const (
-        DEFAULT_LOG_LEVEL   = "info"
-        DEFAULT_PORT        = 8080
-        DEFAULT_INTERVAL    = Duration(1 * time.Minute)
-        DEFAULT_WORLD_DIR   = "/world"
-        SERVER_TYPE_VANILLA = "vanilla"
-        SERVER_TYPE_FORGE   = "forge"
-        SERVER_TYPE_PAPER   = "paper"
+        DEFAULT_LOG_LEVEL    = "info"
+        DEFAULT_PORT         = 8080
+        DEFAULT_INTERVAL     = Duration(1 * time.Minute)
+        DEFAULT_WORLD_DIR    = "/world"
+        SERVER_TYPE_VANILLA  = "vanilla"
+        SERVER_TYPE_FORGE    = "forge"
+        SERVER_TYPE_PAPER    = "paper"
+        SERVER_TYPE_NEOFORGE = "neoforge"
 )
 
 var logLevel *slog.LevelVar
@@ -314,7 +315,7 @@ func LoadConfig(path string, env bool) (Config, error) <span class="cov8" title=
         if err != nil </span><span class="cov0" title="0">{
                 return Config{}, err
         }</span>
-        <span class="cov8" title="1">if c.ServerType != SERVER_TYPE_VANILLA &amp;&amp; c.ServerType != SERVER_TYPE_FORGE &amp;&amp; c.ServerType != SERVER_TYPE_PAPER </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if c.ServerType != SERVER_TYPE_VANILLA &amp;&amp; c.ServerType != SERVER_TYPE_FORGE &amp;&amp; c.ServerType != SERVER_TYPE_PAPER &amp;&amp; c.ServerType != SERVER_TYPE_NEOFORGE </span><span class="cov0" title="0">{
                 return Config{}, &amp;ErrUnknownServerType{Type: c.ServerType}
         }</span>
 
@@ -490,9 +491,9 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                 ch &lt;- prometheus.MustNewConstMetric(mcPlayerOnlineDesc, prometheus.GaugeValue, 1, player)
         }</span>
         <span class="cov0" title="0">switch c.ServerType </span>{
-        case config.SERVER_TYPE_FORGE:<span class="cov0" title="0">
+        case config.SERVER_TYPE_FORGE, config.SERVER_TYPE_NEOFORGE:<span class="cov0" title="0">
                 slog.Debug("Gathering forge metrics")
-                dimStats, overallStat, err := c.rcon.GetForgeTPS()
+                dimStats, overallStat, err := c.rcon.GetForgeTPS(c.ServerType)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to collect forge tps stats", "err", err)
                 }</span> else<span class="cov0" title="0"> {
@@ -503,7 +504,7 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS)
                         ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeOverallDesc, prometheus.CounterValue, overallStat.Ticktime)</span>
                 }
-                <span class="cov0" title="0">entities, err := c.rcon.GetForgeEntities()
+                <span class="cov0" title="0">entities, err := c.rcon.GetForgeEntities(c.ServerType)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to retrieve forge entity list", "err", err)
                 }</span> else<span class="cov0" title="0"> {
@@ -737,8 +738,8 @@ func (c *RCONClient) GetPlayersOnline() []string <span class="cov0" title="0">{
 }
 
 // Get the TPS statistics returned from forge
-func (c *RCONClient) GetForgeTPS() ([]TPSStat, TPSStat, error) <span class="cov0" title="0">{
-        res, err := c.cmd("forge tps")
+func (c *RCONClient) GetForgeTPS(variant string) ([]TPSStat, TPSStat, error) <span class="cov0" title="0">{
+        res, err := c.cmd(variant + " tps")
         if err != nil </span><span class="cov0" title="0">{
                 return nil, TPSStat{}, err
         }</span>
@@ -747,8 +748,8 @@ func (c *RCONClient) GetForgeTPS() ([]TPSStat, TPSStat, error) <span class="cov0
 }
 
 // Get the count and name of all loaded forge entities
-func (c *RCONClient) GetForgeEntities() ([]EntityCount, error) <span class="cov0" title="0">{
-        list, err := c.cmd("forge entity list")
+func (c *RCONClient) GetForgeEntities(variant string) ([]EntityCount, error) <span class="cov0" title="0">{
+        list, err := c.cmd(variant + " entity list")
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
@@ -828,7 +829,7 @@ func (c *RCONClient) CloseConn() error <span class="cov8" title="1">{
                 c.conn = nil
                 return err
         }</span>
-        <span class="cov0" title="0">return nil</span>
+        <span class="cov8" title="1">return nil</span>
 }
 
 // Close the RCON connection if necessary
@@ -865,11 +866,22 @@ func parsePlayersOnline(input string) []string <span class="cov8" title="1">{
 
 // Parse the TPS statistics returned from forge
 func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) <span class="cov8" title="1">{
+        input = text.StripEscape(input)
+
         reg := regexp.MustCompile(`Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)`)
         stats := reg.FindAllStringSubmatch(input, -1)
-        dimStats := make([]TPSStat, len(stats))
+        if len(stats) == 0 </span><span class="cov8" title="1">{
+                // Different regex for newer versions
+                reg = regexp.MustCompile(`(.*):\s(.*?)\sTPS\s\((\d*\.\d*)\sms/tick\)`)
+                stats = reg.FindAllStringSubmatch(input, -1)
+        }</span>
+        <span class="cov8" title="1">dimStats := make([]TPSStat, len(stats))
         for i, stat := range stats </span><span class="cov8" title="1">{
-                ticktime, err := strconv.ParseFloat(stat[3], 64)
+                if len(stat) == 4 </span><span class="cov8" title="1">{
+                        // When matching the 2nd regex need to re-order
+                        stat = []string{stat[0], "", stat[1], stat[3], stat[2]}
+                }</span>
+                <span class="cov8" title="1">ticktime, err := strconv.ParseFloat(stat[3], 64)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to parse ticktime", "err", err, "value", stat[3])
                         return nil, TPSStat{}, err
@@ -886,6 +898,12 @@ func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) <span class="cov8" 
                         TPS:      tps,
                 }</span>
         }
+
+        <span class="cov8" title="1">if len(dimStats) &gt; 0 &amp;&amp; dimStats[len(dimStats)-1].Name == "Overall" </span><span class="cov8" title="1">{
+                overallTPS := dimStats[len(dimStats)-1]
+                overallTPS.Name = ""
+                return dimStats[:len(dimStats)-1], overallTPS, nil
+        }</span>
 
         <span class="cov8" title="1">reg = regexp.MustCompile(`Overall\s?: Mean tick time: (.*) ms. Mean TPS: (.*)`)
         overallStat := reg.FindStringSubmatch(input)
@@ -908,6 +926,8 @@ func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) <span class="cov8" 
 
 // Parse the count and name of all loaded forge entities
 func parseForgeEntities(input string) ([]EntityCount, error) <span class="cov8" title="1">{
+        input = text.StripEscape(input)
+
         reg := regexp.MustCompile(`(\d+): (.*?:.*?)\s`)
         matches := reg.FindAllStringSubmatch(input+" ", -1)
         res := make([]EntityCount, len(matches))
