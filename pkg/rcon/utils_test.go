@@ -63,6 +63,7 @@ func TestParseForgeTPS(t *testing.T) {
 		{
 			Name: "NeoForge-1.21",
 			//lint:ignore ST1018 I need this string
+			//nolint:staticcheck
 			Input: `Overworld: 20.000 TPS (16.387 ms/tick)[0m
 Nether Mining: 20.000 TPS (0.078 ms/tick)[0m
 The End: 20.000 TPS (0.033 ms/tick)[0m
@@ -197,6 +198,7 @@ func TestParseForgeEntities(t *testing.T) {
 		{
 			Name: "NeoForge-1.21",
 			//lint:ignore ST1018 I need this string
+			//nolint:staticcheck
 			Input: `Total: 105[0m
   31: minecraft:chicken[0m
   15: minecraft:bat[0m
@@ -243,6 +245,7 @@ func TestParsePaperTPS(t *testing.T) {
 	}{
 		{Name: "1.20_raw",
 			//lint:ignore ST1018 I need this string
+			//nolint:staticcheck
 			Input: "[0;33mTPS from last 1m, 5m, 15m: [0;1;32m20.0[0m, [0;1;32m20.0[0m, [0;1;32m20.0[0m[0m",
 			TPS:   []float64{20, 20, 20},
 		},
