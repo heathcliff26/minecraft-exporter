@@ -33,6 +33,7 @@ func countAdvancements(advancements map[string]Advancement) uint {
 // Read a nbt file and parse it to the given struct.
 // Assumes the file is gzip compressed.
 func readNBT(path string, target interface{}) error {
+	// #nosec G304: Path is determined dynamically, with only a base directory provided by the user.
 	f, err := os.Open(path)
 	if err != nil {
 		return err
@@ -54,6 +55,7 @@ func readNBT(path string, target interface{}) error {
 
 // Read a json file and parse it to the given struct
 func readJSON(path string, target interface{}) error {
+	// #nosec G304: Path is determined dynamically, with only a base directory provided by the user.
 	f, err := os.Open(path)
 	if err != nil {
 		return err
