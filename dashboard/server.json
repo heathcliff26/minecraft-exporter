@@ -15,7 +15,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "11.6.0-82840"
+      "version": "12.1.0-89781"
     },
     {
       "type": "datasource",
@@ -102,7 +102,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -167,7 +168,7 @@
         },
         "showHeader": false
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -249,7 +250,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -282,7 +284,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -393,7 +395,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -426,7 +429,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -505,7 +508,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -538,7 +542,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -634,7 +638,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -667,7 +672,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -733,7 +738,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -766,7 +772,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -832,7 +838,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -865,7 +872,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -931,7 +938,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -964,7 +972,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -1030,7 +1038,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -1063,7 +1072,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.0-82840",
+      "pluginVersion": "12.1.0-89781",
       "targets": [
         {
           "datasource": {
@@ -1118,6 +1127,6 @@
   "timezone": "",
   "title": "Minecraft - Server",
   "uid": "b2388800-911a-4f53-9a48-95bef5addb10",
-  "version": 4,
+  "version": 5,
   "weekStart": ""
 }
