@@ -5,11 +5,11 @@ go 1.24.0
 require (
 	github.com/Tnze/go-mc v1.20.2
 	github.com/hashicorp/go-version v1.7.0
-	github.com/heathcliff26/promremote v1.0.13
+	github.com/heathcliff26/promremote v1.0.14
 	github.com/jedib0t/go-pretty/v6 v6.6.7
 	github.com/prometheus/client_golang v1.22.0
 	github.com/stretchr/testify v1.10.0
-	sigs.k8s.io/yaml v1.4.0
+	sigs.k8s.io/yaml v1.5.0
 )
 
 require (
@@ -26,8 +26,9 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.63.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/prometheus/prometheus v0.304.0 // indirect
+	github.com/prometheus/prometheus v0.304.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
