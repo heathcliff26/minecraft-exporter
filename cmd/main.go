@@ -38,26 +38,25 @@ func ServerRootHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "<html><body><h1>Welcome to minecraft-exporter</h1>Click <a href='/metrics'>here</a> to see metrics.</body></html>")
 }
 
-func main() {
-	flag.Parse()
-
+// handleVersionFlag checks if version flag is set and prints version if needed.
+// Returns true if version was printed and program should exit.
+func handleVersionFlag() bool {
 	if showVersion {
 		fmt.Print(version.Version())
-		os.Exit(0)
+		return true
 	}
+	return false
+}
 
-	cfg, err := config.LoadConfig(configPath, env)
-	if err != nil {
-		slog.Error("Could not load configuration", slog.String("path", configPath), slog.String("err", err.Error()))
-		os.Exit(1)
-	}
-
+// setupPrometheusRegistry creates and configures a Prometheus registry with collectors.
+// Returns the configured registry and any error encountered.
+func setupPrometheusRegistry(cfg config.Config) (*prometheus.Registry, error) {
 	reg := prometheus.NewRegistry()
 
 	sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.ReduceMetrics)
 	if err != nil {
 		slog.Error("Failed to create save collector", "err", err)
-		os.Exit(1)
+		return nil, err
 	}
 	reg.MustRegister(sc)
 
@@ -65,35 +64,79 @@ func main() {
 		rc, err := rcon.NewRCONCollector(cfg)
 		if err != nil {
 			slog.Error("Failed to create rcon collector", "err", err)
-			os.Exit(1)
+			return nil, err
 		}
 		defer rc.Close()
 		reg.MustRegister(rc)
 		sc.RCON = rc.Client()
 	}
 
-	if cfg.Remote.Enable {
-		rwClient, err := promremote.NewWriteClient(cfg.Remote.URL, cfg.Remote.Instance, "integrations/minecraft-exporter", reg)
-		if err != nil {
-			slog.Error("Failed to create remote write client", "err", err)
-			os.Exit(1)
-		}
-		if cfg.Remote.Username != "" {
-			err := rwClient.SetBasicAuth(cfg.Remote.Username, cfg.Remote.Password)
-			if err != nil {
-				slog.Error("Failed to create remote_write client", "err", err)
-				os.Exit(1)
-			}
-		}
+	return reg, nil
+}
 
-		slog.Info("Starting remote_write client")
-		rwQuit := make(chan bool)
-		rwClient.Run(time.Duration(cfg.Interval), rwQuit)
-		defer func() {
-			rwQuit <- true
-			close(rwQuit)
-		}()
+// loadConfigWithLogging loads configuration and logs any errors.
+// Returns the config and any error encountered.
+func loadConfigWithLogging(configPath string, env bool) (config.Config, error) {
+	cfg, err := config.LoadConfig(configPath, env)
+	if err != nil {
+		slog.Error("Could not load configuration", slog.String("path", configPath), slog.String("err", err.Error()))
+		return cfg, err
 	}
+	return cfg, nil
+}
+
+// setupRemoteWrite configures remote write client if enabled.
+// Returns a cleanup function and any error encountered.
+func setupRemoteWrite(cfg config.Config, reg *prometheus.Registry) (func(), error) {
+	if !cfg.Remote.Enable {
+		return func() {}, nil
+	}
+
+	rwClient, err := promremote.NewWriteClient(cfg.Remote.URL, cfg.Remote.Instance, "integrations/minecraft-exporter", reg)
+	if err != nil {
+		slog.Error("Failed to create remote write client", "err", err)
+		return nil, err
+	}
+	if cfg.Remote.Username != "" {
+		err := rwClient.SetBasicAuth(cfg.Remote.Username, cfg.Remote.Password)
+		if err != nil {
+			slog.Error("Failed to create remote_write client", "err", err)
+			return nil, err
+		}
+	}
+
+	slog.Info("Starting remote_write client")
+	rwQuit := make(chan bool)
+	rwClient.Run(time.Duration(cfg.Interval), rwQuit)
+
+	return func() {
+		rwQuit <- true
+		close(rwQuit)
+	}, nil
+}
+
+func main() {
+	flag.Parse()
+
+	if handleVersionFlag() {
+		os.Exit(0)
+	}
+
+	cfg, err := loadConfigWithLogging(configPath, env)
+	if err != nil {
+		os.Exit(1)
+	}
+
+	reg, err := setupPrometheusRegistry(cfg)
+	if err != nil {
+		os.Exit(1)
+	}
+
+	cleanup, err := setupRemoteWrite(cfg, reg)
+	if err != nil {
+		os.Exit(1)
+	}
+	defer cleanup()
 
 	router := http.NewServeMux()
 	router.HandleFunc("/", ServerRootHandler)
