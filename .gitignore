@@ -7,3 +7,4 @@ test-config.yaml
 # Generated go-test coverage reports
 coverprofiles/
 coverprofile.out
+minecraft-exporter
