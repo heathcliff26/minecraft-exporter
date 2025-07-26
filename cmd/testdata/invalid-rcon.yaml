@@ -1,0 +1,4 @@
+logLevel: "debug"
+world: "testdata/1.20"
+rcon:
+  enable: true

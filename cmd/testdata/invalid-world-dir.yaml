@@ -1,0 +1,2 @@
+logLevel: "info"
+world: "/not/a/valid/world/dir"
