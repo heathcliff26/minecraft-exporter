@@ -63,13 +63,13 @@
 				
 				<option value="file3">github.com/heathcliff26/minecraft-exporter/pkg/config/errors.go (0.0%)</option>
 				
-				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (0.0%)</option>
+				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (46.4%)</option>
 				
-				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (0.0%)</option>
+				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (12.5%)</option>
 				
-				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (62.8%)</option>
+				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (86.0%)</option>
 				
-				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (71.1%)</option>
+				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
 				
 				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (0.0%)</option>
 				
@@ -474,12 +474,12 @@ var (
 // Arguments:
 //
 //        cfg: Configuration for minecraft-exporter. Needs RCON to be filled out in full
-func NewRCONCollector(cfg config.Config) (*RCONCollector, error) <span class="cov0" title="0">{
+func NewRCONCollector(cfg config.Config) (*RCONCollector, error) <span class="cov8" title="1">{
         rc, err := NewRCONClient(cfg.RCON.Host, cfg.RCON.Port, cfg.RCON.Password)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov8" title="1">{
                 return nil, err
         }</span>
-        <span class="cov0" title="0">return &amp;RCONCollector{
+        <span class="cov8" title="1">return &amp;RCONCollector{
                 rcon:          rc,
                 ServerType:    cfg.ServerType,
                 DynmapEnabled: cfg.DynmapEnabled,
@@ -492,31 +492,31 @@ func (c *RCONCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov
 }</span>
 
 // Implements the Collect function for prometheus.Collector
-func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov0" title="0">{
+func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov8" title="1">{
         slog.Debug("Starting collection of minecraft metrics via RCON")
         players := c.rcon.GetPlayersOnline()
-        for _, player := range players </span><span class="cov0" title="0">{
+        for _, player := range players </span><span class="cov8" title="1">{
                 ch &lt;- prometheus.MustNewConstMetric(mcPlayerOnlineDesc, prometheus.GaugeValue, 1, player)
         }</span>
-        <span class="cov0" title="0">switch c.ServerType </span>{
-        case config.SERVER_TYPE_FORGE, config.SERVER_TYPE_NEOFORGE:<span class="cov0" title="0">
+        <span class="cov8" title="1">switch c.ServerType </span>{
+        case config.SERVER_TYPE_FORGE, config.SERVER_TYPE_NEOFORGE:<span class="cov8" title="1">
                 slog.Debug("Gathering forge metrics")
                 dimStats, overallStat, err := c.rcon.GetForgeTPS(c.ServerType)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to collect forge tps stats", "err", err)
-                }</span> else<span class="cov0" title="0"> {
-                        for _, stat := range dimStats </span><span class="cov0" title="0">{
+                }</span> else<span class="cov8" title="1"> {
+                        for _, stat := range dimStats </span><span class="cov8" title="1">{
                                 ch &lt;- prometheus.MustNewConstMetric(forgeTPSDimDesc, prometheus.CounterValue, stat.TPS, stat.ID, stat.Name)
                                 ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeDimDesc, prometheus.CounterValue, stat.Ticktime, stat.ID, stat.Name)
                         }</span>
-                        <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS)
+                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS)
                         ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeOverallDesc, prometheus.CounterValue, overallStat.Ticktime)</span>
                 }
-                <span class="cov0" title="0">entities, err := c.rcon.GetForgeEntities(c.ServerType)
+                <span class="cov8" title="1">entities, err := c.rcon.GetForgeEntities(c.ServerType)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to retrieve forge entity list", "err", err)
-                }</span> else<span class="cov0" title="0"> {
-                        for _, entity := range entities </span><span class="cov0" title="0">{
+                }</span> else<span class="cov8" title="1"> {
+                        for _, entity := range entities </span><span class="cov8" title="1">{
                                 ch &lt;- prometheus.MustNewConstMetric(forgeEntitiesCountDesc, prometheus.CounterValue, float64(entity.Count), entity.Name)
                         }</span>
                 }
@@ -534,7 +534,7 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                 }
         }
 
-        <span class="cov0" title="0">if c.DynmapEnabled </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if c.DynmapEnabled </span><span class="cov0" title="0">{
                 slog.Debug("Gathering dynmap metrics")
                 render, chunks, err := c.rcon.GetDynmapStats()
                 if err != nil </span><span class="cov0" title="0">{
@@ -552,7 +552,7 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                 }
         }
 
-        <span class="cov0" title="0">if c.rcon.V120() </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if c.rcon.V120() </span><span class="cov0" title="0">{
                 tickStats, err := c.rcon.GetTickQuery()
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to collect tick stats", "err", err)
@@ -564,16 +564,16 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                 ch &lt;- prometheus.MustNewConstMetric(tickP95Desc, prometheus.CounterValue, tickStats.P95)
                 ch &lt;- prometheus.MustNewConstMetric(tickP99Desc, prometheus.CounterValue, tickStats.P99)</span>
         }
-        <span class="cov0" title="0">slog.Debug("Finished collection of minecraft metrics via RCON")</span>
+        <span class="cov8" title="1">slog.Debug("Finished collection of minecraft metrics via RCON")</span>
 }
 
 // Expose the RCON client
-func (c *RCONCollector) Client() *RCONClient <span class="cov0" title="0">{
+func (c *RCONCollector) Client() *RCONClient <span class="cov8" title="1">{
         return c.rcon
 }</span>
 
 // Close the RCON connection
-func (c *RCONCollector) Close() error <span class="cov0" title="0">{
+func (c *RCONCollector) Close() error <span class="cov8" title="1">{
         return c.rcon.Close()
 }</span>
 </pre>
@@ -617,7 +617,7 @@ type ErrPaperTPS struct {
         Count int
 }
 
-func NewErrPaperTPS(text string, count int) error <span class="cov0" title="0">{
+func NewErrPaperTPS(text string, count int) error <span class="cov8" title="1">{
         return &amp;ErrPaperTPS{
                 Text:  text,
                 Count: count,
@@ -735,65 +735,65 @@ func (c *RCONClient) cmd(cmd string) (string, error) <span class="cov8" title="1
 }
 
 // Return a list of all players currently online
-func (c *RCONClient) GetPlayersOnline() []string <span class="cov0" title="0">{
+func (c *RCONClient) GetPlayersOnline() []string <span class="cov8" title="1">{
         list, err := c.cmd("list")
         if err != nil </span><span class="cov0" title="0">{
                 slog.Error("Failed to retrieve online players", "err", err)
                 return []string{}
         }</span>
 
-        <span class="cov0" title="0">return parsePlayersOnline(list)</span>
+        <span class="cov8" title="1">return parsePlayersOnline(list)</span>
 }
 
 // Get the TPS statistics returned from forge
-func (c *RCONClient) GetForgeTPS(variant string) ([]TPSStat, TPSStat, error) <span class="cov0" title="0">{
+func (c *RCONClient) GetForgeTPS(variant string) ([]TPSStat, TPSStat, error) <span class="cov8" title="1">{
         res, err := c.cmd(variant + " tps")
         if err != nil </span><span class="cov0" title="0">{
                 return nil, TPSStat{}, err
         }</span>
 
-        <span class="cov0" title="0">return parseForgeTPS(res)</span>
+        <span class="cov8" title="1">return parseForgeTPS(res)</span>
 }
 
 // Get the count and name of all loaded forge entities
-func (c *RCONClient) GetForgeEntities(variant string) ([]EntityCount, error) <span class="cov0" title="0">{
+func (c *RCONClient) GetForgeEntities(variant string) ([]EntityCount, error) <span class="cov8" title="1">{
         list, err := c.cmd(variant + " entity list")
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
 
-        <span class="cov0" title="0">return parseForgeEntities(list)</span>
+        <span class="cov8" title="1">return parseForgeEntities(list)</span>
 }
 
 // Get the TPS statistics returned from paper
-func (c *RCONClient) GetPaperTPS() ([]float64, error) <span class="cov0" title="0">{
+func (c *RCONClient) GetPaperTPS() ([]float64, error) <span class="cov8" title="1">{
         res, err := c.cmd("tps")
         if err != nil </span><span class="cov0" title="0">{
                 return []float64{}, err
         }</span>
 
-        <span class="cov0" title="0">return parsePaperTPS(res)</span>
+        <span class="cov8" title="1">return parsePaperTPS(res)</span>
 }
 
 // Get the render statistics returned from Dynmap
-func (c *RCONClient) GetDynmapStats() ([]DynmapRenderStat, []DynmapChunkloadingStat, error) <span class="cov0" title="0">{
+func (c *RCONClient) GetDynmapStats() ([]DynmapRenderStat, []DynmapChunkloadingStat, error) <span class="cov8" title="1">{
         res, err := c.cmd("dynmap stats")
         if err != nil </span><span class="cov0" title="0">{
                 return nil, nil, err
         }</span>
 
-        <span class="cov0" title="0">return parseDynmapStats(res)</span>
+        <span class="cov8" title="1">return parseDynmapStats(res)</span>
 }
 
 // Get the tick statistics returned from the "tick query" command.
 // The command has been added to Minecraft Java Edition in 1.20.3
-func (c *RCONClient) GetTickQuery() (TickStats, error) <span class="cov0" title="0">{
+func (c *RCONClient) GetTickQuery() (TickStats, error) <span class="cov8" title="1">{
         res, err := c.cmd("tick query")
         if err != nil </span><span class="cov0" title="0">{
                 return TickStats{}, err
         }</span>
 
-        <span class="cov0" title="0">return parseTickQuery(res)</span>
+        <span class="cov8" title="1">return parseTickQuery(res)</span>
 }
 
 // Update the minecraft server version
@@ -837,11 +837,11 @@ func (c *RCONClient) CloseConn() error <span class="cov8" title="1">{
                 c.conn = nil
                 return err
         }</span>
-        <span class="cov0" title="0">return nil</span>
+        <span class="cov8" title="1">return nil</span>
 }
 
 // Close the RCON connection if necessary
-func (c *RCONClient) Close() error <span class="cov0" title="0">{
+func (c *RCONClient) Close() error <span class="cov8" title="1">{
         return c.CloseConn()
 }</span>
 </pre>
@@ -890,7 +890,7 @@ func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) <span class="cov8" 
                         stat = []string{stat[0], "", stat[1], stat[3], stat[2]}
                 }</span>
                 <span class="cov8" title="1">ticktime, err := strconv.ParseFloat(stat[3], 64)
-                if err != nil </span><span class="cov0" title="0">{
+                if err != nil </span><span class="cov8" title="1">{
                         slog.Error("Failed to parse ticktime", "err", err, "value", stat[3])
                         return nil, TPSStat{}, err
                 }</span>
@@ -915,7 +915,7 @@ func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) <span class="cov8" 
 
         <span class="cov8" title="1">reg = regexp.MustCompile(`Overall\s?: Mean tick time: (.*) ms. Mean TPS: (.*)`)
         overallStat := reg.FindStringSubmatch(input)
-        if overallStat == nil </span><span class="cov0" title="0">{
+        if overallStat == nil </span><span class="cov8" title="1">{
                 return nil, TPSStat{}, ErrForgeTPS{}
         }</span>
         <span class="cov8" title="1">ticktime, err := strconv.ParseFloat(overallStat[1], 64)
@@ -963,7 +963,7 @@ func parsePaperTPS(input string) ([]float64, error) <span class="cov8" title="1"
 
         <span class="cov8" title="1">input = strings.TrimPrefix(input, "TPS from last 1m, 5m, 15m: ")
         s := strings.Split(input, ", ")
-        if len(s) != 3 </span><span class="cov0" title="0">{
+        if len(s) != 3 </span><span class="cov8" title="1">{
                 return []float64{}, NewErrPaperTPS(input, len(s))
         }</span>
 
@@ -971,7 +971,7 @@ func parsePaperTPS(input string) ([]float64, error) <span class="cov8" title="1"
         for i := 0; i &lt; len(s); i++ </span><span class="cov8" title="1">{
                 var err error
                 tps[i], err = strconv.ParseFloat(s[i], 64)
-                if err != nil </span><span class="cov0" title="0">{
+                if err != nil </span><span class="cov8" title="1">{
                         return []float64{}, err
                 }</span>
         }
@@ -1038,7 +1038,7 @@ func parseTickQuery(input string) (TickStats, error) <span class="cov8" title="1
 
         reg := regexp.MustCompile(`Target tick rate: (\d*.\d*) per second.`)
         res := reg.FindStringSubmatch(input)
-        if len(res) != 2 </span><span class="cov0" title="0">{
+        if len(res) != 2 </span><span class="cov8" title="1">{
                 slog.Error("Failed to find match for tick target", "out", input)
                 return TickStats{}, ErrVanillaTick{}
         }</span>
@@ -1050,7 +1050,7 @@ func parseTickQuery(input string) (TickStats, error) <span class="cov8" title="1
 
         <span class="cov8" title="1">reg = regexp.MustCompile(`Average time per tick: (\d*.\d*)ms`)
         res = reg.FindStringSubmatch(input)
-        if len(res) != 2 </span><span class="cov0" title="0">{
+        if len(res) != 2 </span><span class="cov8" title="1">{
                 slog.Error("Failed to find match for time per tick", "out", input)
                 return TickStats{}, ErrVanillaTick{}
         }</span>
@@ -1062,7 +1062,7 @@ func parseTickQuery(input string) (TickStats, error) <span class="cov8" title="1
 
         <span class="cov8" title="1">reg = regexp.MustCompile(`Percentiles: P50: (\d*.\d*)ms P95: (\d*.\d*)ms P99: (\d*.\d*)ms[,|.] sample: 100`)
         res = reg.FindStringSubmatch(input)
-        if len(res) != 4 </span><span class="cov0" title="0">{
+        if len(res) != 4 </span><span class="cov8" title="1">{
                 slog.Error("Failed to find match for tick time percentiles", "out", input)
                 return TickStats{}, ErrVanillaTick{}
         }</span>
