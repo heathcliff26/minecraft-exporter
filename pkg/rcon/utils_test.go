@@ -366,3 +366,87 @@ func TestParseTickQuery(t *testing.T) {
 		})
 	}
 }
+
+func TestParseForgeTpsErrorCases(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test invalid input
+	_, _, err := parseForgeTPS("invalid input")
+	assert.Error(err)
+
+	// Test invalid ticktime
+	invalidTicktime := "Dim  0 (DIM_0) : Mean tick time: invalid ms. Mean TPS: 20.000Overall : Mean tick time: 8.037 ms. Mean TPS: 20.000"
+	_, _, err = parseForgeTPS(invalidTicktime)
+	assert.Error(err)
+
+	// Test invalid TPS
+	invalidTPS := "Dim  0 (DIM_0) : Mean tick time: 7.672 ms. Mean TPS: invalidOverall : Mean tick time: 8.037 ms. Mean TPS: 20.000"
+	_, _, err = parseForgeTPS(invalidTPS)
+	assert.Error(err)
+}
+
+func TestParseForgeEntitiesErrorCases(t *testing.T) {
+	// Note: The regex `(\d+): (.*?:.*?)\s` requires digits at start,
+	// so we need to test an input that matches the regex but has invalid numbers
+
+	// Let's test empty input which should return empty result
+	assert := assert.New(t)
+
+	// Test input that matches the regex pattern but would fail strconv.Atoi
+	// Since the regex requires \d+ at the start, we can't easily make it fail
+	// So let's test this function with the knowledge that it's well-protected by regex
+
+	// Test empty input - should return empty slice, not error
+	entities, err := parseForgeEntities("")
+	assert.NoError(err)
+	assert.Empty(entities)
+}
+
+func TestParsePaperTpsErrorCases(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test wrong number of values
+	wrongCount := "TPS from last 1m, 5m, 15m: 20.0, 20.0"
+	_, err := parsePaperTPS(wrongCount)
+	assert.Error(err)
+
+	// Test invalid float value
+	invalidFloat := "TPS from last 1m, 5m, 15m: invalid, 20.0, 20.0"
+	_, err = parsePaperTPS(invalidFloat)
+	assert.Error(err)
+}
+
+func TestParseDynmapStatsErrorCases(t *testing.T) {
+	// Note: The regex patterns are well-protected, so let's test edge cases
+	assert := assert.New(t)
+
+	// Test empty input - should return empty slices, not error
+	renderStats, chunkStats, err := parseDynmapStats("")
+	assert.NoError(err)
+	assert.Empty(renderStats)
+	assert.Empty(chunkStats)
+}
+
+func TestParseTickQueryErrorCases(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test missing target rate
+	missingTarget := "Average time per tick: 7.7ms (Target: 50.0ms)Percentiles: P50: 7.4ms P95: 9.9ms P99: 11.1ms, sample: 100"
+	_, err := parseTickQuery(missingTarget)
+	assert.Error(err)
+
+	// Test missing average time
+	missingAverage := "Target tick rate: 20.0 per second.Percentiles: P50: 7.4ms P95: 9.9ms P99: 11.1ms, sample: 100"
+	_, err = parseTickQuery(missingAverage)
+	assert.Error(err)
+
+	// Test missing percentiles
+	missingPercentiles := "Target tick rate: 20.0 per second.\nAverage time per tick: 7.7ms (Target: 50.0ms)"
+	_, err = parseTickQuery(missingPercentiles)
+	assert.Error(err)
+
+	// Test invalid target value
+	invalidTarget := "Target tick rate: invalid per second.\nAverage time per tick: 7.7ms (Target: 50.0ms)Percentiles: P50: 7.4ms P95: 9.9ms P99: 11.1ms, sample: 100"
+	_, err = parseTickQuery(invalidTarget)
+	assert.Error(err)
+}
