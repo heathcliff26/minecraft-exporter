@@ -30,7 +30,7 @@ github.com/grafana/regexp/syntax
 # github.com/hashicorp/go-version v1.7.0
 ## explicit
 github.com/hashicorp/go-version
-# github.com/heathcliff26/promremote v1.0.15
+# github.com/heathcliff26/promremote v1.0.16
 ## explicit; go 1.23.0
 github.com/heathcliff26/promremote/promremote
 # github.com/jedib0t/go-pretty/v6 v6.6.8
@@ -75,7 +75,7 @@ github.com/prometheus/prometheus/prompb
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg
-# github.com/stretchr/testify v1.10.0
+# github.com/stretchr/testify v1.11.1
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
