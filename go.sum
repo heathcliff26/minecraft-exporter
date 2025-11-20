@@ -18,10 +18,10 @@ github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 h1:cLN4IBkmkYZNnk7E
 github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853/go.mod h1:+JKpmjMGhpgPL+rXZ5nsZieVzvarn86asRlBg4uNGnk=
 github.com/hashicorp/go-version v1.7.0 h1:5tqGy27NaOTB8yJKUZELlFAS/LTKJkrmONwQKeRZfjY=
 github.com/hashicorp/go-version v1.7.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
-github.com/heathcliff26/promremote v1.0.18 h1:NaoVycVmXVtFFYkfMZ9YO7r+wAwsnoeedPKd1+jC5wM=
-github.com/heathcliff26/promremote v1.0.18/go.mod h1:CCpkX9QuhhbULVCCAFyFfJL9BbpT+fIzwjiod14vil4=
-github.com/jedib0t/go-pretty/v6 v6.6.9 h1:PQecJLK3L8ODuVyMe2223b61oRJjrKnmXAncbWTv9MY=
-github.com/jedib0t/go-pretty/v6 v6.6.9/go.mod h1:YwC5CE4fJ1HFUDeivSV1r//AmANFHyqczZk+U6BDALU=
+github.com/heathcliff26/promremote v1.0.19 h1:WpchWPwKUGfWGiJ7jzyTAm0Wsc677vsZzpRDOOPIDnU=
+github.com/heathcliff26/promremote v1.0.19/go.mod h1:sAQyloFO/I4wbD5EFnIxDNvPSRTsIREUvKVCP0yYvEE=
+github.com/jedib0t/go-pretty/v6 v6.7.4 h1:GaXJ6Xj3UOt/rzxYGqEdWdqciSpdvIia9kl/Ms5MR5o=
+github.com/jedib0t/go-pretty/v6 v6.7.4/go.mod h1:YwC5CE4fJ1HFUDeivSV1r//AmANFHyqczZk+U6BDALU=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=
