@@ -1,6 +1,7 @@
 logLevel: "debug"
 port: 2080
 interval: "30m"
+instance: "another-instance"
 remote:
   enable: true
   url: "https://example.org/"

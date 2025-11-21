@@ -41,6 +41,7 @@ type Config struct {
 	LogLevel      string       `json:"logLevel,omitempty"`
 	Port          int          `json:"port,omitempty"`
 	Interval      Duration     `json:"interval,omitempty"`
+	Instance      string       `json:"instance"`
 	ReduceMetrics bool         `json:"reduceMetrics,omitempty"`
 	ServerType    string       `json:"server,omitempty"`
 	DynmapEnabled bool         `json:"dynmap,omitempty"`
@@ -59,7 +60,7 @@ type RCONConfig struct {
 type RemoteConfig struct {
 	Enable   bool   `json:"enable"`
 	URL      string `json:"url"`
-	Instance string `json:"instance"`
+	Instance string `json:"instance,omitempty"`
 	JobName  string `json:"jobName,omitempty"`
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
@@ -67,15 +68,25 @@ type RemoteConfig struct {
 
 // Returns a Config with default values set
 func DefaultConfig() Config {
+	hostname, err := os.Hostname()
+	if err != nil {
+		slog.Error("Failed to retrieve hostname, using localhost instead", "err", err)
+		hostname = "localhost"
+	}
 	return Config{
 		LogLevel:   DEFAULT_LOG_LEVEL,
 		Port:       DEFAULT_PORT,
 		Interval:   DEFAULT_INTERVAL,
+		Instance:   hostname,
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   DEFAULT_WORLD_DIR,
-		Remote: RemoteConfig{
-			JobName: DEFAULT_REMOTE_JOB_NAME,
-		},
+		Remote:     defaultRemoteConfig(),
+	}
+}
+
+func defaultRemoteConfig() RemoteConfig {
+	return RemoteConfig{
+		JobName: DEFAULT_REMOTE_JOB_NAME,
 	}
 }
 
@@ -117,21 +128,16 @@ func LoadConfig(path string, env bool) (Config, error) {
 		return Config{}, &ErrUnknownServerType{Type: c.ServerType}
 	}
 
+	if c.Remote.Instance == "" {
+		c.Remote.Instance = c.Instance
+	}
+
 	if c.Remote.Enable {
 		if c.Remote.URL == "" {
 			return Config{}, promremote.ErrMissingEndpoint{}
 		}
 		if c.Remote.Username != c.Remote.Password && (c.Remote.Username == "" || c.Remote.Password == "") {
 			return Config{}, promremote.ErrMissingAuthCredentials{}
-		}
-		if c.Remote.Instance == "" {
-			slog.Info("No instance name provided, defaulting to hostname")
-			hostname, err := os.Hostname()
-			if err != nil {
-				slog.Error("Failed to retrieve hostname, using localhost instead", "err", err)
-				hostname = "localhost"
-			}
-			c.Remote.Instance = hostname
 		}
 	}
 

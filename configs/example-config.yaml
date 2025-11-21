@@ -5,6 +5,8 @@ logLevel: "info"
 port: 8080
 # Interval in which remote_write is invoked when enabled
 interval: "5m"
+# Name of the instance, used to label metrics. Defaults to hostname when empty
+instance: ""
 # Indicate if the number of metrics should be reduced (Useful when using grafana cloud)
 reduceMetrics: false
 # Set the server type (vanilla, forge, paper, neoforge), used for RCON collection
@@ -31,7 +33,7 @@ remote:
   enable: true
   # URL to prometheus remote_write endpoint
   url: ""
-  # Name of the instance, used to label metrics when performing remote_write. Defaults to hostname when empty
+  # Overwrite the instance label for remote write.
   instance: ""
   # Name of job under which metrics will be pushed
   jobName: "minecraft-exporter"
