@@ -749,14 +749,14 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values({job=\"integrations/minecraft-exporter\"},instance)",
+        "definition": "label_values({job=\"minecraft-exporter\"},instance)",
         "includeAll": true,
         "label": "Instance",
         "multi": true,
         "name": "instance",
         "options": [],
         "query": {
-          "query": "label_values({job=\"integrations/minecraft-exporter\"},instance)",
+          "query": "label_values({job=\"minecraft-exporter\"},instance)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,

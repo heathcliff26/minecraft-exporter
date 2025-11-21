@@ -23,6 +23,9 @@ func TestValidConfigs(t *testing.T) {
 			Port:     25575,
 			Password: "password",
 		},
+		Remote: RemoteConfig{
+			JobName: DEFAULT_REMOTE_JOB_NAME,
+		},
 	}
 	c2 := Config{
 		LogLevel:   "debug",
@@ -34,6 +37,7 @@ func TestValidConfigs(t *testing.T) {
 			Enable:   true,
 			URL:      "https://example.org/",
 			Instance: "test",
+			JobName:  "testjob",
 			Username: "somebody",
 			Password: "somebody's password",
 		},
@@ -48,6 +52,7 @@ func TestValidConfigs(t *testing.T) {
 			Enable:   true,
 			URL:      "https://example.org/",
 			Instance: "test",
+			JobName:  "testjob",
 		},
 	}
 	tMatrix := []struct {
@@ -142,6 +147,9 @@ func TestEnvSubstitution(t *testing.T) {
 		Interval:   Duration(time.Minute),
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   "/some/server/world",
+		Remote: RemoteConfig{
+			JobName: DEFAULT_REMOTE_JOB_NAME,
+		},
 	}
 	t.Setenv("MINECRAFT_EXPORTER_LOG_LEVEL", c.LogLevel)
 	t.Setenv("MINECRAFT_EXPORTER_PORT", strconv.Itoa(c.Port))
