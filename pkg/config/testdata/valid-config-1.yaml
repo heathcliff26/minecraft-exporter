@@ -1,6 +1,7 @@
 logLevel: "warn"
 port: 80
 interval: "5m"
+instance: "testinstance"
 world: "/path/to/world"
 rcon:
   enable: true

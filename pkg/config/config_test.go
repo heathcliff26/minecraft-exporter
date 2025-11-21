@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidConfigs(t *testing.T) {
@@ -15,6 +16,7 @@ func TestValidConfigs(t *testing.T) {
 		LogLevel:   "warn",
 		Port:       80,
 		Interval:   Duration(5 * time.Minute),
+		Instance:   "testinstance",
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   "/path/to/world",
 		RCON: RCONConfig{
@@ -23,14 +25,14 @@ func TestValidConfigs(t *testing.T) {
 			Port:     25575,
 			Password: "password",
 		},
-		Remote: RemoteConfig{
-			JobName: DEFAULT_REMOTE_JOB_NAME,
-		},
+		Remote: defaultRemoteConfig(),
 	}
+	c1.Remote.Instance = "testinstance"
 	c2 := Config{
 		LogLevel:   "debug",
 		Port:       2080,
 		Interval:   Duration(30 * time.Minute),
+		Instance:   "another-instance",
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   DEFAULT_WORLD_DIR,
 		Remote: RemoteConfig{
@@ -46,6 +48,7 @@ func TestValidConfigs(t *testing.T) {
 		LogLevel:   "error",
 		Port:       DEFAULT_PORT,
 		Interval:   DEFAULT_INTERVAL,
+		Instance:   "test",
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   DEFAULT_WORLD_DIR,
 		Remote: RemoteConfig{
@@ -87,9 +90,7 @@ func TestValidConfigs(t *testing.T) {
 
 			assert := assert.New(t)
 
-			if !assert.NoError(err) {
-				t.Fatalf("Failed to load config: %v", err)
-			}
+			require.NoError(t, err, "Should load config")
 			assert.Equal(tCase.Result, c)
 		})
 	}
@@ -147,9 +148,7 @@ func TestEnvSubstitution(t *testing.T) {
 		Interval:   Duration(time.Minute),
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   "/some/server/world",
-		Remote: RemoteConfig{
-			JobName: DEFAULT_REMOTE_JOB_NAME,
-		},
+		Remote:     defaultRemoteConfig(),
 	}
 	t.Setenv("MINECRAFT_EXPORTER_LOG_LEVEL", c.LogLevel)
 	t.Setenv("MINECRAFT_EXPORTER_PORT", strconv.Itoa(c.Port))
@@ -159,6 +158,11 @@ func TestEnvSubstitution(t *testing.T) {
 	res, err := LoadConfig("testdata/env-config.yaml", true)
 
 	assert := assert.New(t)
+
+	assert.NotEmpty(res.Instance, "Should fill in instance by default")
+	assert.Equal(res.Instance, res.Remote.Instance, "Should fill in remote instance with instance")
+	c.Instance = res.Instance
+	c.Remote.Instance = res.Instance
 
 	assert.NoError(err)
 	assert.Equal(c, res)
