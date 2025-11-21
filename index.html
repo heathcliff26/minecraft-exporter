@@ -57,7 +57,7 @@
 				
 				<option value="file0">github.com/heathcliff26/minecraft-exporter/cmd/main.go (64.7%)</option>
 				
-				<option value="file1">github.com/heathcliff26/minecraft-exporter/pkg/config/config.go (81.0%)</option>
+				<option value="file1">github.com/heathcliff26/minecraft-exporter/pkg/config/config.go (90.5%)</option>
 				
 				<option value="file2">github.com/heathcliff26/minecraft-exporter/pkg/config/duration.go (90.9%)</option>
 				
@@ -259,6 +259,7 @@ type Config struct {
         LogLevel      string       `json:"logLevel,omitempty"`
         Port          int          `json:"port,omitempty"`
         Interval      Duration     `json:"interval,omitempty"`
+        Instance      string       `json:"instance"`
         ReduceMetrics bool         `json:"reduceMetrics,omitempty"`
         ServerType    string       `json:"server,omitempty"`
         DynmapEnabled bool         `json:"dynmap,omitempty"`
@@ -277,7 +278,7 @@ type RCONConfig struct {
 type RemoteConfig struct {
         Enable   bool   `json:"enable"`
         URL      string `json:"url"`
-        Instance string `json:"instance"`
+        Instance string `json:"instance,omitempty"`
         JobName  string `json:"jobName,omitempty"`
         Username string `json:"username,omitempty"`
         Password string `json:"password,omitempty"`
@@ -285,15 +286,25 @@ type RemoteConfig struct {
 
 // Returns a Config with default values set
 func DefaultConfig() Config <span class="cov8" title="1">{
-        return Config{
+        hostname, err := os.Hostname()
+        if err != nil </span><span class="cov0" title="0">{
+                slog.Error("Failed to retrieve hostname, using localhost instead", "err", err)
+                hostname = "localhost"
+        }</span>
+        <span class="cov8" title="1">return Config{
                 LogLevel:   DEFAULT_LOG_LEVEL,
                 Port:       DEFAULT_PORT,
                 Interval:   DEFAULT_INTERVAL,
+                Instance:   hostname,
                 ServerType: SERVER_TYPE_VANILLA,
                 WorldDir:   DEFAULT_WORLD_DIR,
-                Remote: RemoteConfig{
-                        JobName: DEFAULT_REMOTE_JOB_NAME,
-                },
+                Remote:     defaultRemoteConfig(),
+        }</span>
+}
+
+func defaultRemoteConfig() RemoteConfig <span class="cov8" title="1">{
+        return RemoteConfig{
+                JobName: DEFAULT_REMOTE_JOB_NAME,
         }
 }</span>
 
@@ -335,6 +346,10 @@ func LoadConfig(path string, env bool) (Config, error) <span class="cov8" title=
                 return Config{}, &amp;ErrUnknownServerType{Type: c.ServerType}
         }</span>
 
+        <span class="cov8" title="1">if c.Remote.Instance == "" </span><span class="cov8" title="1">{
+                c.Remote.Instance = c.Instance
+        }</span>
+
         <span class="cov8" title="1">if c.Remote.Enable </span><span class="cov8" title="1">{
                 if c.Remote.URL == "" </span><span class="cov8" title="1">{
                         return Config{}, promremote.ErrMissingEndpoint{}
@@ -342,15 +357,6 @@ func LoadConfig(path string, env bool) (Config, error) <span class="cov8" title=
                 <span class="cov8" title="1">if c.Remote.Username != c.Remote.Password &amp;&amp; (c.Remote.Username == "" || c.Remote.Password == "") </span><span class="cov8" title="1">{
                         return Config{}, promremote.ErrMissingAuthCredentials{}
                 }</span>
-                <span class="cov8" title="1">if c.Remote.Instance == "" </span><span class="cov0" title="0">{
-                        slog.Info("No instance name provided, defaulting to hostname")
-                        hostname, err := os.Hostname()
-                        if err != nil </span><span class="cov0" title="0">{
-                                slog.Error("Failed to retrieve hostname, using localhost instead", "err", err)
-                                hostname = "localhost"
-                        }</span>
-                        <span class="cov0" title="0">c.Remote.Instance = hostname</span>
-                }
         }
 
         <span class="cov8" title="1">return c, nil</span>
@@ -452,30 +458,32 @@ type RCONCollector struct {
         rcon          *RCONClient
         ServerType    string
         DynmapEnabled bool
+
+        mcPlayerOnlineDesc *prometheus.Desc
+
+        forgeTPSDimDesc          *prometheus.Desc
+        forgeTicktimeDimDesc     *prometheus.Desc
+        forgeTPSOverallDesc      *prometheus.Desc
+        forgeTicktimeOverallDesc *prometheus.Desc
+        forgeEntitiesCountDesc   *prometheus.Desc
+
+        paperTPS1mDesc  *prometheus.Desc
+        paperTPS5mDesc  *prometheus.Desc
+        paperTPS15mDesc *prometheus.Desc
+
+        dynmapTileRenderStatDesc       *prometheus.Desc
+        dynmapChunkLoadingCountDesc    *prometheus.Desc
+        dynmapChunkLoadingDurationDesc *prometheus.Desc
+
+        tickTargetDesc  *prometheus.Desc
+        tickAverageDesc *prometheus.Desc
+        tickP50Desc     *prometheus.Desc
+        tickP95Desc     *prometheus.Desc
+        tickP99Desc     *prometheus.Desc
 }
 
-var (
-        mcPlayerOnlineDesc = prometheus.NewDesc("minecraft_player_online", "Show currently online players. Value is always 1", []string{"player"}, nil)
-
-        forgeTPSDimDesc          = prometheus.NewDesc("forge_tps_dim", "TPS of a dimension", []string{"dimension_id", "dimension_name"}, nil)
-        forgeTicktimeDimDesc     = prometheus.NewDesc("forge_ticktime_dim", "Time a Tick took in a Dimension", []string{"dimension_id", "dimension_name"}, nil)
-        forgeTPSOverallDesc      = prometheus.NewDesc("forge_tps_overall", "Overall TPS", nil, nil)
-        forgeTicktimeOverallDesc = prometheus.NewDesc("forge_ticktime_overall", "Overall Ticktime", nil, nil)
-        forgeEntitiesCountDesc   = prometheus.NewDesc("forge_entity_count", "Type and count of active entites", []string{"entity"}, nil)
-
-        paperTPS1mDesc  = prometheus.NewDesc("paper_tps_1m", "1 Minute TPS", nil, prometheus.Labels{"tps": "1m"})
-        paperTPS5mDesc  = prometheus.NewDesc("paper_tps_5m", "5 Minute TPS", nil, prometheus.Labels{"tps": "5m"})
-        paperTPS15mDesc = prometheus.NewDesc("paper_tps_15m", "15 Minute TPS", nil, prometheus.Labels{"tps": "15m"})
-
-        dynmapTileRenderStatDesc       = prometheus.NewDesc("dynmap_tile_render_stat", "Tile Render Statistics reported by Dynmap", []string{"type", "file"}, nil)
-        dynmapChunkLoadingCountDesc    = prometheus.NewDesc("dynmap_chunk_loading_count", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, nil)
-        dynmapChunkLoadingDurationDesc = prometheus.NewDesc("dynmap_chunk_loading_duration", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, nil)
-
-        tickTargetDesc  = prometheus.NewDesc("minecraft_tick_target", "Targeted number of ticks per second", nil, nil)
-        tickAverageDesc = prometheus.NewDesc("minecraft_tick_average", "Average time per tick in milliseconds", nil, nil)
-        tickP50Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "50"})
-        tickP95Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "95"})
-        tickP99Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{"percentile": "99"})
+const (
+        instanceLabelName = "instance"
 )
 
 // Create new instance of collector, returns error if RCON is not correctly configured not provided
@@ -491,6 +499,28 @@ func NewRCONCollector(cfg config.Config) (*RCONCollector, error) <span class="co
                 rcon:          rc,
                 ServerType:    cfg.ServerType,
                 DynmapEnabled: cfg.DynmapEnabled,
+
+                mcPlayerOnlineDesc: prometheus.NewDesc("minecraft_player_online", "Show currently online players. Value is always 1", []string{"player"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
+
+                forgeTPSDimDesc:          prometheus.NewDesc("forge_tps_dim", "TPS of a dimension", []string{"dimension_id", "dimension_name"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
+                forgeTicktimeDimDesc:     prometheus.NewDesc("forge_ticktime_dim", "Time a Tick took in a Dimension", []string{"dimension_id", "dimension_name"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
+                forgeTPSOverallDesc:      prometheus.NewDesc("forge_tps_overall", "Overall TPS", nil, prometheus.Labels{instanceLabelName: cfg.Instance}),
+                forgeTicktimeOverallDesc: prometheus.NewDesc("forge_ticktime_overall", "Overall Ticktime", nil, prometheus.Labels{instanceLabelName: cfg.Instance}),
+                forgeEntitiesCountDesc:   prometheus.NewDesc("forge_entity_count", "Type and count of active entities", []string{"entity"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
+
+                paperTPS1mDesc:  prometheus.NewDesc("paper_tps_1m", "1 Minute TPS", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "tps": "1m"}),
+                paperTPS5mDesc:  prometheus.NewDesc("paper_tps_5m", "5 Minute TPS", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "tps": "5m"}),
+                paperTPS15mDesc: prometheus.NewDesc("paper_tps_15m", "15 Minute TPS", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "tps": "15m"}),
+
+                dynmapTileRenderStatDesc:       prometheus.NewDesc("dynmap_tile_render_stat", "Tile Render Statistics reported by Dynmap", []string{"type", "file"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
+                dynmapChunkLoadingCountDesc:    prometheus.NewDesc("dynmap_chunk_loading_count", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
+                dynmapChunkLoadingDurationDesc: prometheus.NewDesc("dynmap_chunk_loading_duration", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
+
+                tickTargetDesc:  prometheus.NewDesc("minecraft_tick_target", "Targeted number of ticks per second", nil, prometheus.Labels{instanceLabelName: cfg.Instance}),
+                tickAverageDesc: prometheus.NewDesc("minecraft_tick_average", "Average time per tick in milliseconds", nil, prometheus.Labels{instanceLabelName: cfg.Instance}),
+                tickP50Desc:     prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "percentile": "50"}),
+                tickP95Desc:     prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "percentile": "95"}),
+                tickP99Desc:     prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "percentile": "99"}),
         }, nil</span>
 }
 
@@ -504,7 +534,7 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
         slog.Debug("Starting collection of minecraft metrics via RCON")
         players := c.rcon.GetPlayersOnline()
         for _, player := range players </span><span class="cov8" title="1">{
-                ch &lt;- prometheus.MustNewConstMetric(mcPlayerOnlineDesc, prometheus.GaugeValue, 1, player)
+                ch &lt;- prometheus.MustNewConstMetric(c.mcPlayerOnlineDesc, prometheus.GaugeValue, 1, player)
         }</span>
         <span class="cov8" title="1">switch c.ServerType </span>{
         case config.SERVER_TYPE_FORGE, config.SERVER_TYPE_NEOFORGE:<span class="cov8" title="1">
@@ -514,18 +544,18 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         slog.Error("Failed to collect forge tps stats", "err", err)
                 }</span> else<span class="cov8" title="1"> {
                         for _, stat := range dimStats </span><span class="cov8" title="1">{
-                                ch &lt;- prometheus.MustNewConstMetric(forgeTPSDimDesc, prometheus.CounterValue, stat.TPS, stat.ID, stat.Name)
-                                ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeDimDesc, prometheus.CounterValue, stat.Ticktime, stat.ID, stat.Name)
+                                ch &lt;- prometheus.MustNewConstMetric(c.forgeTPSDimDesc, prometheus.CounterValue, stat.TPS, stat.ID, stat.Name)
+                                ch &lt;- prometheus.MustNewConstMetric(c.forgeTicktimeDimDesc, prometheus.CounterValue, stat.Ticktime, stat.ID, stat.Name)
                         }</span>
-                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS)
-                        ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeOverallDesc, prometheus.CounterValue, overallStat.Ticktime)</span>
+                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(c.forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS)
+                        ch &lt;- prometheus.MustNewConstMetric(c.forgeTicktimeOverallDesc, prometheus.CounterValue, overallStat.Ticktime)</span>
                 }
                 <span class="cov8" title="1">entities, err := c.rcon.GetForgeEntities(c.ServerType)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to retrieve forge entity list", "err", err)
                 }</span> else<span class="cov8" title="1"> {
                         for _, entity := range entities </span><span class="cov8" title="1">{
-                                ch &lt;- prometheus.MustNewConstMetric(forgeEntitiesCountDesc, prometheus.CounterValue, float64(entity.Count), entity.Name)
+                                ch &lt;- prometheus.MustNewConstMetric(c.forgeEntitiesCountDesc, prometheus.CounterValue, float64(entity.Count), entity.Name)
                         }</span>
                 }
         case config.SERVER_TYPE_PAPER:<span class="cov0" title="0">
@@ -535,9 +565,9 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         slog.Error("Failed to collect paper tps stats", "err", err)
                 }</span> else<span class="cov0" title="0"> {
                         if len(paperTPS) == 3 </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(paperTPS1mDesc, prometheus.CounterValue, paperTPS[0])
-                                ch &lt;- prometheus.MustNewConstMetric(paperTPS5mDesc, prometheus.CounterValue, paperTPS[1])
-                                ch &lt;- prometheus.MustNewConstMetric(paperTPS15mDesc, prometheus.CounterValue, paperTPS[2])
+                                ch &lt;- prometheus.MustNewConstMetric(c.paperTPS1mDesc, prometheus.CounterValue, paperTPS[0])
+                                ch &lt;- prometheus.MustNewConstMetric(c.paperTPS5mDesc, prometheus.CounterValue, paperTPS[1])
+                                ch &lt;- prometheus.MustNewConstMetric(c.paperTPS15mDesc, prometheus.CounterValue, paperTPS[2])
                         }</span>
                 }
         }
@@ -549,13 +579,13 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         slog.Error("Failed to collect dynmap stats", "err", err)
                 }</span> else<span class="cov0" title="0"> {
                         for _, stat := range render </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Processed), "processed", stat.Dim)
-                                ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Rendered), "rendered", stat.Dim)
-                                ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Updated), "updated", stat.Dim)
+                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Processed), "processed", stat.Dim)
+                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Rendered), "rendered", stat.Dim)
+                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Updated), "updated", stat.Dim)
                         }</span>
                         <span class="cov0" title="0">for _, stat := range chunks </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(dynmapChunkLoadingCountDesc, prometheus.CounterValue, float64(stat.Count), stat.State)
-                                ch &lt;- prometheus.MustNewConstMetric(dynmapChunkLoadingDurationDesc, prometheus.CounterValue, stat.Duration, stat.State)
+                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapChunkLoadingCountDesc, prometheus.CounterValue, float64(stat.Count), stat.State)
+                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapChunkLoadingDurationDesc, prometheus.CounterValue, stat.Duration, stat.State)
                         }</span>
                 }
         }
@@ -566,11 +596,11 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         slog.Error("Failed to collect tick stats", "err", err)
                 }</span>
 
-                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(tickTargetDesc, prometheus.CounterValue, tickStats.Target)
-                ch &lt;- prometheus.MustNewConstMetric(tickAverageDesc, prometheus.CounterValue, tickStats.Average)
-                ch &lt;- prometheus.MustNewConstMetric(tickP50Desc, prometheus.CounterValue, tickStats.P50)
-                ch &lt;- prometheus.MustNewConstMetric(tickP95Desc, prometheus.CounterValue, tickStats.P95)
-                ch &lt;- prometheus.MustNewConstMetric(tickP99Desc, prometheus.CounterValue, tickStats.P99)</span>
+                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(c.tickTargetDesc, prometheus.CounterValue, tickStats.Target)
+                ch &lt;- prometheus.MustNewConstMetric(c.tickAverageDesc, prometheus.CounterValue, tickStats.Average)
+                ch &lt;- prometheus.MustNewConstMetric(c.tickP50Desc, prometheus.CounterValue, tickStats.P50)
+                ch &lt;- prometheus.MustNewConstMetric(c.tickP95Desc, prometheus.CounterValue, tickStats.P95)
+                ch &lt;- prometheus.MustNewConstMetric(c.tickP99Desc, prometheus.CounterValue, tickStats.P99)</span>
         }
         <span class="cov8" title="1">slog.Debug("Finished collection of minecraft metrics via RCON")</span>
 }
