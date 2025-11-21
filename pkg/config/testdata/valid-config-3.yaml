@@ -3,3 +3,4 @@ remote:
   enable: true
   url: "https://example.org/"
   instance: "test"
+  jobName: "testjob"

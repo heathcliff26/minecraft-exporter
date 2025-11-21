@@ -11,10 +11,14 @@ import (
 )
 
 const (
-	DEFAULT_LOG_LEVEL    = "info"
-	DEFAULT_PORT         = 8080
-	DEFAULT_INTERVAL     = Duration(1 * time.Minute)
-	DEFAULT_WORLD_DIR    = "/world"
+	DEFAULT_LOG_LEVEL       = "info"
+	DEFAULT_PORT            = 8080
+	DEFAULT_INTERVAL        = Duration(1 * time.Minute)
+	DEFAULT_WORLD_DIR       = "/world"
+	DEFAULT_REMOTE_JOB_NAME = "minecraft-exporter"
+)
+
+const (
 	SERVER_TYPE_VANILLA  = "vanilla"
 	SERVER_TYPE_FORGE    = "forge"
 	SERVER_TYPE_PAPER    = "paper"
@@ -56,6 +60,7 @@ type RemoteConfig struct {
 	Enable   bool   `json:"enable"`
 	URL      string `json:"url"`
 	Instance string `json:"instance"`
+	JobName  string `json:"jobName,omitempty"`
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 }
@@ -68,6 +73,9 @@ func DefaultConfig() Config {
 		Interval:   DEFAULT_INTERVAL,
 		ServerType: SERVER_TYPE_VANILLA,
 		WorldDir:   DEFAULT_WORLD_DIR,
+		Remote: RemoteConfig{
+			JobName: DEFAULT_REMOTE_JOB_NAME,
+		},
 	}
 }
 
