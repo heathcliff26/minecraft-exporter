@@ -308,7 +308,7 @@
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "Average",
           "range": true,
           "refId": "C",
           "useBackend": false
@@ -322,7 +322,7 @@
           "expr": "minecraft_tick_percentile{instance=~\"$instance\"}",
           "hide": false,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "Percentile {{percentile}}",
           "range": true,
           "refId": "D"
         }
