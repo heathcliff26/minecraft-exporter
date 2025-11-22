@@ -23,6 +23,7 @@ There is zero compatibility to the other exporter.
     - [Image location](#image-location)
     - [Tags](#tags)
   - [Usage](#usage)
+    - [Kubernetes](#kubernetes)
   - [Metrics](#metrics)
     - [Reduced Metrics](#reduced-metrics)
     - [RCON Metrics](#rcon-metrics)
@@ -77,6 +78,14 @@ Running the container with config file:
 ```
 podman run -d -p 8080:8080 -v /path/to/world:/world:ro -v /path/to/config.yaml:/config/config.yaml ghcr.io/heathcliff26/minecraft-exporter:latest -config /config/config.yaml
 ```
+
+### Kubernetes
+
+Helm charts are released via oci repos and can be installed with:
+```
+helm install minecraft-exporter oci://ghcr.io/heathcliff26/manifests/minecraft-exporter --version <version>
+```
+Please use the latest version from the releases page.
 
 ## Metrics
 

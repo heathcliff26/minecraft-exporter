@@ -1,0 +1,19 @@
+apiVersion: v2
+name: minecraft-exporter
+description: A Helm chart for minecraft-exporter - monitor the state of your Minecraft server with Prometheus and Grafana
+type: application
+version: 0.1.0
+appVersion: "v0.0.0"
+home: https://github.com/heathcliff26/minecraft-exporter
+maintainers:
+  - name: heathcliff26
+    email: heathcliff@heathcliff.eu
+keywords:
+  - minecraft-exporter
+  - prometheus
+  - monitoring
+  - grafana
+  - minecraft
+  - gaming
+sources:
+  - https://github.com/heathcliff26/minecraft-exporter

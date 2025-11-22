@@ -1,0 +1,15 @@
+{{- if .Values.dashboard.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "minecraft-exporter.fullname" . }}-dashboards
+  namespace: {{ .Values.dashboard.namespace | default .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+    {{- include "minecraft-exporter.labels" . | nindent 4 }}
+data:
+  server.json: |-
+{{ .Files.Get "server.json" | indent 4 }}
+  player.json: |-
+{{ .Files.Get "player.json" | indent 4 }}
+{{- end }}

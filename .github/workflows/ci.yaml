@@ -64,6 +64,7 @@ jobs:
     needs:
       - lint
       - unit-tests
+      - validate
     permissions:
       contents: read
       packages: write
@@ -71,5 +72,20 @@ jobs:
       dockerfile: Dockerfile
       tag: "${{ inputs.tag == '' && 'rolling' || inputs.tag }}"
       tags: "${{ inputs.latest == true && 'type=raw,value=latest' || '' }}"
+      dry-run: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.dry-run == 'true' }}
+    secrets: inherit
+
+  push-helm:
+    uses: heathcliff26/ci/.github/workflows/push-helm-chart.yaml@main
+    if: ${{ inputs.tag != '' && inputs.tag != 'rolling' }}
+    permissions:
+      contents: read
+      packages: write
+    needs:
+      - lint
+      - unit-tests
+      - validate
+    with:
+      tag: "${{ inputs.tag }}"
       dry-run: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.dry-run == 'true' }}
     secrets: inherit
