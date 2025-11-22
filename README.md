@@ -165,14 +165,14 @@ There are 2 different dashboards, one for stats for the server and one for stats
 
 ### Minecraft - Server
 
-The server can be imported from [json](dashboard/server.json).
+The dashboard can be imported from [json](dashboard/server.json) or from grafana.com with the id [24440](https://grafana.com/grafana/dashboards/24440-minecraft-server/).
 
 Here is a preview:
 ![](images/dashboard-server.png)
 
 ### Minecraft - Player
 
-The server can be imported from [json](dashboard/player.json).
+The dashboard can be imported from [json](dashboard/player.json) or from grafana.com with the id [24441](https://grafana.com/grafana/dashboards/24441-minecraft-player/).
 
 Here is a preview:
 ![](images/dashboard-player.png)

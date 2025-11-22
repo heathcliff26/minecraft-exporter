@@ -2,7 +2,7 @@
   "__inputs": [
     {
       "name": "DS_PROMETHEUS",
-      "label": "prometheus",
+      "label": "Prometheus",
       "description": "",
       "type": "datasource",
       "pluginId": "prometheus",
@@ -15,7 +15,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "12.1.0-89781"
+      "version": "12.3.0"
     },
     {
       "type": "datasource",
@@ -56,7 +56,6 @@
   "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
   "links": [
     {
       "asDropdown": true,
@@ -108,6 +107,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -157,7 +157,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0-89781",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
@@ -208,6 +208,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -257,7 +258,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0-89781",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
@@ -308,6 +309,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -357,7 +359,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0-89781",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
@@ -437,7 +439,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.1.0-89781",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
@@ -517,7 +519,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.1.0-89781",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
@@ -568,6 +570,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -617,7 +620,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0-89781",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
@@ -668,6 +671,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -717,7 +721,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0-89781",
+      "pluginVersion": "12.3.0",
       "targets": [
         {
           "datasource": {
@@ -735,8 +739,9 @@
       "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "",
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [
     "minecraft"
   ],
@@ -792,6 +797,7 @@
   "timezone": "",
   "title": "Minecraft - Player",
   "uid": "dfd08a45-a3a4-4ef0-a9f6-4920df29ce52",
-  "version": 5,
-  "weekStart": ""
+  "version": 6,
+  "weekStart": "",
+  "id": null
 }
