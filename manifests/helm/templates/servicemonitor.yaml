@@ -1,0 +1,36 @@
+{{- if .Values.servicemonitor.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "minecraft-exporter.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- with .Values.servicemonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- include "minecraft-exporter.labels" . | nindent 4 }}
+spec:
+  endpoints:
+    - port: metrics
+      scrapeTimeout: {{ .Values.servicemonitor.scrapeTimeout }}
+      interval: {{ .Values.servicemonitor.interval }}
+      relabelings:
+        {{- if .Values.servicemonitor.relabelings }}
+        {{- toYaml .Values.servicemonitor.relabelings | nindent 8 }}
+        {{- else }}
+        - replacement: "minecraft-exporter"
+          action: replace
+          targetLabel: job
+        - replacement: {{ .Values.config.instance | default (include "minecraft-exporter.fullname" .) | quote }}
+          action: replace
+          targetLabel: instance
+        - action: labeldrop
+          regex: pod
+        {{- end }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "minecraft-exporter.selectorLabels" . | nindent 6 }}
+{{- end }}

@@ -19,7 +19,7 @@ world: "/world"
 # Configure RCON
 rcon:
   # Enable rcon, when false this part of the config will be ignored
-  enable: true
+  enable: false
   # The IP/Address of the Server (e.g localhost, example.org, 127.0.0.1)
   host: ""
   # RCON port configured in the server settings
@@ -30,7 +30,7 @@ rcon:
 # Configure remote_write behaviour
 remote:
   # Enable remote write, when false this part of the config will be ignored
-  enable: true
+  enable: false
   # URL to prometheus remote_write endpoint
   url: ""
   # Overwrite the instance label for remote write.
