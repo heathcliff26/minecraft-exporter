@@ -281,7 +281,7 @@
           "exemplar": true,
           "expr": "forge_ticktime_dim{instance=~\"$instance\"}",
           "interval": "",
-          "legendFormat": "{{dimension_name}}",
+          "legendFormat": "{{dimension_name}} {{instance}} ",
           "range": true,
           "refId": "A"
         },
@@ -292,7 +292,7 @@
           },
           "editorMode": "code",
           "expr": "forge_ticktime_overall{instance=~\"$instance\"}",
-          "legendFormat": "Overall",
+          "legendFormat": "Overall {{instance}} ",
           "range": true,
           "refId": "B"
         },
@@ -308,7 +308,7 @@
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Average",
+          "legendFormat": "Average {{instance}}",
           "range": true,
           "refId": "C",
           "useBackend": false
@@ -322,7 +322,7 @@
           "expr": "minecraft_tick_percentile{instance=~\"$instance\"}",
           "hide": false,
           "instant": false,
-          "legendFormat": "Percentile {{percentile}}",
+          "legendFormat": "P{{percentile}} {{instance}} ",
           "range": true,
           "refId": "D"
         }
