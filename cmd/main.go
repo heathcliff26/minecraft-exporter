@@ -54,7 +54,7 @@ func main() {
 
 	reg := prometheus.NewRegistry()
 
-	sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.ReduceMetrics)
+	sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.Instance, cfg.ReduceMetrics)
 	if err != nil {
 		slog.Error("Failed to create save collector", "err", err)
 		os.Exit(1)
