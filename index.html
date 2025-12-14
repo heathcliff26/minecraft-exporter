@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/heathcliff26/minecraft-exporter/cmd/main.go (64.7%)</option>
+				<option value="file0">github.com/heathcliff26/minecraft-exporter/cmd/main.go (61.1%)</option>
 				
 				<option value="file1">github.com/heathcliff26/minecraft-exporter/pkg/config/config.go (90.5%)</option>
 				
@@ -71,7 +71,7 @@
 				
 				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
 				
-				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (90.2%)</option>
+				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (92.2%)</option>
 				
 				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (25.0%)</option>
 				
@@ -170,7 +170,11 @@ func main() <span class="cov8" title="1">{
                 }</span>
                 <span class="cov0" title="0">defer rc.Close()
                 reg.MustRegister(rc)
-                sc.RCON = rc.Client()</span>
+                err = sc.SetRCONClient(rc.Client())
+                if err != nil </span><span class="cov0" title="0">{
+                        slog.Error("Failed to read the minecraft version from save", "err", err)
+                        os.Exit(1)
+                }</span>
         }
 
         <span class="cov8" title="1">if cfg.Remote.Enable </span><span class="cov0" title="0">{
@@ -1309,13 +1313,31 @@ func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                 }</span>
         }
 
-        // Update the game version in the rcon client
-        <span class="cov8" title="1">if c.RCON != nil &amp;&amp; c.RCON.Version() != c.save.Version.Name </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">c.updateRCONMinecraftVersion()
+
+        slog.Debug("Finished collection of minecraft metrics from savedata")</span>
+}
+
+func (c *SaveCollector) SetRCONClient(rc *rcon.RCONClient) error <span class="cov8" title="1">{
+        c.RCON = rc
+
+        if c.save.Version.Name == "" </span><span class="cov8" title="1">{
+                err := c.save.GetVersion()
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+
+        <span class="cov8" title="1">c.updateRCONMinecraftVersion()
+        return nil</span>
+}
+
+// Update the game version in the rcon client
+func (c *SaveCollector) updateRCONMinecraftVersion() <span class="cov8" title="1">{
+        if c.RCON != nil &amp;&amp; c.RCON.Version() != c.save.Version.Name </span><span class="cov8" title="1">{
                 slog.Info("Minecraft Version", "version", c.save.Version.Name)
                 c.RCON.UpdateVersion(c.save.Version.Name)
         }</span>
-
-        <span class="cov8" title="1">slog.Debug("Finished collection of minecraft metrics from savedata")</span>
 }
 </pre>
 		
