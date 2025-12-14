@@ -85,8 +85,8 @@ func countTotal(values map[string]int) int {
 }
 
 // Convert a given map to metrics
-func mapToMetrics(ch chan<- prometheus.Metric, desc *prometheus.Desc, values map[string]int, player string) {
+func mapToMetrics(ch chan<- prometheus.Metric, desc *prometheus.Desc, values map[string]int, labels []string) {
 	for k, v := range values {
-		ch <- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, float64(v), player, k)
+		ch <- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, float64(v), append(labels, k)...)
 	}
 }
