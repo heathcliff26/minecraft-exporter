@@ -172,11 +172,29 @@ func (c *SaveCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 	}
 
-	// Update the game version in the rcon client
+	c.updateRCONMinecraftVersion()
+
+	slog.Debug("Finished collection of minecraft metrics from savedata")
+}
+
+func (c *SaveCollector) SetRCONClient(rc *rcon.RCONClient) error {
+	c.RCON = rc
+
+	if c.save.Version.Name == "" {
+		err := c.save.GetVersion()
+		if err != nil {
+			return err
+		}
+	}
+
+	c.updateRCONMinecraftVersion()
+	return nil
+}
+
+// Update the game version in the rcon client
+func (c *SaveCollector) updateRCONMinecraftVersion() {
 	if c.RCON != nil && c.RCON.Version() != c.save.Version.Name {
 		slog.Info("Minecraft Version", "version", c.save.Version.Name)
 		c.RCON.UpdateVersion(c.save.Version.Name)
 	}
-
-	slog.Debug("Finished collection of minecraft metrics from savedata")
 }

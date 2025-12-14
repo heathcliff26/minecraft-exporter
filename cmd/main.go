@@ -69,7 +69,11 @@ func main() {
 		}
 		defer rc.Close()
 		reg.MustRegister(rc)
-		sc.RCON = rc.Client()
+		err = sc.SetRCONClient(rc.Client())
+		if err != nil {
+			slog.Error("Failed to read the minecraft version from save", "err", err)
+			os.Exit(1)
+		}
 	}
 
 	if cfg.Remote.Enable {

@@ -3,6 +3,7 @@ package save
 import (
 	"testing"
 
+	"github.com/heathcliff26/minecraft-exporter/pkg/rcon"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -54,7 +55,7 @@ func TestCollectorDescribe(t *testing.T) {
 			require := require.New(t)
 
 			c, err := NewSaveCollector("./testdata/1.20", "test-instance", reduceMetrics)
-			require.NoError(err)
+			require.NoError(err, "Should create collector")
 
 			expectedDescCount := 19
 
@@ -85,4 +86,18 @@ func TestCollectorDescribe(t *testing.T) {
 		})
 	}
 
+}
+
+func TestUpdateRCONMinecraftVersion(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	rc, err := rcon.NewRCONClient("localhost", 25575, "password")
+	require.NoError(err, "Should create RCON client")
+	c, err := NewSaveCollector("./testdata/1.20", "test-instance", false)
+	require.NoError(err, "Should create collector")
+
+	assert.Empty(rc.Version(), "RCON client should not yet have a minecraft version")
+	assert.NoError(c.SetRCONClient(rc), "Should set RCON client in collector")
+	assert.Equal("1.20.1", rc.Version(), "RCON client should have updated minecraft version")
 }
