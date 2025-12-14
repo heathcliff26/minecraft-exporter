@@ -61,7 +61,27 @@ func NewRCONCollector(cfg config.Config) (*RCONCollector, error) {
 
 // Implements the Describe function for prometheus.Collector
 func (c *RCONCollector) Describe(ch chan<- *prometheus.Desc) {
-	prometheus.DescribeByCollect(c, ch)
+	ch <- mcPlayerOnlineDesc
+
+	ch <- forgeTPSDimDesc
+	ch <- forgeTicktimeDimDesc
+	ch <- forgeTPSOverallDesc
+	ch <- forgeTicktimeOverallDesc
+	ch <- forgeEntitiesCountDesc
+
+	ch <- paperTPS1mDesc
+	ch <- paperTPS5mDesc
+	ch <- paperTPS15mDesc
+
+	ch <- dynmapTileRenderStatDesc
+	ch <- dynmapChunkLoadingCountDesc
+	ch <- dynmapChunkLoadingDurationDesc
+
+	ch <- tickTargetDesc
+	ch <- tickAverageDesc
+	ch <- tickP50Desc
+	ch <- tickP95Desc
+	ch <- tickP99Desc
 }
 
 // Implements the Collect function for prometheus.Collector
