@@ -63,7 +63,7 @@
 				
 				<option value="file3">github.com/heathcliff26/minecraft-exporter/pkg/config/errors.go (0.0%)</option>
 				
-				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (48.3%)</option>
+				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (60.8%)</option>
 				
 				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (12.5%)</option>
 				
@@ -71,7 +71,7 @@
 				
 				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
 				
-				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (80.0%)</option>
+				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (90.2%)</option>
 				
 				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (25.0%)</option>
 				
@@ -79,7 +79,7 @@
 				
 				<option value="file11">github.com/heathcliff26/minecraft-exporter/pkg/save/types.go (88.9%)</option>
 				
-				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (73.7%)</option>
+				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (84.2%)</option>
 				
 				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/errors.go (71.4%)</option>
 				
@@ -507,8 +507,28 @@ func NewRCONCollector(cfg config.Config) (*RCONCollector, error) <span class="co
 }
 
 // Implements the Describe function for prometheus.Collector
-func (c *RCONCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov0" title="0">{
-        prometheus.DescribeByCollect(c, ch)
+func (c *RCONCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov8" title="1">{
+        ch &lt;- mcPlayerOnlineDesc
+
+        ch &lt;- forgeTPSDimDesc
+        ch &lt;- forgeTicktimeDimDesc
+        ch &lt;- forgeTPSOverallDesc
+        ch &lt;- forgeTicktimeOverallDesc
+        ch &lt;- forgeEntitiesCountDesc
+
+        ch &lt;- paperTPS1mDesc
+        ch &lt;- paperTPS5mDesc
+        ch &lt;- paperTPS15mDesc
+
+        ch &lt;- dynmapTileRenderStatDesc
+        ch &lt;- dynmapChunkLoadingCountDesc
+        ch &lt;- dynmapChunkLoadingDurationDesc
+
+        ch &lt;- tickTargetDesc
+        ch &lt;- tickAverageDesc
+        ch &lt;- tickP50Desc
+        ch &lt;- tickP95Desc
+        ch &lt;- tickP99Desc
 }</span>
 
 // Implements the Collect function for prometheus.Collector
@@ -1142,9 +1162,10 @@ var (
         mcStatBlocksPickedUpReducedDesc = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", commonVariableLabels, nil)
         mcStatBlocksCraftedReducedDesc  = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", commonVariableLabels, nil)
 
-        mcStatBlocksMinedDesc       = prometheus.NewDesc("minecraft_stat_blocks_mined", "Blocks a player mined", append(commonVariableLabels, "block"), nil)
-        mcStatBlocksPickedUpDesc    = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", append(commonVariableLabels, "block"), nil)
-        mcStatBlocksCraftedDesc     = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", append(commonVariableLabels, "block"), nil)
+        mcStatBlocksMinedDesc    = prometheus.NewDesc("minecraft_stat_blocks_mined", "Blocks a player mined", append(commonVariableLabels, "block"), nil)
+        mcStatBlocksPickedUpDesc = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", append(commonVariableLabels, "block"), nil)
+        mcStatBlocksCraftedDesc  = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", append(commonVariableLabels, "block"), nil)
+
         mcStatDeathsDesc            = prometheus.NewDesc("minecraft_stat_deaths", "How often a player died. Cause \"minecraft:deaths\" is used for total deaths", append(commonVariableLabels, "cause"), nil)
         mcStatJumpsDesc             = prometheus.NewDesc("minecraft_stat_jumps", "How often a player has jumped", commonVariableLabels, nil)
         mcStatCMTraveledDesc        = prometheus.NewDesc("minecraft_stat_cm_traveled", "How many cm a player traveled", append(commonVariableLabels, "method"), nil)
@@ -1184,9 +1205,34 @@ func NewSaveCollector(path, instance string, reduceMetrics bool) (*SaveCollector
 }
 
 // Implements the Describe function for prometheus.Collector
-func (c *SaveCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov0" title="0">{
-        prometheus.DescribeByCollect(c, ch)
-}</span>
+func (c *SaveCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov8" title="1">{
+        if c.ReduceMetrics </span><span class="cov8" title="1">{
+                ch &lt;- mcStatBlocksMinedReducedDesc
+                ch &lt;- mcStatBlocksPickedUpReducedDesc
+                ch &lt;- mcStatBlocksCraftedReducedDesc
+        }</span> else<span class="cov8" title="1"> {
+                ch &lt;- mcStatBlocksMinedDesc
+                ch &lt;- mcStatBlocksPickedUpDesc
+                ch &lt;- mcStatBlocksCraftedDesc
+        }</span>
+
+        <span class="cov8" title="1">ch &lt;- mcStatDeathsDesc
+        ch &lt;- mcStatJumpsDesc
+        ch &lt;- mcStatCMTraveledDesc
+        ch &lt;- mcStatXPTotalDesc
+        ch &lt;- mcStatCurrentLevelDesc
+        ch &lt;- mcStatFoodLevelDesc
+        ch &lt;- mcStatHealthDesc
+        ch &lt;- mcStatScoreDesc
+        ch &lt;- mcStatEntitiesKilledDesc
+        ch &lt;- mcStatDamageTakenDesc
+        ch &lt;- mcStatDamageDealtDesc
+        ch &lt;- mcStatPlaytimeDesc
+        ch &lt;- mcStatAdvancementsDesc
+        ch &lt;- mcStatSleptDesc
+        ch &lt;- mcStatUsedCraftingTableDesc
+        ch &lt;- mcStatCustomDesc</span>
+}
 
 // Implements the Collect function for prometheus.Collector
 func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov8" title="1">{
@@ -1213,7 +1259,7 @@ func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
 
                 <span class="cov8" title="1">commonLabels := []string{c.Instance, name}
 
-                if c.ReduceMetrics </span><span class="cov0" title="0">{
+                if c.ReduceMetrics </span><span class="cov8" title="1">{
                         ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksMinedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.Mined)), commonLabels...)
                         ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksPickedUpReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.PickedUp)), commonLabels...)
                         ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksCraftedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.CraftedItems)), commonLabels...)
@@ -1756,13 +1802,13 @@ func readJSON(path string, target interface{}) error <span class="cov8" title="1
 }
 
 // Count up all numbers of the map
-func countTotal(values map[string]int) int <span class="cov0" title="0">{
+func countTotal(values map[string]int) int <span class="cov8" title="1">{
         var total = 0
 
-        for _, v := range values </span><span class="cov0" title="0">{
+        for _, v := range values </span><span class="cov8" title="1">{
                 total = total + v
         }</span>
-        <span class="cov0" title="0">return total</span>
+        <span class="cov8" title="1">return total</span>
 }
 
 // Convert a given map to metrics
