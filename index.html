@@ -63,7 +63,7 @@
 				
 				<option value="file3">github.com/heathcliff26/minecraft-exporter/pkg/config/errors.go (0.0%)</option>
 				
-				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (46.4%)</option>
+				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (48.3%)</option>
 				
 				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (12.5%)</option>
 				
@@ -71,15 +71,15 @@
 				
 				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
 				
-				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (0.0%)</option>
+				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (80.0%)</option>
 				
-				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (0.0%)</option>
+				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (25.0%)</option>
 				
-				<option value="file10">github.com/heathcliff26/minecraft-exporter/pkg/save/save.go (78.4%)</option>
+				<option value="file10">github.com/heathcliff26/minecraft-exporter/pkg/save/save.go (79.4%)</option>
 				
 				<option value="file11">github.com/heathcliff26/minecraft-exporter/pkg/save/types.go (88.9%)</option>
 				
-				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (65.8%)</option>
+				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (73.7%)</option>
 				
 				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/errors.go (71.4%)</option>
 				
@@ -155,7 +155,7 @@ func main() <span class="cov8" title="1">{
 
         <span class="cov8" title="1">reg := prometheus.NewRegistry()
 
-        sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.ReduceMetrics)
+        sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.Instance, cfg.ReduceMetrics)
         if err != nil </span><span class="cov8" title="1">{
                 slog.Error("Failed to create save collector", "err", err)
                 os.Exit(1)
@@ -459,31 +459,33 @@ type RCONCollector struct {
         ServerType    string
         DynmapEnabled bool
 
-        mcPlayerOnlineDesc *prometheus.Desc
-
-        forgeTPSDimDesc          *prometheus.Desc
-        forgeTicktimeDimDesc     *prometheus.Desc
-        forgeTPSOverallDesc      *prometheus.Desc
-        forgeTicktimeOverallDesc *prometheus.Desc
-        forgeEntitiesCountDesc   *prometheus.Desc
-
-        paperTPS1mDesc  *prometheus.Desc
-        paperTPS5mDesc  *prometheus.Desc
-        paperTPS15mDesc *prometheus.Desc
-
-        dynmapTileRenderStatDesc       *prometheus.Desc
-        dynmapChunkLoadingCountDesc    *prometheus.Desc
-        dynmapChunkLoadingDurationDesc *prometheus.Desc
-
-        tickTargetDesc  *prometheus.Desc
-        tickAverageDesc *prometheus.Desc
-        tickP50Desc     *prometheus.Desc
-        tickP95Desc     *prometheus.Desc
-        tickP99Desc     *prometheus.Desc
+        Instance string
 }
 
-const (
-        instanceLabelName = "instance"
+var (
+        commonVariableLabels = []string{"instance"}
+
+        mcPlayerOnlineDesc = prometheus.NewDesc("minecraft_player_online", "Show currently online players. Value is always 1", append(commonVariableLabels, "player"), nil)
+
+        forgeTPSDimDesc          = prometheus.NewDesc("forge_tps_dim", "TPS of a dimension", append(commonVariableLabels, "dimension_id", "dimension_name"), nil)
+        forgeTicktimeDimDesc     = prometheus.NewDesc("forge_ticktime_dim", "Time a Tick took in a Dimension", append(commonVariableLabels, "dimension_id", "dimension_name"), nil)
+        forgeTPSOverallDesc      = prometheus.NewDesc("forge_tps_overall", "Overall TPS", commonVariableLabels, nil)
+        forgeTicktimeOverallDesc = prometheus.NewDesc("forge_ticktime_overall", "Overall Ticktime", commonVariableLabels, nil)
+        forgeEntitiesCountDesc   = prometheus.NewDesc("forge_entity_count", "Type and count of active entities", append(commonVariableLabels, "entity"), nil)
+
+        paperTPS1mDesc  = prometheus.NewDesc("paper_tps_1m", "1 Minute TPS", commonVariableLabels, prometheus.Labels{"tps": "1m"})
+        paperTPS5mDesc  = prometheus.NewDesc("paper_tps_5m", "5 Minute TPS", commonVariableLabels, prometheus.Labels{"tps": "5m"})
+        paperTPS15mDesc = prometheus.NewDesc("paper_tps_15m", "15 Minute TPS", commonVariableLabels, prometheus.Labels{"tps": "15m"})
+
+        dynmapTileRenderStatDesc       = prometheus.NewDesc("dynmap_tile_render_stat", "Tile Render Statistics reported by Dynmap", append(commonVariableLabels, "type", "file"), nil)
+        dynmapChunkLoadingCountDesc    = prometheus.NewDesc("dynmap_chunk_loading_count", "Chunk Loading Statistics reported by Dynmap", append(commonVariableLabels, "type"), nil)
+        dynmapChunkLoadingDurationDesc = prometheus.NewDesc("dynmap_chunk_loading_duration", "Chunk Loading Statistics reported by Dynmap", append(commonVariableLabels, "type"), nil)
+
+        tickTargetDesc  = prometheus.NewDesc("minecraft_tick_target", "Targeted number of ticks per second", commonVariableLabels, nil)
+        tickAverageDesc = prometheus.NewDesc("minecraft_tick_average", "Average time per tick in milliseconds", commonVariableLabels, nil)
+        tickP50Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", commonVariableLabels, prometheus.Labels{"percentile": "50"})
+        tickP95Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", commonVariableLabels, prometheus.Labels{"percentile": "95"})
+        tickP99Desc     = prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", commonVariableLabels, prometheus.Labels{"percentile": "99"})
 )
 
 // Create new instance of collector, returns error if RCON is not correctly configured not provided
@@ -500,27 +502,7 @@ func NewRCONCollector(cfg config.Config) (*RCONCollector, error) <span class="co
                 ServerType:    cfg.ServerType,
                 DynmapEnabled: cfg.DynmapEnabled,
 
-                mcPlayerOnlineDesc: prometheus.NewDesc("minecraft_player_online", "Show currently online players. Value is always 1", []string{"player"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
-
-                forgeTPSDimDesc:          prometheus.NewDesc("forge_tps_dim", "TPS of a dimension", []string{"dimension_id", "dimension_name"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
-                forgeTicktimeDimDesc:     prometheus.NewDesc("forge_ticktime_dim", "Time a Tick took in a Dimension", []string{"dimension_id", "dimension_name"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
-                forgeTPSOverallDesc:      prometheus.NewDesc("forge_tps_overall", "Overall TPS", nil, prometheus.Labels{instanceLabelName: cfg.Instance}),
-                forgeTicktimeOverallDesc: prometheus.NewDesc("forge_ticktime_overall", "Overall Ticktime", nil, prometheus.Labels{instanceLabelName: cfg.Instance}),
-                forgeEntitiesCountDesc:   prometheus.NewDesc("forge_entity_count", "Type and count of active entities", []string{"entity"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
-
-                paperTPS1mDesc:  prometheus.NewDesc("paper_tps_1m", "1 Minute TPS", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "tps": "1m"}),
-                paperTPS5mDesc:  prometheus.NewDesc("paper_tps_5m", "5 Minute TPS", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "tps": "5m"}),
-                paperTPS15mDesc: prometheus.NewDesc("paper_tps_15m", "15 Minute TPS", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "tps": "15m"}),
-
-                dynmapTileRenderStatDesc:       prometheus.NewDesc("dynmap_tile_render_stat", "Tile Render Statistics reported by Dynmap", []string{"type", "file"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
-                dynmapChunkLoadingCountDesc:    prometheus.NewDesc("dynmap_chunk_loading_count", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
-                dynmapChunkLoadingDurationDesc: prometheus.NewDesc("dynmap_chunk_loading_duration", "Chunk Loading Statistics reported by Dynmap", []string{"type"}, prometheus.Labels{instanceLabelName: cfg.Instance}),
-
-                tickTargetDesc:  prometheus.NewDesc("minecraft_tick_target", "Targeted number of ticks per second", nil, prometheus.Labels{instanceLabelName: cfg.Instance}),
-                tickAverageDesc: prometheus.NewDesc("minecraft_tick_average", "Average time per tick in milliseconds", nil, prometheus.Labels{instanceLabelName: cfg.Instance}),
-                tickP50Desc:     prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "percentile": "50"}),
-                tickP95Desc:     prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "percentile": "95"}),
-                tickP99Desc:     prometheus.NewDesc("minecraft_tick_percentile", "Time per tick in percentiles", nil, prometheus.Labels{instanceLabelName: cfg.Instance, "percentile": "99"}),
+                Instance: cfg.Instance,
         }, nil</span>
 }
 
@@ -532,9 +514,11 @@ func (c *RCONCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov
 // Implements the Collect function for prometheus.Collector
 func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov8" title="1">{
         slog.Debug("Starting collection of minecraft metrics via RCON")
+        commonLabels := []string{c.Instance}
+
         players := c.rcon.GetPlayersOnline()
         for _, player := range players </span><span class="cov8" title="1">{
-                ch &lt;- prometheus.MustNewConstMetric(c.mcPlayerOnlineDesc, prometheus.GaugeValue, 1, player)
+                ch &lt;- prometheus.MustNewConstMetric(mcPlayerOnlineDesc, prometheus.GaugeValue, 1, append(commonLabels, player)...)
         }</span>
         <span class="cov8" title="1">switch c.ServerType </span>{
         case config.SERVER_TYPE_FORGE, config.SERVER_TYPE_NEOFORGE:<span class="cov8" title="1">
@@ -544,18 +528,19 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         slog.Error("Failed to collect forge tps stats", "err", err)
                 }</span> else<span class="cov8" title="1"> {
                         for _, stat := range dimStats </span><span class="cov8" title="1">{
-                                ch &lt;- prometheus.MustNewConstMetric(c.forgeTPSDimDesc, prometheus.CounterValue, stat.TPS, stat.ID, stat.Name)
-                                ch &lt;- prometheus.MustNewConstMetric(c.forgeTicktimeDimDesc, prometheus.CounterValue, stat.Ticktime, stat.ID, stat.Name)
+                                labels := append(commonLabels, stat.ID, stat.Name)
+                                ch &lt;- prometheus.MustNewConstMetric(forgeTPSDimDesc, prometheus.CounterValue, stat.TPS, labels...)
+                                ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeDimDesc, prometheus.CounterValue, stat.Ticktime, labels...)
                         }</span>
-                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(c.forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS)
-                        ch &lt;- prometheus.MustNewConstMetric(c.forgeTicktimeOverallDesc, prometheus.CounterValue, overallStat.Ticktime)</span>
+                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS, commonLabels...)
+                        ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeOverallDesc, prometheus.CounterValue, overallStat.Ticktime, commonLabels...)</span>
                 }
                 <span class="cov8" title="1">entities, err := c.rcon.GetForgeEntities(c.ServerType)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to retrieve forge entity list", "err", err)
                 }</span> else<span class="cov8" title="1"> {
                         for _, entity := range entities </span><span class="cov8" title="1">{
-                                ch &lt;- prometheus.MustNewConstMetric(c.forgeEntitiesCountDesc, prometheus.CounterValue, float64(entity.Count), entity.Name)
+                                ch &lt;- prometheus.MustNewConstMetric(forgeEntitiesCountDesc, prometheus.CounterValue, float64(entity.Count), append(commonLabels, entity.Name)...)
                         }</span>
                 }
         case config.SERVER_TYPE_PAPER:<span class="cov0" title="0">
@@ -565,9 +550,9 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         slog.Error("Failed to collect paper tps stats", "err", err)
                 }</span> else<span class="cov0" title="0"> {
                         if len(paperTPS) == 3 </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(c.paperTPS1mDesc, prometheus.CounterValue, paperTPS[0])
-                                ch &lt;- prometheus.MustNewConstMetric(c.paperTPS5mDesc, prometheus.CounterValue, paperTPS[1])
-                                ch &lt;- prometheus.MustNewConstMetric(c.paperTPS15mDesc, prometheus.CounterValue, paperTPS[2])
+                                ch &lt;- prometheus.MustNewConstMetric(paperTPS1mDesc, prometheus.CounterValue, paperTPS[0], commonLabels...)
+                                ch &lt;- prometheus.MustNewConstMetric(paperTPS5mDesc, prometheus.CounterValue, paperTPS[1], commonLabels...)
+                                ch &lt;- prometheus.MustNewConstMetric(paperTPS15mDesc, prometheus.CounterValue, paperTPS[2], commonLabels...)
                         }</span>
                 }
         }
@@ -579,13 +564,13 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         slog.Error("Failed to collect dynmap stats", "err", err)
                 }</span> else<span class="cov0" title="0"> {
                         for _, stat := range render </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Processed), "processed", stat.Dim)
-                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Rendered), "rendered", stat.Dim)
-                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Updated), "updated", stat.Dim)
+                                ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Processed), append(commonLabels, "processed", stat.Dim)...)
+                                ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Rendered), append(commonLabels, "rendered", stat.Dim)...)
+                                ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Updated), append(commonLabels, "updated", stat.Dim)...)
                         }</span>
                         <span class="cov0" title="0">for _, stat := range chunks </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapChunkLoadingCountDesc, prometheus.CounterValue, float64(stat.Count), stat.State)
-                                ch &lt;- prometheus.MustNewConstMetric(c.dynmapChunkLoadingDurationDesc, prometheus.CounterValue, stat.Duration, stat.State)
+                                ch &lt;- prometheus.MustNewConstMetric(dynmapChunkLoadingCountDesc, prometheus.CounterValue, float64(stat.Count), append(commonLabels, stat.State)...)
+                                ch &lt;- prometheus.MustNewConstMetric(dynmapChunkLoadingDurationDesc, prometheus.CounterValue, stat.Duration, append(commonLabels, stat.State)...)
                         }</span>
                 }
         }
@@ -596,11 +581,11 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                         slog.Error("Failed to collect tick stats", "err", err)
                 }</span>
 
-                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(c.tickTargetDesc, prometheus.CounterValue, tickStats.Target)
-                ch &lt;- prometheus.MustNewConstMetric(c.tickAverageDesc, prometheus.CounterValue, tickStats.Average)
-                ch &lt;- prometheus.MustNewConstMetric(c.tickP50Desc, prometheus.CounterValue, tickStats.P50)
-                ch &lt;- prometheus.MustNewConstMetric(c.tickP95Desc, prometheus.CounterValue, tickStats.P95)
-                ch &lt;- prometheus.MustNewConstMetric(c.tickP99Desc, prometheus.CounterValue, tickStats.P99)</span>
+                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(tickTargetDesc, prometheus.CounterValue, tickStats.Target, commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(tickAverageDesc, prometheus.CounterValue, tickStats.Average, commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(tickP50Desc, prometheus.CounterValue, tickStats.P50, commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(tickP95Desc, prometheus.CounterValue, tickStats.P95, commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(tickP99Desc, prometheus.CounterValue, tickStats.P99, commonLabels...)</span>
         }
         <span class="cov8" title="1">slog.Debug("Finished collection of minecraft metrics via RCON")</span>
 }
@@ -1145,51 +1130,56 @@ type SaveCollector struct {
         save          *Save
         uuidCache     *uuid.UUIDCache
         ReduceMetrics bool
+        Instance      string
 
         RCON *rcon.RCONClient
 }
 
 var (
-        mcStatBlocksMinedReducedDesc    = prometheus.NewDesc("minecraft_stat_blocks_mined", "Blocks a player mined", []string{"player"}, nil)
-        mcStatBlocksPickedUpReducedDesc = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", []string{"player"}, nil)
-        mcStatBlocksCraftedReducedDesc  = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", []string{"player"}, nil)
+        commonVariableLabels = []string{"instance", "player"}
 
-        mcStatBlocksMinedDesc       = prometheus.NewDesc("minecraft_stat_blocks_mined", "Blocks a player mined", []string{"player", "block"}, nil)
-        mcStatBlocksPickedUpDesc    = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", []string{"player", "block"}, nil)
-        mcStatBlocksCraftedDesc     = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", []string{"player", "block"}, nil)
-        mcStatDeathsDesc            = prometheus.NewDesc("minecraft_stat_deaths", "How often a player died. Cause \"minecraft:deaths\" is used for total deaths", []string{"player", "cause"}, nil)
-        mcStatJumpsDesc             = prometheus.NewDesc("minecraft_stat_jumps", "How often a player has jumped", []string{"player"}, nil)
-        mcStatCMTraveledDesc        = prometheus.NewDesc("minecraft_stat_cm_traveled", "How many cm a player traveled", []string{"player", "method"}, nil)
-        mcStatXPTotalDesc           = prometheus.NewDesc("minecraft_stat_xp_total", "How much total XP a player earned", []string{"player"}, nil)
-        mcStatCurrentLevelDesc      = prometheus.NewDesc("minecraft_stat_current_level", "How many levels the player currently has", []string{"player"}, nil)
-        mcStatFoodLevelDesc         = prometheus.NewDesc("minecraft_stat_food_level", "How fed the player currently is", []string{"player"}, nil)
-        mcStatHealthDesc            = prometheus.NewDesc("minecraft_stat_health", "How much health the player currently has", []string{"player"}, nil)
-        mcStatScoreDesc             = prometheus.NewDesc("minecraft_stat_score", "The score of the player", []string{"player"}, nil)
-        mcStatEntitiesKilledDesc    = prometheus.NewDesc("minecraft_stat_entities_killed", "Entities killed by player", []string{"player", "entity"}, nil)
-        mcStatDamageTakenDesc       = prometheus.NewDesc("minecraft_stat_damage_taken", "Damage taken by player", []string{"player"}, nil)
-        mcStatDamageDealtDesc       = prometheus.NewDesc("minecraft_stat_damage_dealt", "Damage dealt by player", []string{"player"}, nil)
-        mcStatPlaytimeDesc          = prometheus.NewDesc("minecraft_stat_playtime", "Time in minutes a player was online", []string{"player"}, nil)
-        mcStatAdvancementsDesc      = prometheus.NewDesc("minecraft_stat_advancements", "Number of completed advancements of a player", []string{"player"}, nil)
-        mcStatSleptDesc             = prometheus.NewDesc("minecraft_stat_slept", "Times a player slept in a bed", []string{"player"}, nil)
-        mcStatUsedCraftingTableDesc = prometheus.NewDesc("minecraft_stat_used_crafting_table", "Times a player used a crafting table", []string{"player"}, nil)
-        mcStatCustomDesc            = prometheus.NewDesc("minecraft_stat_custom", "Custom minecraft stat", []string{"player", "stat"}, nil)
+        mcStatBlocksMinedReducedDesc    = prometheus.NewDesc("minecraft_stat_blocks_mined", "Blocks a player mined", commonVariableLabels, nil)
+        mcStatBlocksPickedUpReducedDesc = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", commonVariableLabels, nil)
+        mcStatBlocksCraftedReducedDesc  = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", commonVariableLabels, nil)
+
+        mcStatBlocksMinedDesc       = prometheus.NewDesc("minecraft_stat_blocks_mined", "Blocks a player mined", append(commonVariableLabels, "block"), nil)
+        mcStatBlocksPickedUpDesc    = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", append(commonVariableLabels, "block"), nil)
+        mcStatBlocksCraftedDesc     = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", append(commonVariableLabels, "block"), nil)
+        mcStatDeathsDesc            = prometheus.NewDesc("minecraft_stat_deaths", "How often a player died. Cause \"minecraft:deaths\" is used for total deaths", append(commonVariableLabels, "cause"), nil)
+        mcStatJumpsDesc             = prometheus.NewDesc("minecraft_stat_jumps", "How often a player has jumped", commonVariableLabels, nil)
+        mcStatCMTraveledDesc        = prometheus.NewDesc("minecraft_stat_cm_traveled", "How many cm a player traveled", append(commonVariableLabels, "method"), nil)
+        mcStatXPTotalDesc           = prometheus.NewDesc("minecraft_stat_xp_total", "How much total XP a player earned", commonVariableLabels, nil)
+        mcStatCurrentLevelDesc      = prometheus.NewDesc("minecraft_stat_current_level", "How many levels the player currently has", commonVariableLabels, nil)
+        mcStatFoodLevelDesc         = prometheus.NewDesc("minecraft_stat_food_level", "How fed the player currently is", commonVariableLabels, nil)
+        mcStatHealthDesc            = prometheus.NewDesc("minecraft_stat_health", "How much health the player currently has", commonVariableLabels, nil)
+        mcStatScoreDesc             = prometheus.NewDesc("minecraft_stat_score", "The score of the player", commonVariableLabels, nil)
+        mcStatEntitiesKilledDesc    = prometheus.NewDesc("minecraft_stat_entities_killed", "Entities killed by player", append(commonVariableLabels, "entity"), nil)
+        mcStatDamageTakenDesc       = prometheus.NewDesc("minecraft_stat_damage_taken", "Damage taken by player", commonVariableLabels, nil)
+        mcStatDamageDealtDesc       = prometheus.NewDesc("minecraft_stat_damage_dealt", "Damage dealt by player", commonVariableLabels, nil)
+        mcStatPlaytimeDesc          = prometheus.NewDesc("minecraft_stat_playtime", "Time in minutes a player was online", commonVariableLabels, nil)
+        mcStatAdvancementsDesc      = prometheus.NewDesc("minecraft_stat_advancements", "Number of completed advancements of a player", commonVariableLabels, nil)
+        mcStatSleptDesc             = prometheus.NewDesc("minecraft_stat_slept", "Times a player slept in a bed", commonVariableLabels, nil)
+        mcStatUsedCraftingTableDesc = prometheus.NewDesc("minecraft_stat_used_crafting_table", "Times a player used a crafting table", commonVariableLabels, nil)
+        mcStatCustomDesc            = prometheus.NewDesc("minecraft_stat_custom", "Custom minecraft stat", append(commonVariableLabels, "stat"), nil)
 )
 
 // Create new instance of collector, returns error if an world directory is not provided
 // Arguments:
 //
-//                path: The path of the minecraft world directory
-//         reduceMetrics: Indicate if the amount of metrics should be reduced
-func NewSaveCollector(path string, reduceMetrics bool) (*SaveCollector, error) <span class="cov0" title="0">{
+//        path: The path of the minecraft world directory
+//        instance: The instance label to use for the metrics
+//        reduceMetrics: Indicate if the amount of metrics should be reduced
+func NewSaveCollector(path, instance string, reduceMetrics bool) (*SaveCollector, error) <span class="cov8" title="1">{
         save, err := NewSave(path)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov8" title="1">{
                 return nil, err
         }</span>
 
-        <span class="cov0" title="0">return &amp;SaveCollector{
+        <span class="cov8" title="1">return &amp;SaveCollector{
                 save:          save,
                 uuidCache:     uuid.NewUUIDCache(time.Duration(time.Hour * 12)),
                 ReduceMetrics: reduceMetrics,
+                Instance:      instance,
         }, nil</span>
 }
 
@@ -1199,7 +1189,7 @@ func (c *SaveCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov
 }</span>
 
 // Implements the Collect function for prometheus.Collector
-func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov0" title="0">{
+func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov8" title="1">{
         slog.Debug("Starting collection of minecraft metrics from savedata")
 
         players, err := c.save.GetPlayers()
@@ -1208,76 +1198,78 @@ func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                 return
         }</span>
 
-        <span class="cov0" title="0">for _, player := range players </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">for _, player := range players </span><span class="cov8" title="1">{
                 name, err := c.uuidCache.GetNameFromUUID(player)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to fetch name from uuid", "err", err, "player", player)
                         return
                 }</span>
 
-                <span class="cov0" title="0">d, err := c.save.LoadPlayerData(player)
+                <span class="cov8" title="1">d, err := c.save.LoadPlayerData(player)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to load data for player", "err", err, "player", player)
                         return
                 }</span>
 
-                <span class="cov0" title="0">if c.ReduceMetrics </span><span class="cov0" title="0">{
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksMinedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.Mined)), name)
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksPickedUpReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.PickedUp)), name)
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksCraftedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.CraftedItems)), name)
-                }</span> else<span class="cov0" title="0"> {
-                        mapToMetrics(ch, mcStatBlocksMinedDesc, d.Stats.Mined, name)
-                        mapToMetrics(ch, mcStatBlocksPickedUpDesc, d.Stats.PickedUp, name)
-                        mapToMetrics(ch, mcStatBlocksCraftedDesc, d.Stats.CraftedItems, name)
+                <span class="cov8" title="1">commonLabels := []string{c.Instance, name}
+
+                if c.ReduceMetrics </span><span class="cov0" title="0">{
+                        ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksMinedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.Mined)), commonLabels...)
+                        ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksPickedUpReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.PickedUp)), commonLabels...)
+                        ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksCraftedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.CraftedItems)), commonLabels...)
+                }</span> else<span class="cov8" title="1"> {
+                        mapToMetrics(ch, mcStatBlocksMinedDesc, d.Stats.Mined, commonLabels)
+                        mapToMetrics(ch, mcStatBlocksPickedUpDesc, d.Stats.PickedUp, commonLabels)
+                        mapToMetrics(ch, mcStatBlocksCraftedDesc, d.Stats.CraftedItems, commonLabels)
                 }</span>
 
-                <span class="cov0" title="0">for key, value := range d.Stats.KilledBy </span><span class="cov0" title="0">{
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatDeathsDesc, prometheus.CounterValue, float64(value), name, key)
+                <span class="cov8" title="1">for key, value := range d.Stats.KilledBy </span><span class="cov8" title="1">{
+                        ch &lt;- prometheus.MustNewConstMetric(mcStatDeathsDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
                 }</span>
-                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(mcStatDeathsDesc, prometheus.CounterValue, float64(d.Stats.Custom.Deaths), name, "minecraft:deaths")
+                <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatDeathsDesc, prometheus.CounterValue, float64(d.Stats.Custom.Deaths), append(commonLabels, "minecraft:deaths")...)
 
-                ch &lt;- prometheus.MustNewConstMetric(mcStatJumpsDesc, prometheus.CounterValue, float64(d.Stats.Custom.Jump), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Walk), name, "walking")
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Swim), name, "swimming")
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Sprint), name, "sprinting")
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Dive), name, "diving")
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Fall), name, "falling")
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Fly), name, "flying")
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Boat), name, "boat")
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Horse), name, "Horse")
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Climb), name, "climbing")
+                ch &lt;- prometheus.MustNewConstMetric(mcStatJumpsDesc, prometheus.CounterValue, float64(d.Stats.Custom.Jump), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Walk), append(commonLabels, "walking")...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Swim), append(commonLabels, "swimming")...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Sprint), append(commonLabels, "sprinting")...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Dive), append(commonLabels, "diving")...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Fall), append(commonLabels, "falling")...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Fly), append(commonLabels, "flying")...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Boat), append(commonLabels, "boat")...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Horse), append(commonLabels, "Horse")...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Climb), append(commonLabels, "climbing")...)
 
-                ch &lt;- prometheus.MustNewConstMetric(mcStatXPTotalDesc, prometheus.CounterValue, float64(d.PlayerData.XPTotal), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatCurrentLevelDesc, prometheus.CounterValue, float64(d.PlayerData.XPLevel), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatFoodLevelDesc, prometheus.CounterValue, float64(d.PlayerData.FoodLevel), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatHealthDesc, prometheus.CounterValue, float64(d.PlayerData.Health), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatScoreDesc, prometheus.CounterValue, float64(d.PlayerData.Score), name)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatXPTotalDesc, prometheus.CounterValue, float64(d.PlayerData.XPTotal), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatCurrentLevelDesc, prometheus.CounterValue, float64(d.PlayerData.XPLevel), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatFoodLevelDesc, prometheus.CounterValue, float64(d.PlayerData.FoodLevel), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatHealthDesc, prometheus.CounterValue, float64(d.PlayerData.Health), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatScoreDesc, prometheus.CounterValue, float64(d.PlayerData.Score), commonLabels...)
 
-                for key, value := range d.Stats.Killed </span><span class="cov0" title="0">{
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatEntitiesKilledDesc, prometheus.CounterValue, float64(value), name, key)
+                for key, value := range d.Stats.Killed </span><span class="cov8" title="1">{
+                        ch &lt;- prometheus.MustNewConstMetric(mcStatEntitiesKilledDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
                 }</span>
 
-                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(mcStatDamageTakenDesc, prometheus.CounterValue, float64(d.Stats.Custom.DamageTaken), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatDamageDealtDesc, prometheus.CounterValue, float64(d.Stats.Custom.DamageDealt), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatPlaytimeDesc, prometheus.CounterValue, float64(d.Stats.Custom.Playtime), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatSleptDesc, prometheus.CounterValue, float64(d.Stats.Custom.Sleep), name)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatUsedCraftingTableDesc, prometheus.CounterValue, float64(d.Stats.Custom.Crafted), name)
+                <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatDamageTakenDesc, prometheus.CounterValue, float64(d.Stats.Custom.DamageTaken), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatDamageDealtDesc, prometheus.CounterValue, float64(d.Stats.Custom.DamageDealt), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatPlaytimeDesc, prometheus.CounterValue, float64(d.Stats.Custom.Playtime), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatSleptDesc, prometheus.CounterValue, float64(d.Stats.Custom.Sleep), commonLabels...)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatUsedCraftingTableDesc, prometheus.CounterValue, float64(d.Stats.Custom.Crafted), commonLabels...)
 
                 advancements := countAdvancements(d.Advancements)
-                ch &lt;- prometheus.MustNewConstMetric(mcStatAdvancementsDesc, prometheus.CounterValue, float64(advancements), name)
+                ch &lt;- prometheus.MustNewConstMetric(mcStatAdvancementsDesc, prometheus.CounterValue, float64(advancements), commonLabels...)
 
-                for key, value := range d.Stats.Custom.Custom </span><span class="cov0" title="0">{
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatCustomDesc, prometheus.CounterValue, float64(value), name, key)
+                for key, value := range d.Stats.Custom.Custom </span><span class="cov8" title="1">{
+                        ch &lt;- prometheus.MustNewConstMetric(mcStatCustomDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
                 }</span>
         }
 
         // Update the game version in the rcon client
-        <span class="cov0" title="0">if c.RCON != nil &amp;&amp; c.RCON.Version() != c.save.Version.Name </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if c.RCON != nil &amp;&amp; c.RCON.Version() != c.save.Version.Name </span><span class="cov0" title="0">{
                 slog.Info("Minecraft Version", "version", c.save.Version.Name)
                 c.RCON.UpdateVersion(c.save.Version.Name)
         }</span>
 
-        <span class="cov0" title="0">slog.Debug("Finished collection of minecraft metrics from savedata")</span>
+        <span class="cov8" title="1">slog.Debug("Finished collection of minecraft metrics from savedata")</span>
 }
 </pre>
 		
@@ -1289,7 +1281,7 @@ type ErrNoWorldDirectory struct {
         details string
 }
 
-func NewErrNoWorldDirectory(details string) *ErrNoWorldDirectory <span class="cov0" title="0">{
+func NewErrNoWorldDirectory(details string) *ErrNoWorldDirectory <span class="cov8" title="1">{
         return &amp;ErrNoWorldDirectory{
                 details: details,
         }
@@ -1340,7 +1332,7 @@ type Save struct {
 
 // Create a new save from the given path
 func NewSave(path string) (*Save, error) <span class="cov8" title="1">{
-        if !isDirectory(path) </span><span class="cov0" title="0">{
+        if !isDirectory(path) </span><span class="cov8" title="1">{
                 return nil, NewErrNoWorldDirectory("\"" + path + "\"" + " is not a directory")
         }</span>
 
@@ -1702,7 +1694,7 @@ import (
 // Check if the given path is a directory
 func isDirectory(path string) bool <span class="cov8" title="1">{
         fileInfo, err := os.Stat(path)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov8" title="1">{
                 return false
         }</span>
         <span class="cov8" title="1">return fileInfo.IsDir()</span>
@@ -1774,9 +1766,9 @@ func countTotal(values map[string]int) int <span class="cov0" title="0">{
 }
 
 // Convert a given map to metrics
-func mapToMetrics(ch chan&lt;- prometheus.Metric, desc *prometheus.Desc, values map[string]int, player string) <span class="cov0" title="0">{
-        for k, v := range values </span><span class="cov0" title="0">{
-                ch &lt;- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, float64(v), player, k)
+func mapToMetrics(ch chan&lt;- prometheus.Metric, desc *prometheus.Desc, values map[string]int, labels []string) <span class="cov8" title="1">{
+        for k, v := range values </span><span class="cov8" title="1">{
+                ch &lt;- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, float64(v), append(labels, k)...)
         }</span>
 }
 </pre>
