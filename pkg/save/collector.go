@@ -25,9 +25,10 @@ var (
 	mcStatBlocksPickedUpReducedDesc = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", commonVariableLabels, nil)
 	mcStatBlocksCraftedReducedDesc  = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", commonVariableLabels, nil)
 
-	mcStatBlocksMinedDesc       = prometheus.NewDesc("minecraft_stat_blocks_mined", "Blocks a player mined", append(commonVariableLabels, "block"), nil)
-	mcStatBlocksPickedUpDesc    = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", append(commonVariableLabels, "block"), nil)
-	mcStatBlocksCraftedDesc     = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", append(commonVariableLabels, "block"), nil)
+	mcStatBlocksMinedDesc    = prometheus.NewDesc("minecraft_stat_blocks_mined", "Blocks a player mined", append(commonVariableLabels, "block"), nil)
+	mcStatBlocksPickedUpDesc = prometheus.NewDesc("minecraft_stat_blocks_picked_up", "Blocks a player picked up", append(commonVariableLabels, "block"), nil)
+	mcStatBlocksCraftedDesc  = prometheus.NewDesc("minecraft_stat_blocks_crafted", "Items a player crafted", append(commonVariableLabels, "block"), nil)
+
 	mcStatDeathsDesc            = prometheus.NewDesc("minecraft_stat_deaths", "How often a player died. Cause \"minecraft:deaths\" is used for total deaths", append(commonVariableLabels, "cause"), nil)
 	mcStatJumpsDesc             = prometheus.NewDesc("minecraft_stat_jumps", "How often a player has jumped", commonVariableLabels, nil)
 	mcStatCMTraveledDesc        = prometheus.NewDesc("minecraft_stat_cm_traveled", "How many cm a player traveled", append(commonVariableLabels, "method"), nil)
@@ -68,7 +69,32 @@ func NewSaveCollector(path, instance string, reduceMetrics bool) (*SaveCollector
 
 // Implements the Describe function for prometheus.Collector
 func (c *SaveCollector) Describe(ch chan<- *prometheus.Desc) {
-	prometheus.DescribeByCollect(c, ch)
+	if c.ReduceMetrics {
+		ch <- mcStatBlocksMinedReducedDesc
+		ch <- mcStatBlocksPickedUpReducedDesc
+		ch <- mcStatBlocksCraftedReducedDesc
+	} else {
+		ch <- mcStatBlocksMinedDesc
+		ch <- mcStatBlocksPickedUpDesc
+		ch <- mcStatBlocksCraftedDesc
+	}
+
+	ch <- mcStatDeathsDesc
+	ch <- mcStatJumpsDesc
+	ch <- mcStatCMTraveledDesc
+	ch <- mcStatXPTotalDesc
+	ch <- mcStatCurrentLevelDesc
+	ch <- mcStatFoodLevelDesc
+	ch <- mcStatHealthDesc
+	ch <- mcStatScoreDesc
+	ch <- mcStatEntitiesKilledDesc
+	ch <- mcStatDamageTakenDesc
+	ch <- mcStatDamageDealtDesc
+	ch <- mcStatPlaytimeDesc
+	ch <- mcStatAdvancementsDesc
+	ch <- mcStatSleptDesc
+	ch <- mcStatUsedCraftingTableDesc
+	ch <- mcStatCustomDesc
 }
 
 // Implements the Collect function for prometheus.Collector

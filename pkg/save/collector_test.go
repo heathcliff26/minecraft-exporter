@@ -42,3 +42,47 @@ func TestCollectHasCommonLabels(t *testing.T) {
 		assert.Contains(desc, "variableLabels: {instance,player", "Metric description should contain the correct instance label")
 	}
 }
+
+func TestCollectorDescribe(t *testing.T) {
+	tMatrix := map[string]bool{
+		"ReducedMetrics": false,
+		"FullMetrics":    true,
+	}
+	for name, reduceMetrics := range tMatrix {
+		t.Run(name, func(t *testing.T) {
+			assert := assert.New(t)
+			require := require.New(t)
+
+			c, err := NewSaveCollector("./testdata/1.20", "test-instance", reduceMetrics)
+			require.NoError(err)
+
+			expectedDescCount := 19
+
+			ch := make(chan *prometheus.Desc)
+			expectedDescs := make([]*prometheus.Desc, 0, expectedDescCount)
+			go func() {
+				prometheus.DescribeByCollect(c, ch)
+				close(ch)
+			}()
+			for desc := range ch {
+				expectedDescs = append(expectedDescs, desc)
+			}
+
+			ch = make(chan *prometheus.Desc)
+			result := make([]*prometheus.Desc, 0, expectedDescCount)
+			go func() {
+				c.Describe(ch)
+				close(ch)
+			}()
+			for desc := range ch {
+				result = append(result, desc)
+			}
+
+			assert.Len(result, expectedDescCount, "Should have correct number of described metrics")
+			for _, desc := range expectedDescs {
+				assert.Contains(result, desc, "Described metrics should match collected metrics")
+			}
+		})
+	}
+
+}
