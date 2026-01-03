@@ -59,33 +59,31 @@
 				
 				<option value="file1">github.com/heathcliff26/minecraft-exporter/pkg/config/config.go (90.5%)</option>
 				
-				<option value="file2">github.com/heathcliff26/minecraft-exporter/pkg/config/duration.go (90.9%)</option>
+				<option value="file2">github.com/heathcliff26/minecraft-exporter/pkg/config/errors.go (0.0%)</option>
 				
-				<option value="file3">github.com/heathcliff26/minecraft-exporter/pkg/config/errors.go (0.0%)</option>
+				<option value="file3">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (60.8%)</option>
 				
-				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (60.8%)</option>
+				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (12.5%)</option>
 				
-				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (12.5%)</option>
+				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (86.0%)</option>
 				
-				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (86.0%)</option>
+				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
 				
-				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
+				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (92.2%)</option>
 				
-				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (92.2%)</option>
+				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (25.0%)</option>
 				
-				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (25.0%)</option>
+				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/save.go (79.4%)</option>
 				
-				<option value="file10">github.com/heathcliff26/minecraft-exporter/pkg/save/save.go (79.4%)</option>
+				<option value="file10">github.com/heathcliff26/minecraft-exporter/pkg/save/types.go (88.9%)</option>
 				
-				<option value="file11">github.com/heathcliff26/minecraft-exporter/pkg/save/types.go (88.9%)</option>
+				<option value="file11">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (84.2%)</option>
 				
-				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (84.2%)</option>
+				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/uuid/errors.go (71.4%)</option>
 				
-				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/errors.go (71.4%)</option>
+				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/uuid.go (87.0%)</option>
 				
-				<option value="file14">github.com/heathcliff26/minecraft-exporter/pkg/uuid/uuid.go (87.0%)</option>
-				
-				<option value="file15">github.com/heathcliff26/minecraft-exporter/pkg/version/version.go (80.0%)</option>
+				<option value="file14">github.com/heathcliff26/minecraft-exporter/pkg/version/version.go (80.0%)</option>
 				
 				</select>
 			</div>
@@ -189,7 +187,7 @@ func main() <span class="cov8" title="1">{
                 }</span>
 
                 <span class="cov0" title="0">slog.Info("Starting remote_write client")
-                err = rwClient.Run(time.Duration(cfg.Interval))
+                err = rwClient.Run(cfg.Interval)
                 if err != nil </span><span class="cov0" title="0">{
                         slog.Error("Failed to start remote write client", "err", err)
                         os.Exit(1)
@@ -226,13 +224,13 @@ import (
         "time"
 
         "github.com/heathcliff26/promremote/v2/promremote"
-        "sigs.k8s.io/yaml"
+        "go.yaml.in/yaml/v3"
 )
 
 const (
         DEFAULT_LOG_LEVEL       = "info"
         DEFAULT_PORT            = 8080
-        DEFAULT_INTERVAL        = Duration(1 * time.Minute)
+        DEFAULT_INTERVAL        = 1 * time.Minute
         DEFAULT_WORLD_DIR       = "/world"
         DEFAULT_REMOTE_JOB_NAME = "minecraft-exporter"
 )
@@ -257,32 +255,32 @@ func init() <span class="cov8" title="1">{
 }</span>
 
 type Config struct {
-        LogLevel      string       `json:"logLevel,omitempty"`
-        Port          int          `json:"port,omitempty"`
-        Interval      Duration     `json:"interval,omitempty"`
-        Instance      string       `json:"instance"`
-        ReduceMetrics bool         `json:"reduceMetrics,omitempty"`
-        ServerType    string       `json:"server,omitempty"`
-        DynmapEnabled bool         `json:"dynmap,omitempty"`
-        WorldDir      string       `json:"world,omitempty"`
-        RCON          RCONConfig   `json:"rcon,omitempty"`
-        Remote        RemoteConfig `json:"remote,omitempty"`
+        LogLevel      string        `yaml:"logLevel,omitempty"`
+        Port          int           `yaml:"port,omitempty"`
+        Interval      time.Duration `yaml:"interval,omitempty"`
+        Instance      string        `yaml:"instance"`
+        ReduceMetrics bool          `yaml:"reduceMetrics,omitempty"`
+        ServerType    string        `yaml:"server,omitempty"`
+        DynmapEnabled bool          `yaml:"dynmap,omitempty"`
+        WorldDir      string        `yaml:"world,omitempty"`
+        RCON          RCONConfig    `yaml:"rcon,omitempty"`
+        Remote        RemoteConfig  `yaml:"remote,omitempty"`
 }
 
 type RCONConfig struct {
-        Enable   bool   `json:"enable"`
-        Host     string `json:"host"`
-        Port     int    `json:"port"`
-        Password string `json:"password"`
+        Enable   bool   `yaml:"enable"`
+        Host     string `yaml:"host"`
+        Port     int    `yaml:"port"`
+        Password string `yaml:"password"`
 }
 
 type RemoteConfig struct {
-        Enable   bool   `json:"enable"`
-        URL      string `json:"url"`
-        Instance string `json:"instance,omitempty"`
-        JobName  string `json:"jobName,omitempty"`
-        Username string `json:"username,omitempty"`
-        Password string `json:"password,omitempty"`
+        Enable   bool   `yaml:"enable"`
+        URL      string `yaml:"url"`
+        Instance string `yaml:"instance,omitempty"`
+        JobName  string `yaml:"jobName,omitempty"`
+        Username string `yaml:"username,omitempty"`
+        Password string `yaml:"password,omitempty"`
 }
 
 // Returns a Config with default values set
@@ -383,42 +381,6 @@ func setLogLevel(level string) error <span class="cov8" title="1">{
 		
 		<pre class="file" id="file2" style="display: none">package config
 
-import (
-        "encoding/json"
-        "time"
-)
-
-// Custom wrapper around time.Duration to implement json marshalling
-type Duration time.Duration
-
-func (d *Duration) UnmarshalJSON(b []byte) error <span class="cov8" title="1">{
-        var s string
-        err := json.Unmarshal(b, &amp;s)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-
-        <span class="cov8" title="1">res, err := time.ParseDuration(s)
-        if err != nil </span><span class="cov8" title="1">{
-                return err
-        }</span>
-
-        <span class="cov8" title="1">*d = Duration(res)
-
-        return nil</span>
-}
-
-func (d Duration) MarshalJSON() ([]byte, error) <span class="cov8" title="1">{
-        return json.Marshal(d.String())
-}</span>
-
-func (d Duration) String() string <span class="cov8" title="1">{
-        return time.Duration(d).String()
-}</span>
-</pre>
-		
-		<pre class="file" id="file3" style="display: none">package config
-
 import "time"
 
 type ErrUnknownLogLevel struct {
@@ -446,7 +408,7 @@ func (e *ErrUnknownServerType) Error() string <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package rcon
+		<pre class="file" id="file3" style="display: none">package rcon
 
 import (
         "log/slog"
@@ -622,7 +584,7 @@ func (c *RCONCollector) Close() error <span class="cov8" title="1">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file5" style="display: none">package rcon
+		<pre class="file" id="file4" style="display: none">package rcon
 
 import "fmt"
 
@@ -679,7 +641,7 @@ func (e ErrVanillaTick) Error() string <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file6" style="display: none">package rcon
+		<pre class="file" id="file5" style="display: none">package rcon
 
 import (
         "log/slog"
@@ -890,7 +852,7 @@ func (c *RCONClient) Close() error <span class="cov8" title="1">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file7" style="display: none">package rcon
+		<pre class="file" id="file6" style="display: none">package rcon
 
 import (
         "log/slog"
@@ -1136,7 +1098,7 @@ func parseTickQuery(input string) (TickStats, error) <span class="cov8" title="1
 }
 </pre>
 		
-		<pre class="file" id="file8" style="display: none">package save
+		<pre class="file" id="file7" style="display: none">package save
 
 import (
         "log/slog"
@@ -1199,7 +1161,7 @@ func NewSaveCollector(path, instance string, reduceMetrics bool) (*SaveCollector
 
         <span class="cov8" title="1">return &amp;SaveCollector{
                 save:          save,
-                uuidCache:     uuid.NewUUIDCache(time.Duration(time.Hour * 12)),
+                uuidCache:     uuid.NewUUIDCache(time.Hour * 12),
                 ReduceMetrics: reduceMetrics,
                 Instance:      instance,
         }, nil</span>
@@ -1338,7 +1300,7 @@ func (c *SaveCollector) updateRCONMinecraftVersion() <span class="cov8" title="1
 }
 </pre>
 		
-		<pre class="file" id="file9" style="display: none">package save
+		<pre class="file" id="file8" style="display: none">package save
 
 import "fmt"
 
@@ -1373,7 +1335,7 @@ func (e *ErrFailedToParseStat) Error() string <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package save
+		<pre class="file" id="file9" style="display: none">package save
 
 import (
         "os"
@@ -1587,7 +1549,7 @@ func (s *Save) loadStatsPre115(player string) (Stats, error) <span class="cov8" 
 }
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package save
+		<pre class="file" id="file10" style="display: none">package save
 
 import (
         "encoding/json"
@@ -1744,7 +1706,7 @@ type MinecraftPlayerData struct {
 }
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package save
+		<pre class="file" id="file11" style="display: none">package save
 
 import (
         "compress/gzip"
@@ -1838,7 +1800,7 @@ func mapToMetrics(ch chan&lt;- prometheus.Metric, desc *prometheus.Desc, values 
 }
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package uuid
+		<pre class="file" id="file12" style="display: none">package uuid
 
 import (
         "fmt"
@@ -1871,7 +1833,7 @@ func (e *ErrHttpRequestFailed) Error() string <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package uuid
+		<pre class="file" id="file13" style="display: none">package uuid
 
 import (
         "encoding/json"
@@ -1949,7 +1911,7 @@ func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) <span class="co
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package version
+		<pre class="file" id="file14" style="display: none">package version
 
 import (
         "runtime"
