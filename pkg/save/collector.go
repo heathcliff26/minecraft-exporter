@@ -61,7 +61,7 @@ func NewSaveCollector(path, instance string, reduceMetrics bool) (*SaveCollector
 
 	return &SaveCollector{
 		save:          save,
-		uuidCache:     uuid.NewUUIDCache(time.Duration(time.Hour * 12)),
+		uuidCache:     uuid.NewUUIDCache(time.Hour * 12),
 		ReduceMetrics: reduceMetrics,
 		Instance:      instance,
 	}, nil

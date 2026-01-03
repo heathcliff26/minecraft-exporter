@@ -88,7 +88,7 @@ func main() {
 		}
 
 		slog.Info("Starting remote_write client")
-		err = rwClient.Run(time.Duration(cfg.Interval))
+		err = rwClient.Run(cfg.Interval)
 		if err != nil {
 			slog.Error("Failed to start remote write client", "err", err)
 			os.Exit(1)
