@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/heathcliff26/promremote/v2/promremote"
-	"sigs.k8s.io/yaml"
+	"go.yaml.in/yaml/v3"
 )
 
 const (
 	DEFAULT_LOG_LEVEL       = "info"
 	DEFAULT_PORT            = 8080
-	DEFAULT_INTERVAL        = Duration(1 * time.Minute)
+	DEFAULT_INTERVAL        = 1 * time.Minute
 	DEFAULT_WORLD_DIR       = "/world"
 	DEFAULT_REMOTE_JOB_NAME = "minecraft-exporter"
 )
@@ -38,32 +38,32 @@ func init() {
 }
 
 type Config struct {
-	LogLevel      string       `json:"logLevel,omitempty"`
-	Port          int          `json:"port,omitempty"`
-	Interval      Duration     `json:"interval,omitempty"`
-	Instance      string       `json:"instance"`
-	ReduceMetrics bool         `json:"reduceMetrics,omitempty"`
-	ServerType    string       `json:"server,omitempty"`
-	DynmapEnabled bool         `json:"dynmap,omitempty"`
-	WorldDir      string       `json:"world,omitempty"`
-	RCON          RCONConfig   `json:"rcon,omitempty"`
-	Remote        RemoteConfig `json:"remote,omitempty"`
+	LogLevel      string        `yaml:"logLevel,omitempty"`
+	Port          int           `yaml:"port,omitempty"`
+	Interval      time.Duration `yaml:"interval,omitempty"`
+	Instance      string        `yaml:"instance"`
+	ReduceMetrics bool          `yaml:"reduceMetrics,omitempty"`
+	ServerType    string        `yaml:"server,omitempty"`
+	DynmapEnabled bool          `yaml:"dynmap,omitempty"`
+	WorldDir      string        `yaml:"world,omitempty"`
+	RCON          RCONConfig    `yaml:"rcon,omitempty"`
+	Remote        RemoteConfig  `yaml:"remote,omitempty"`
 }
 
 type RCONConfig struct {
-	Enable   bool   `json:"enable"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	Password string `json:"password"`
+	Enable   bool   `yaml:"enable"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Password string `yaml:"password"`
 }
 
 type RemoteConfig struct {
-	Enable   bool   `json:"enable"`
-	URL      string `json:"url"`
-	Instance string `json:"instance,omitempty"`
-	JobName  string `json:"jobName,omitempty"`
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
+	Enable   bool   `yaml:"enable"`
+	URL      string `yaml:"url"`
+	Instance string `yaml:"instance,omitempty"`
+	JobName  string `yaml:"jobName,omitempty"`
+	Username string `yaml:"username,omitempty"`
+	Password string `yaml:"password,omitempty"`
 }
 
 // Returns a Config with default values set
