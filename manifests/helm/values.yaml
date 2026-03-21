@@ -72,13 +72,15 @@ podSecurityContext: {}
   # fsGroup: 2000
 
 # This is for setting the container security context.
-securityContext: {}
+securityContext:
+  # Should be the same user/group as the minecraft server, to ensure that the files can be accessed.
+  runAsUser: 1001
+  runAsGroup: 1001
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
 
 # This is for setting up a service.
 service:
