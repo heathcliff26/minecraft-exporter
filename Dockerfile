@@ -27,7 +27,7 @@ COPY --from=build-stage /app/bin/minecraft-exporter /
 
 EXPOSE 8080
 
-USER 1001:1001
+USER 65534:65534
 
 ENTRYPOINT ["/minecraft-exporter"]
 

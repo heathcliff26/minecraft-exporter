@@ -73,14 +73,18 @@ podSecurityContext: {}
 
 # This is for setting the container security context.
 securityContext:
-  # Should be the same user/group as the minecraft server, to ensure that the files can be accessed.
-  runAsUser: 1001
-  runAsGroup: 1001
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
+  # By default the container runs as UID/GID 65534 (nobody). This works as long as the
+  # mounted /world directory and its files are readable by UID/GID 65534.
+  # Override runAsUser/runAsGroup if your Minecraft world directory is owned by a different
+  # user/group and is not accessible to UID/GID 65534.
+  runAsUser: 65534
+  runAsGroup: 65534
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
 
 # This is for setting up a service.
 service:
