@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/Tnze/go-mc v1.20.2
-	github.com/hashicorp/go-version v1.8.0
+	github.com/hashicorp/go-version v1.9.0
 	github.com/heathcliff26/promremote/v2 v2.0.2
 	github.com/jedib0t/go-pretty/v6 v6.7.8
 	github.com/prometheus/client_golang v1.23.2
