@@ -243,14 +243,22 @@ func TestParsePaperTPS(t *testing.T) {
 		Name, Input string
 		TPS         []float64
 	}{
-		{Name: "1.20_raw",
+		{
+			Name: "1.20_raw",
 			//lint:ignore ST1018 I need this string
 			//nolint:staticcheck
 			Input: "[0;33mTPS from last 1m, 5m, 15m: [0;1;32m20.0[0m, [0;1;32m20.0[0m, [0;1;32m20.0[0m[0m",
 			TPS:   []float64{20, 20, 20},
 		},
-		{Name: "1.20",
+		{
+			Name:  "1.20",
 			Input: "§6TPS from last 1m, 5m, 15m: §a20.0§r, §a20.0§r, §a20.0\n",
+			TPS:   []float64{20, 20, 20},
+		},
+		{Name: "26.1.2_raw",
+			//lint:ignore ST1018 I need this string
+			//nolint:staticcheck
+			Input: "[0;33mTPS from last 1m, 5m, 15m: [0;1;32m20.0[0m, [0;1;32m20.0[0m, [0;1;32m20.0[0m\n[0m",
 			TPS:   []float64{20, 20, 20},
 		},
 	}
@@ -351,6 +359,17 @@ func TestParseTickQuery(t *testing.T) {
 				P50:     7.4,
 				P95:     9.9,
 				P99:     11.1,
+			},
+		},
+		{
+			Name:  "26.1.2",
+			Input: "The game is running normallyTarget tick rate: 20.0 per second.\nAverage time per tick: 18.3ms (Target: 50.0ms)Percentiles: P50: 14.9ms P95: 42.2ms P99: 44.3ms. Sample: 100",
+			Result: TickStats{
+				Target:  20.0,
+				Average: 18.3,
+				P50:     14.9,
+				P95:     42.2,
+				P99:     44.3,
 			},
 		},
 	}
