@@ -1,17 +1,22 @@
 package save
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	version "github.com/hashicorp/go-version"
+	"github.com/heathcliff26/minecraft-exporter/pkg/utils"
 )
 
 const (
-	STATS_DIR        = "/stats"
-	PLAYER_DIR       = "/playerdata"
-	ADVANCEMENTS_DIR = "/advancements"
+	STATS_DIR        = "/players/stats"
+	PLAYER_DIR       = "/players/data"
+	ADVANCEMENTS_DIR = "/players/advancements"
+
+	STATS_DIR_LEGACY        = "/stats"
+	PLAYER_DIR_LEGACY       = "/playerdata"
+	ADVANCEMENTS_DIR_LEGACY = "/advancements"
 )
 
 type Save struct {
@@ -26,35 +31,41 @@ func NewSave(path string) (*Save, error) {
 		return nil, NewErrNoWorldDirectory("\"" + path + "\"" + " is not a directory")
 	}
 
+	version, err := getSaveVersion(path)
+	if err != nil {
+		return nil, NewErrNoWorldDirectory(fmt.Sprintf("Failed to read minecraft version: %v", err))
+	}
+
+	var statsDir, playerDir, advancementsDir string
+	if utils.VersionGreaterOrEqual(utils.VERSION_26, version.Name) {
+		statsDir = path + STATS_DIR
+		playerDir = path + PLAYER_DIR
+		advancementsDir = path + ADVANCEMENTS_DIR
+	} else {
+		statsDir = path + STATS_DIR_LEGACY
+		playerDir = path + PLAYER_DIR_LEGACY
+		advancementsDir = path + ADVANCEMENTS_DIR_LEGACY
+	}
+
 	s := &Save{
 		worldDir:        path,
-		statsDir:        path + STATS_DIR,
-		playerDir:       path + PLAYER_DIR,
-		advancementsDir: path + ADVANCEMENTS_DIR,
+		statsDir:        statsDir,
+		playerDir:       playerDir,
+		advancementsDir: advancementsDir,
+
+		Version: version,
 	}
 	if !isDirectory(s.statsDir) {
-		return nil, NewErrNoWorldDirectory("Failed to find \"stats\" subdirectory")
+		return nil, NewErrNoWorldDirectory("Failed to find player stats subdirectory")
 	}
-	if !isDirectory(s.statsDir) {
-		return nil, NewErrNoWorldDirectory("Failed to find \"playerdata\" subdirectory")
+	if !isDirectory(s.playerDir) {
+		return nil, NewErrNoWorldDirectory("Failed to find player data subdirectory")
 	}
 	if !isDirectory(s.advancementsDir) {
-		return nil, NewErrNoWorldDirectory("Failed to find \"advancements\" subdirectory")
+		return nil, NewErrNoWorldDirectory("Failed to find player advancements subdirectory")
 	}
 
 	return s, nil
-}
-
-// Return the Minecraft Version of the save
-func (s *Save) GetVersion() error {
-	var data MinecraftLevelDat
-	err := readNBT(filepath.Join(s.worldDir, "level.dat"), &data)
-	if err != nil {
-		return err
-	}
-
-	s.Version = data.Data.Version
-	return nil
 }
 
 // Return all players from the save
@@ -78,11 +89,6 @@ func (s *Save) GetPlayers() ([]string, error) {
 // Load all relevant data for the given player
 func (s *Save) LoadPlayerData(player string) (PlayerData, error) {
 	advancements, err := s.loadAdvancements(player)
-	if err != nil {
-		return PlayerData{}, err
-	}
-
-	err = s.GetVersion()
 	if err != nil {
 		return PlayerData{}, err
 	}
@@ -118,13 +124,7 @@ func (s *Save) loadAdvancements(player string) (map[string]Advancement, error) {
 
 // Load the stats for the given player
 func (s *Save) loadStats(player string) (Stats, error) {
-	v115 := version.Must(version.NewSemver("1.15.0"))
-	v, err := version.NewSemver(s.Version.Name)
-	if err != nil {
-		return Stats{}, err
-	}
-
-	if v115.LessThanOrEqual(v) {
+	if utils.VersionGreaterOrEqual(utils.VERSION_1_15, s.Version.Name) {
 		var stats MinecraftStats
 		err := readJSON(filepath.Join(s.statsDir, player+".json"), &stats)
 		if err != nil {

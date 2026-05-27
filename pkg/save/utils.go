@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/Tnze/go-mc/nbt"
 	"github.com/prometheus/client_golang/prometheus"
@@ -89,4 +90,14 @@ func mapToMetrics(ch chan<- prometheus.Metric, desc *prometheus.Desc, values map
 	for k, v := range values {
 		ch <- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, float64(v), append(labels, k)...)
 	}
+}
+
+// Return the Minecraft Version of the save from level.dat
+func getSaveVersion(path string) (MinecraftVersion, error) {
+	var data MinecraftLevelDat
+	err := readNBT(filepath.Join(path, "level.dat"), &data)
+	if err != nil {
+		return MinecraftVersion{}, err
+	}
+	return data.Data.Version, nil
 }
