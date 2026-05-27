@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Tnze/go-mc/net"
-	"github.com/hashicorp/go-version"
+	"github.com/heathcliff26/minecraft-exporter/pkg/utils"
 )
 
 type RCONClient struct {
@@ -177,20 +177,7 @@ func (c *RCONClient) Version() string {
 
 // Returns if the version is greater or equal 1.20.3
 func (c *RCONClient) V120() bool {
-	versionStr := c.Version()
-
-	if versionStr == "" {
-		return false
-	}
-
-	v120 := version.Must(version.NewSemver("1.20.3"))
-
-	v, err := version.NewSemver(versionStr)
-	if err != nil {
-		return false
-	}
-
-	return v120.LessThanOrEqual(v)
+	return utils.VersionGreaterOrEqual(utils.VERSION_1_20_3, c.Version())
 }
 
 // Closes the RCON Connection and sets it to nil

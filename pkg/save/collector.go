@@ -180,13 +180,6 @@ func (c *SaveCollector) Collect(ch chan<- prometheus.Metric) {
 func (c *SaveCollector) SetRCONClient(rc *rcon.RCONClient) error {
 	c.RCON = rc
 
-	if c.save.Version.Name == "" {
-		err := c.save.GetVersion()
-		if err != nil {
-			return err
-		}
-	}
-
 	c.updateRCONMinecraftVersion()
 	return nil
 }
