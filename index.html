@@ -65,25 +65,27 @@
 				
 				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (12.5%)</option>
 				
-				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (86.0%)</option>
+				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (86.1%)</option>
 				
 				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
 				
-				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (92.2%)</option>
+				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (93.0%)</option>
 				
-				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (25.0%)</option>
+				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (50.0%)</option>
 				
-				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/save.go (79.4%)</option>
+				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/save.go (85.3%)</option>
 				
-				<option value="file10">github.com/heathcliff26/minecraft-exporter/pkg/save/types.go (88.9%)</option>
+				<option value="file10">github.com/heathcliff26/minecraft-exporter/pkg/save/types.go (91.7%)</option>
 				
-				<option value="file11">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (84.2%)</option>
+				<option value="file11">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (88.4%)</option>
 				
-				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/uuid/errors.go (71.4%)</option>
+				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/utils/utils.go (100.0%)</option>
 				
-				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/uuid.go (87.0%)</option>
+				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/errors.go (71.4%)</option>
 				
-				<option value="file14">github.com/heathcliff26/minecraft-exporter/pkg/version/version.go (80.0%)</option>
+				<option value="file14">github.com/heathcliff26/minecraft-exporter/pkg/uuid/uuid.go (87.0%)</option>
+				
+				<option value="file15">github.com/heathcliff26/minecraft-exporter/pkg/version/version.go (80.0%)</option>
 				
 				</select>
 			</div>
@@ -650,7 +652,7 @@ import (
         "time"
 
         "github.com/Tnze/go-mc/net"
-        "github.com/hashicorp/go-version"
+        "github.com/heathcliff26/minecraft-exporter/pkg/utils"
 )
 
 type RCONClient struct {
@@ -820,21 +822,8 @@ func (c *RCONClient) Version() string <span class="cov8" title="1">{
 
 // Returns if the version is greater or equal 1.20.3
 func (c *RCONClient) V120() bool <span class="cov8" title="1">{
-        versionStr := c.Version()
-
-        if versionStr == "" </span><span class="cov8" title="1">{
-                return false
-        }</span>
-
-        <span class="cov8" title="1">v120 := version.Must(version.NewSemver("1.20.3"))
-
-        v, err := version.NewSemver(versionStr)
-        if err != nil </span><span class="cov0" title="0">{
-                return false
-        }</span>
-
-        <span class="cov8" title="1">return v120.LessThanOrEqual(v)</span>
-}
+        return utils.VersionGreaterOrEqual(utils.VERSION_1_20_3, c.Version())
+}</span>
 
 // Closes the RCON Connection and sets it to nil
 func (c *RCONClient) CloseConn() error <span class="cov8" title="1">{
@@ -1280,16 +1269,9 @@ func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
 func (c *SaveCollector) SetRCONClient(rc *rcon.RCONClient) error <span class="cov8" title="1">{
         c.RCON = rc
 
-        if c.save.Version.Name == "" </span><span class="cov8" title="1">{
-                err := c.save.GetVersion()
-                if err != nil </span><span class="cov0" title="0">{
-                        return err
-                }</span>
-        }
-
-        <span class="cov8" title="1">c.updateRCONMinecraftVersion()
-        return nil</span>
-}
+        c.updateRCONMinecraftVersion()
+        return nil
+}</span>
 
 // Update the game version in the rcon client
 func (c *SaveCollector) updateRCONMinecraftVersion() <span class="cov8" title="1">{
@@ -1314,7 +1296,7 @@ func NewErrNoWorldDirectory(details string) *ErrNoWorldDirectory <span class="co
         }
 }</span>
 
-func (e *ErrNoWorldDirectory) Error() string <span class="cov0" title="0">{
+func (e *ErrNoWorldDirectory) Error() string <span class="cov8" title="1">{
         return "No valid world directory provided: " + e.details
 }</span>
 
@@ -1338,17 +1320,22 @@ func (e *ErrFailedToParseStat) Error() string <span class="cov0" title="0">{
 		<pre class="file" id="file9" style="display: none">package save
 
 import (
+        "fmt"
         "os"
         "path/filepath"
         "strings"
 
-        version "github.com/hashicorp/go-version"
+        "github.com/heathcliff26/minecraft-exporter/pkg/utils"
 )
 
 const (
-        STATS_DIR        = "/stats"
-        PLAYER_DIR       = "/playerdata"
-        ADVANCEMENTS_DIR = "/advancements"
+        STATS_DIR        = "/players/stats"
+        PLAYER_DIR       = "/players/data"
+        ADVANCEMENTS_DIR = "/players/advancements"
+
+        STATS_DIR_LEGACY        = "/stats"
+        PLAYER_DIR_LEGACY       = "/playerdata"
+        ADVANCEMENTS_DIR_LEGACY = "/advancements"
 )
 
 type Save struct {
@@ -1363,35 +1350,41 @@ func NewSave(path string) (*Save, error) <span class="cov8" title="1">{
                 return nil, NewErrNoWorldDirectory("\"" + path + "\"" + " is not a directory")
         }</span>
 
+        <span class="cov8" title="1">version, err := getSaveVersion(path)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, NewErrNoWorldDirectory(fmt.Sprintf("Failed to read minecraft version: %v", err))
+        }</span>
+
+        <span class="cov8" title="1">var statsDir, playerDir, advancementsDir string
+        if utils.VersionGreaterOrEqual(utils.VERSION_26, version.Name) </span><span class="cov8" title="1">{
+                statsDir = path + STATS_DIR
+                playerDir = path + PLAYER_DIR
+                advancementsDir = path + ADVANCEMENTS_DIR
+        }</span> else<span class="cov8" title="1"> {
+                statsDir = path + STATS_DIR_LEGACY
+                playerDir = path + PLAYER_DIR_LEGACY
+                advancementsDir = path + ADVANCEMENTS_DIR_LEGACY
+        }</span>
+
         <span class="cov8" title="1">s := &amp;Save{
                 worldDir:        path,
-                statsDir:        path + STATS_DIR,
-                playerDir:       path + PLAYER_DIR,
-                advancementsDir: path + ADVANCEMENTS_DIR,
+                statsDir:        statsDir,
+                playerDir:       playerDir,
+                advancementsDir: advancementsDir,
+
+                Version: version,
         }
-        if !isDirectory(s.statsDir) </span><span class="cov0" title="0">{
-                return nil, NewErrNoWorldDirectory("Failed to find \"stats\" subdirectory")
+        if !isDirectory(s.statsDir) </span><span class="cov8" title="1">{
+                return nil, NewErrNoWorldDirectory("Failed to find player stats subdirectory")
         }</span>
-        <span class="cov8" title="1">if !isDirectory(s.statsDir) </span><span class="cov0" title="0">{
-                return nil, NewErrNoWorldDirectory("Failed to find \"playerdata\" subdirectory")
+        <span class="cov8" title="1">if !isDirectory(s.playerDir) </span><span class="cov8" title="1">{
+                return nil, NewErrNoWorldDirectory("Failed to find player data subdirectory")
         }</span>
-        <span class="cov8" title="1">if !isDirectory(s.advancementsDir) </span><span class="cov0" title="0">{
-                return nil, NewErrNoWorldDirectory("Failed to find \"advancements\" subdirectory")
+        <span class="cov8" title="1">if !isDirectory(s.advancementsDir) </span><span class="cov8" title="1">{
+                return nil, NewErrNoWorldDirectory("Failed to find player advancements subdirectory")
         }</span>
 
         <span class="cov8" title="1">return s, nil</span>
-}
-
-// Return the Minecraft Version of the save
-func (s *Save) GetVersion() error <span class="cov8" title="1">{
-        var data MinecraftLevelDat
-        err := readNBT(filepath.Join(s.worldDir, "level.dat"), &amp;data)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
-
-        <span class="cov8" title="1">s.Version = data.Data.Version
-        return nil</span>
 }
 
 // Return all players from the save
@@ -1415,11 +1408,6 @@ func (s *Save) GetPlayers() ([]string, error) <span class="cov8" title="1">{
 // Load all relevant data for the given player
 func (s *Save) LoadPlayerData(player string) (PlayerData, error) <span class="cov8" title="1">{
         advancements, err := s.loadAdvancements(player)
-        if err != nil </span><span class="cov0" title="0">{
-                return PlayerData{}, err
-        }</span>
-
-        <span class="cov8" title="1">err = s.GetVersion()
         if err != nil </span><span class="cov0" title="0">{
                 return PlayerData{}, err
         }</span>
@@ -1455,13 +1443,7 @@ func (s *Save) loadAdvancements(player string) (map[string]Advancement, error) <
 
 // Load the stats for the given player
 func (s *Save) loadStats(player string) (Stats, error) <span class="cov8" title="1">{
-        v115 := version.Must(version.NewSemver("1.15.0"))
-        v, err := version.NewSemver(s.Version.Name)
-        if err != nil </span><span class="cov0" title="0">{
-                return Stats{}, err
-        }</span>
-
-        <span class="cov8" title="1">if v115.LessThanOrEqual(v) </span><span class="cov8" title="1">{
+        if utils.VersionGreaterOrEqual(utils.VERSION_1_15, s.Version.Name) </span><span class="cov8" title="1">{
                 var stats MinecraftStats
                 err := readJSON(filepath.Join(s.statsDir, player+".json"), &amp;stats)
                 if err != nil </span><span class="cov0" title="0">{
@@ -1682,7 +1664,7 @@ func (s *CustomStats) UnmarshalJSON(data []byte) error <span class="cov8" title=
                         s.Fly = value</span>
                 case "minecraft:boat_one_cm":<span class="cov8" title="1">
                         s.Boat = value</span>
-                case "minecraft:horse_one_cm":<span class="cov0" title="0">
+                case "minecraft:horse_one_cm":<span class="cov8" title="1">
                         s.Horse = value</span>
                 case "minecraft:climb_one_cm":<span class="cov8" title="1">
                         s.Climb = value</span>
@@ -1713,6 +1695,7 @@ import (
         "encoding/json"
         "io"
         "os"
+        "path/filepath"
 
         "github.com/Tnze/go-mc/nbt"
         "github.com/prometheus/client_golang/prometheus"
@@ -1743,7 +1726,7 @@ func countAdvancements(advancements map[string]Advancement) uint <span class="co
 func readNBT(path string, target interface{}) error <span class="cov8" title="1">{
         // #nosec G304: Path is determined dynamically, with only a base directory provided by the user.
         f, err := os.Open(path)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov8" title="1">{
                 return err
         }</span>
         <span class="cov8" title="1">defer f.Close()
@@ -1798,9 +1781,58 @@ func mapToMetrics(ch chan&lt;- prometheus.Metric, desc *prometheus.Desc, values 
                 ch &lt;- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, float64(v), append(labels, k)...)
         }</span>
 }
+
+// Return the Minecraft Version of the save from level.dat
+func getSaveVersion(path string) (MinecraftVersion, error) <span class="cov8" title="1">{
+        var data MinecraftLevelDat
+        err := readNBT(filepath.Join(path, "level.dat"), &amp;data)
+        if err != nil </span><span class="cov8" title="1">{
+                return MinecraftVersion{}, err
+        }</span>
+        <span class="cov8" title="1">return data.Data.Version, nil</span>
+}
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package uuid
+		<pre class="file" id="file12" style="display: none">package utils
+
+import (
+        "log/slog"
+
+        goversion "github.com/hashicorp/go-version"
+)
+
+const (
+        VERSION_1_15   = "1.15.0"
+        VERSION_1_20_3 = "1.20.3"
+        VERSION_26     = "26.0.0"
+)
+
+// Compares the choosen base version against the target version.
+// Returns true if the target is greater or equal.
+// Always returns false if the version string is not a proper semver version.
+func VersionGreaterOrEqual(base, target string) bool <span class="cov8" title="1">{
+        if base == "" || target == "" </span><span class="cov8" title="1">{
+                slog.Warn("Could not compare version strings, either the base or the target was empty", slog.String("base", base), slog.String("target", target))
+                return false
+        }</span>
+
+        <span class="cov8" title="1">vBase, err := goversion.NewSemver(base)
+        if err != nil </span><span class="cov8" title="1">{
+                slog.Warn("Failed to convert base version to semver", "error", err)
+                return false
+        }</span>
+
+        <span class="cov8" title="1">vTarget, err := goversion.NewSemver(target)
+        if err != nil </span><span class="cov8" title="1">{
+                slog.Warn("Failed to convert target version to semver", "error", err)
+                return false
+        }</span>
+
+        <span class="cov8" title="1">return vBase.LessThanOrEqual(vTarget)</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package uuid
 
 import (
         "fmt"
@@ -1833,7 +1865,7 @@ func (e *ErrHttpRequestFailed) Error() string <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package uuid
+		<pre class="file" id="file14" style="display: none">package uuid
 
 import (
         "encoding/json"
@@ -1911,7 +1943,7 @@ func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) <span class="co
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package version
+		<pre class="file" id="file15" style="display: none">package version
 
 import (
         "runtime"
