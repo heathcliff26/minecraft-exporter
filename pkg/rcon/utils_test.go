@@ -255,7 +255,8 @@ func TestParsePaperTPS(t *testing.T) {
 			Input: "§6TPS from last 1m, 5m, 15m: §a20.0§r, §a20.0§r, §a20.0\n",
 			TPS:   []float64{20, 20, 20},
 		},
-		{Name: "26.1.2_raw",
+		{
+			Name: "26.1.2_raw",
 			//lint:ignore ST1018 I need this string
 			//nolint:staticcheck
 			Input: "[0;33mTPS from last 1m, 5m, 15m: [0;1;32m20.0[0m, [0;1;32m20.0[0m, [0;1;32m20.0[0m\n[0m",
