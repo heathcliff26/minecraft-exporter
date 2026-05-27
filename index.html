@@ -1055,7 +1055,7 @@ func parseTickQuery(input string) (TickStats, error) <span class="cov8" title="1
                 return TickStats{}, err
         }</span>
 
-        <span class="cov8" title="1">reg = regexp.MustCompile(`Percentiles: P50: (\d*.\d*)ms P95: (\d*.\d*)ms P99: (\d*.\d*)ms[,|.] sample: 100`)
+        <span class="cov8" title="1">reg = regexp.MustCompile(`Percentiles: P50: (\d*.\d*)ms P95: (\d*.\d*)ms P99: (\d*.\d*)ms[,|.]`)
         res = reg.FindStringSubmatch(input)
         if len(res) != 4 </span><span class="cov8" title="1">{
                 slog.Error("Failed to find match for tick time percentiles", "out", input)
