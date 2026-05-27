@@ -212,7 +212,7 @@ func parseTickQuery(input string) (TickStats, error) {
 		return TickStats{}, err
 	}
 
-	reg = regexp.MustCompile(`Percentiles: P50: (\d*.\d*)ms P95: (\d*.\d*)ms P99: (\d*.\d*)ms[,|.] sample: 100`)
+	reg = regexp.MustCompile(`Percentiles: P50: (\d*.\d*)ms P95: (\d*.\d*)ms P99: (\d*.\d*)ms[,|.]`)
 	res = reg.FindStringSubmatch(input)
 	if len(res) != 4 {
 		slog.Error("Failed to find match for tick time percentiles", "out", input)
