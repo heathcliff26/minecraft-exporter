@@ -1,7 +1,8 @@
 package save
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 )
 
 type MinecraftLevelDat struct {
@@ -29,7 +30,7 @@ type MinecraftAdvancements struct {
 
 // Implements Unmarshal, allows to drop "DataVersion"
 func (a *MinecraftAdvancements) UnmarshalJSON(data []byte) error {
-	var v map[string]json.RawMessage
+	var v map[string]jsontext.Value
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}

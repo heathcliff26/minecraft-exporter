@@ -2,7 +2,7 @@ package save
 
 import (
 	"compress/gzip"
-	"encoding/json"
+	"encoding/json/v2"
 	"io"
 	"os"
 	"path/filepath"

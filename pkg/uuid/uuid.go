@@ -1,7 +1,7 @@
 package uuid
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"log/slog"
 	"net/http"
 	"time"
@@ -55,7 +55,7 @@ func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) {
 	switch res.StatusCode {
 	case http.StatusOK:
 		var result MojanUUIDToProfileResponse
-		err = json.NewDecoder(res.Body).Decode(&result)
+		err = json.UnmarshalRead(res.Body, &result)
 		if err != nil {
 			return "", err
 		}
