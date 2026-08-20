@@ -83,7 +83,6 @@ func TestCloseConnectionOnError(t *testing.T) {
 			err = conn.RespCmd(resp)
 			assert.NoError(err)
 		}
-		t.Log("Closed the goroutine") // TODO: remove
 	}()
 
 	addr := strings.Split(s.Listener.Addr().String(), ":")
