@@ -55,37 +55,37 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/heathcliff26/minecraft-exporter/cmd/main.go (63.5%)</option>
+				<option value="file0">github.com/heathcliff26/minecraft-exporter/cmd/main.go (74.0%)</option>
 				
-				<option value="file1">github.com/heathcliff26/minecraft-exporter/pkg/config/config.go (90.5%)</option>
+				<option value="file1">github.com/heathcliff26/minecraft-exporter/pkg/config/config.go (91.7%)</option>
 				
 				<option value="file2">github.com/heathcliff26/minecraft-exporter/pkg/config/errors.go (0.0%)</option>
 				
-				<option value="file3">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (60.8%)</option>
+				<option value="file3">github.com/heathcliff26/minecraft-exporter/pkg/rcon/collector.go (80.1%)</option>
 				
 				<option value="file4">github.com/heathcliff26/minecraft-exporter/pkg/rcon/errors.go (12.5%)</option>
 				
-				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (86.1%)</option>
+				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (89.3%)</option>
 				
-				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
+				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (81.1%)</option>
 				
-				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (93.0%)</option>
+				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (96.3%)</option>
 				
 				<option value="file8">github.com/heathcliff26/minecraft-exporter/pkg/save/errors.go (50.0%)</option>
 				
-				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/save.go (85.3%)</option>
+				<option value="file9">github.com/heathcliff26/minecraft-exporter/pkg/save/save.go (86.3%)</option>
 				
-				<option value="file10">github.com/heathcliff26/minecraft-exporter/pkg/save/types.go (91.7%)</option>
+				<option value="file10">github.com/heathcliff26/minecraft-exporter/pkg/save/types.go (92.1%)</option>
 				
-				<option value="file11">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (88.4%)</option>
+				<option value="file11">github.com/heathcliff26/minecraft-exporter/pkg/save/utils.go (89.6%)</option>
 				
 				<option value="file12">github.com/heathcliff26/minecraft-exporter/pkg/utils/utils.go (100.0%)</option>
 				
 				<option value="file13">github.com/heathcliff26/minecraft-exporter/pkg/uuid/errors.go (71.4%)</option>
 				
-				<option value="file14">github.com/heathcliff26/minecraft-exporter/pkg/uuid/uuid.go (87.0%)</option>
+				<option value="file14">github.com/heathcliff26/minecraft-exporter/pkg/uuid/uuid.go (90.3%)</option>
 				
-				<option value="file15">github.com/heathcliff26/minecraft-exporter/pkg/version/version.go (80.0%)</option>
+				<option value="file15">github.com/heathcliff26/minecraft-exporter/pkg/version/version.go (85.0%)</option>
 				
 				</select>
 			</div>
@@ -127,93 +127,93 @@ var (
 )
 
 // Initialize the logger
-func init() <span class="cov8" title="1">{
-        flag.StringVar(&amp;configPath, "config", "", "Optional: Path to config file")
+func init() {
+        <span class="cov8" title="1">flag.StringVar(&amp;configPath, "config", "", "Optional: Path to config file")
         flag.BoolVar(&amp;env, "env", false, "Used together with -config, when set will expand enviroment variables in config")
         flag.BoolVar(&amp;showVersion, "version", false, "Show the version information and exit")
-}</span>
+</span>}
 
 // Handle requests to the webroot.
 // Serves static, human-readable HTML that provides a link to /metrics
-func ServerRootHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
-        fmt.Fprint(w, "&lt;html&gt;&lt;body&gt;&lt;h1&gt;Welcome to minecraft-exporter&lt;/h1&gt;Click &lt;a href='/metrics'&gt;here&lt;/a&gt; to see metrics.&lt;/body&gt;&lt;/html&gt;")
-}</span>
+func ServerRootHandler(w http.ResponseWriter, r *http.Request) {
+        <span class="cov8" title="1">fmt.Fprint(w, "&lt;html&gt;&lt;body&gt;&lt;h1&gt;Welcome to minecraft-exporter&lt;/h1&gt;Click &lt;a href='/metrics'&gt;here&lt;/a&gt; to see metrics.&lt;/body&gt;&lt;/html&gt;")
+</span>}
 
-func main() <span class="cov8" title="1">{
-        flag.Parse()
-
-        if showVersion </span><span class="cov8" title="1">{
-                fmt.Print(version.Version())
+func main() {
+        <span class="cov8" title="1">flag.Parse()
+</span>
+        <span class="cov8" title="1">if showVersion </span>{
+                <span class="cov8" title="1">fmt.Print(version.Version())
                 os.Exit(0)
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">cfg, err := config.LoadConfig(configPath, env)
-        if err != nil </span><span class="cov8" title="1">{
-                slog.Error("Could not load configuration", slog.String("path", configPath), slog.String("err", err.Error()))
+        if err != nil </span>{
+                <span class="cov8" title="1">slog.Error("Could not load configuration", slog.String("path", configPath), slog.String("err", err.Error()))
                 os.Exit(1)
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">reg := prometheus.NewRegistry()
-
-        sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.Instance, cfg.ReduceMetrics)
-        if err != nil </span><span class="cov8" title="1">{
-                slog.Error("Failed to create save collector", "err", err)
+</span>
+        <span class="cov8" title="1">sc, err := save.NewSaveCollector(cfg.WorldDir, cfg.Instance, cfg.ReduceMetrics)
+        if err != nil </span>{
+                <span class="cov8" title="1">slog.Error("Failed to create save collector", "err", err)
                 os.Exit(1)
-        }</span>
+</span>        }
         <span class="cov8" title="1">reg.MustRegister(sc)
-
-        if cfg.RCON.Enable </span><span class="cov8" title="1">{
-                rc, err := rcon.NewRCONCollector(cfg)
-                if err != nil </span><span class="cov8" title="1">{
-                        slog.Error("Failed to create rcon collector", "err", err)
+</span>
+        <span class="cov8" title="1">if cfg.RCON.Enable </span>{
+                <span class="cov8" title="1">rc, err := rcon.NewRCONCollector(cfg)
+                if err != nil </span>{
+                        <span class="cov8" title="1">slog.Error("Failed to create rcon collector", "err", err)
                         os.Exit(1)
-                }</span>
+</span>                }
                 <span class="cov0" title="0">defer rc.Close()
                 reg.MustRegister(rc)
                 err = sc.SetRCONClient(rc.Client())
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to read the minecraft version from save", "err", err)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to read the minecraft version from save", "err", err)
                         os.Exit(1)
-                }</span>
+</span>                }
         }
 
-        <span class="cov8" title="1">if cfg.Remote.Enable </span><span class="cov0" title="0">{
-                opts := []promremote.ClientOption{promremote.WithInstanceLabel(cfg.Remote.Instance), promremote.WithJobLabel(cfg.Remote.JobName)}
-                if cfg.Remote.Username != "" </span><span class="cov0" title="0">{
-                        opts = append(opts, promremote.WithBasicAuth(cfg.Remote.Username, cfg.Remote.Password))
-                }</span>
+        <span class="cov8" title="1">if cfg.Remote.Enable </span>{
+                <span class="cov0" title="0">opts := []promremote.ClientOption{promremote.WithInstanceLabel(cfg.Remote.Instance), promremote.WithJobLabel(cfg.Remote.JobName)}
+                if cfg.Remote.Username != "" </span>{
+                        <span class="cov0" title="0">opts = append(opts, promremote.WithBasicAuth(cfg.Remote.Username, cfg.Remote.Password))
+</span>                }
                 <span class="cov0" title="0">rwClient, err := promremote.NewWriteClient(cfg.Remote.URL, reg, opts...)
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to create remote write client", "err", err)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to create remote write client", "err", err)
                         os.Exit(1)
-                }</span>
+</span>                }
 
                 <span class="cov0" title="0">slog.Info("Starting remote_write client")
                 err = rwClient.Run(cfg.Interval)
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to start remote write client", "err", err)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to start remote write client", "err", err)
                         os.Exit(1)
-                }</span>
+</span>                }
                 <span class="cov0" title="0">defer rwClient.Stop()</span>
         }
 
         <span class="cov8" title="1">router := http.NewServeMux()
         router.HandleFunc("/", ServerRootHandler)
         router.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{Registry: reg}))
-
-        server := &amp;http.Server{
+</span>
+        <span class="cov8" title="1">server := &amp;http.Server{
                 Addr:         ":" + strconv.Itoa(cfg.Port),
                 Handler:      router,
                 ReadTimeout:  10 * time.Second,
                 WriteTimeout: 10 * time.Second,
-        }
+</span>        }
 
-        slog.Info("Starting http server", slog.String("addr", server.Addr))
+        <span class="cov8" title="1">slog.Info("Starting http server", slog.String("addr", server.Addr))
         err = server.ListenAndServe()
-        if err != nil &amp;&amp; !errors.Is(err, http.ErrServerClosed) </span><span class="cov8" title="1">{
-                slog.Error("Failed to start http server", "err", err)
+        if err != nil &amp;&amp; !errors.Is(err, http.ErrServerClosed) </span>{
+                <span class="cov8" title="1">slog.Error("Failed to start http server", "err", err)
                 os.Exit(1)
-        }</span>
+</span>        }
 }
 </pre>
 		
@@ -247,14 +247,14 @@ const (
 var logLevel *slog.LevelVar
 
 // Initialize the logger
-func init() <span class="cov8" title="1">{
-        logLevel = &amp;slog.LevelVar{}
+func init() {
+        <span class="cov8" title="1">logLevel = &amp;slog.LevelVar{}
         opts := slog.HandlerOptions{
                 Level: logLevel,
-        }
-        logger := slog.New(slog.NewTextHandler(os.Stdout, &amp;opts))
+</span>        }
+        <span class="cov8" title="1">logger := slog.New(slog.NewTextHandler(os.Stdout, &amp;opts))
         slog.SetDefault(logger)
-}</span>
+</span>}
 
 type Config struct {
         LogLevel      string        `yaml:"logLevel,omitempty"`
@@ -286,12 +286,12 @@ type RemoteConfig struct {
 }
 
 // Returns a Config with default values set
-func DefaultConfig() Config <span class="cov8" title="1">{
-        hostname, err := os.Hostname()
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to retrieve hostname, using localhost instead", "err", err)
+func DefaultConfig() Config {
+        <span class="cov8" title="1">hostname, err := os.Hostname()
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to retrieve hostname, using localhost instead", "err", err)
                 hostname = "localhost"
-        }</span>
+</span>        }
         <span class="cov8" title="1">return Config{
                 LogLevel:   DEFAULT_LOG_LEVEL,
                 Port:       DEFAULT_PORT,
@@ -300,14 +300,14 @@ func DefaultConfig() Config <span class="cov8" title="1">{
                 ServerType: SERVER_TYPE_VANILLA,
                 WorldDir:   DEFAULT_WORLD_DIR,
                 Remote:     defaultRemoteConfig(),
-        }</span>
+</span>        }
 }
 
-func defaultRemoteConfig() RemoteConfig <span class="cov8" title="1">{
-        return RemoteConfig{
+func defaultRemoteConfig() RemoteConfig {
+        <span class="cov8" title="1">return RemoteConfig{
                 JobName: DEFAULT_REMOTE_JOB_NAME,
-        }
-}</span>
+</span>        }
+}
 
 // Loads config from file, returns error if config is invalid
 // Arguments:
@@ -316,66 +316,66 @@ func defaultRemoteConfig() RemoteConfig <span class="cov8" title="1">{
 //        env: Determines if enviroment variables in the file will be expanded before decoding
 //
 // RCON Parameters are validated inside the RCON package itself, so it is not checked here.
-func LoadConfig(path string, env bool) (Config, error) <span class="cov8" title="1">{
-        c := DefaultConfig()
-
-        if path == "" </span><span class="cov8" title="1">{
-                _ = setLogLevel(DEFAULT_LOG_LEVEL)
+func LoadConfig(path string, env bool) (Config, error) {
+        <span class="cov8" title="1">c := DefaultConfig()
+</span>
+        <span class="cov8" title="1">if path == "" </span>{
+                <span class="cov8" title="1">_ = setLogLevel(DEFAULT_LOG_LEVEL)
                 return c, nil
-        }</span>
+</span>        }
 
         // #nosec G304: Local users can decide on their file path themselves.
         <span class="cov8" title="1">f, err := os.ReadFile(path)
-        if err != nil </span><span class="cov8" title="1">{
-                return Config{}, err
-        }</span>
+        if err != nil </span>{
+                <span class="cov8" title="1">return Config{}, err
+</span>        }
 
-        <span class="cov8" title="1">if env </span><span class="cov8" title="1">{
-                f = []byte(os.ExpandEnv(string(f)))
-        }</span>
+        <span class="cov8" title="1">if env </span>{
+                <span class="cov8" title="1">f = []byte(os.ExpandEnv(string(f)))
+</span>        }
 
         <span class="cov8" title="1">err = yaml.Unmarshal(f, &amp;c)
-        if err != nil </span><span class="cov8" title="1">{
-                return Config{}, err
-        }</span>
+        if err != nil </span>{
+                <span class="cov8" title="1">return Config{}, err
+</span>        }
 
         <span class="cov8" title="1">err = setLogLevel(c.LogLevel)
-        if err != nil </span><span class="cov0" title="0">{
-                return Config{}, err
-        }</span>
-        <span class="cov8" title="1">if c.ServerType != SERVER_TYPE_VANILLA &amp;&amp; c.ServerType != SERVER_TYPE_FORGE &amp;&amp; c.ServerType != SERVER_TYPE_PAPER &amp;&amp; c.ServerType != SERVER_TYPE_NEOFORGE </span><span class="cov0" title="0">{
-                return Config{}, &amp;ErrUnknownServerType{Type: c.ServerType}
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return Config{}, err
+</span>        }
+        <span class="cov8" title="1">if c.ServerType != SERVER_TYPE_VANILLA &amp;&amp; c.ServerType != SERVER_TYPE_FORGE &amp;&amp; c.ServerType != SERVER_TYPE_PAPER &amp;&amp; c.ServerType != SERVER_TYPE_NEOFORGE </span>{
+                <span class="cov0" title="0">return Config{}, &amp;ErrUnknownServerType{Type: c.ServerType}
+</span>        }
 
-        <span class="cov8" title="1">if c.Remote.Instance == "" </span><span class="cov8" title="1">{
-                c.Remote.Instance = c.Instance
-        }</span>
+        <span class="cov8" title="1">if c.Remote.Instance == "" </span>{
+                <span class="cov8" title="1">c.Remote.Instance = c.Instance
+</span>        }
 
-        <span class="cov8" title="1">if c.Remote.Enable </span><span class="cov8" title="1">{
-                if c.Remote.URL == "" </span><span class="cov8" title="1">{
-                        return Config{}, promremote.ErrMissingEndpoint{}
-                }</span>
-                <span class="cov8" title="1">if c.Remote.Username != c.Remote.Password &amp;&amp; (c.Remote.Username == "" || c.Remote.Password == "") </span><span class="cov8" title="1">{
-                        return Config{}, promremote.ErrMissingAuthCredentials{}
-                }</span>
+        <span class="cov8" title="1">if c.Remote.Enable </span>{
+                <span class="cov8" title="1">if c.Remote.URL == "" </span>{
+                        <span class="cov8" title="1">return Config{}, promremote.ErrMissingEndpoint{}
+</span>                }
+                <span class="cov8" title="1">if c.Remote.Username != c.Remote.Password &amp;&amp; (c.Remote.Username == "" || c.Remote.Password == "") </span>{
+                        <span class="cov8" title="1">return Config{}, promremote.ErrMissingAuthCredentials{}
+</span>                }
         }
 
         <span class="cov8" title="1">return c, nil</span>
 }
 
 // Parse a given string and set the resulting log level
-func setLogLevel(level string) error <span class="cov8" title="1">{
-        switch strings.ToLower(level) </span>{
-        case "debug":<span class="cov8" title="1">
-                logLevel.Set(slog.LevelDebug)</span>
-        case "info":<span class="cov8" title="1">
-                logLevel.Set(slog.LevelInfo)</span>
-        case "warn":<span class="cov8" title="1">
-                logLevel.Set(slog.LevelWarn)</span>
-        case "error":<span class="cov8" title="1">
-                logLevel.Set(slog.LevelError)</span>
-        default:<span class="cov8" title="1">
-                return &amp;ErrUnknownLogLevel{level}</span>
+func setLogLevel(level string) error {
+        <span class="cov8" title="1">switch strings.ToLower(level) </span>{
+        case "debug":
+                <span class="cov8" title="1">logLevel.Set(slog.LevelDebug)</span>
+        case "info":
+                <span class="cov8" title="1">logLevel.Set(slog.LevelInfo)</span>
+        case "warn":
+                <span class="cov8" title="1">logLevel.Set(slog.LevelWarn)</span>
+        case "error":
+                <span class="cov8" title="1">logLevel.Set(slog.LevelError)</span>
+        default:
+                <span class="cov8" title="1">return &amp;ErrUnknownLogLevel{level}</span>
         }
         <span class="cov8" title="1">return nil</span>
 }
@@ -389,25 +389,25 @@ type ErrUnknownLogLevel struct {
         Level string
 }
 
-func (e *ErrUnknownLogLevel) Error() string <span class="cov0" title="0">{
-        return "Unknown log level " + e.Level
-}</span>
+func (e *ErrUnknownLogLevel) Error() string {
+        <span class="cov0" title="0">return "Unknown log level " + e.Level
+</span>}
 
 type ErrInvalidInterval struct {
         Interval time.Duration
 }
 
-func (e *ErrInvalidInterval) Error() string <span class="cov0" title="0">{
-        return "Interval is to short, needs to be at least 30s, current " + e.Interval.String()
-}</span>
+func (e *ErrInvalidInterval) Error() string {
+        <span class="cov0" title="0">return "Interval is to short, needs to be at least 30s, current " + e.Interval.String()
+</span>}
 
 type ErrUnknownServerType struct {
         Type string
 }
 
-func (e *ErrUnknownServerType) Error() string <span class="cov0" title="0">{
-        return "Received unknown server type " + e.Type
-}</span>
+func (e *ErrUnknownServerType) Error() string {
+        <span class="cov0" title="0">return "Received unknown server type " + e.Type
+</span>}
 </pre>
 		
 		<pre class="file" id="file3" style="display: none">package rcon
@@ -457,11 +457,11 @@ var (
 // Arguments:
 //
 //        cfg: Configuration for minecraft-exporter. Needs RCON to be filled out in full
-func NewRCONCollector(cfg config.Config) (*RCONCollector, error) <span class="cov8" title="1">{
-        rc, err := NewRCONClient(cfg.RCON.Host, cfg.RCON.Port, cfg.RCON.Password)
-        if err != nil </span><span class="cov8" title="1">{
-                return nil, err
-        }</span>
+func NewRCONCollector(cfg config.Config) (*RCONCollector, error) {
+        <span class="cov8" title="1">rc, err := NewRCONClient(cfg.RCON.Host, cfg.RCON.Port, cfg.RCON.Password)
+        if err != nil </span>{
+                <span class="cov8" title="1">return nil, err
+</span>        }
         <span class="cov8" title="1">return &amp;RCONCollector{
                 rcon:          rc,
                 ServerType:    cfg.ServerType,
@@ -472,99 +472,99 @@ func NewRCONCollector(cfg config.Config) (*RCONCollector, error) <span class="co
 }
 
 // Implements the Describe function for prometheus.Collector
-func (c *RCONCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov8" title="1">{
-        ch &lt;- mcPlayerOnlineDesc
-
-        ch &lt;- forgeTPSDimDesc
+func (c *RCONCollector) Describe(ch chan&lt;- *prometheus.Desc) {
+        <span class="cov8" title="1">ch &lt;- mcPlayerOnlineDesc
+</span>
+        <span class="cov8" title="1">ch &lt;- forgeTPSDimDesc
         ch &lt;- forgeTicktimeDimDesc
         ch &lt;- forgeTPSOverallDesc
         ch &lt;- forgeTicktimeOverallDesc
         ch &lt;- forgeEntitiesCountDesc
-
-        ch &lt;- paperTPS1mDesc
+</span>
+        <span class="cov8" title="1">ch &lt;- paperTPS1mDesc
         ch &lt;- paperTPS5mDesc
         ch &lt;- paperTPS15mDesc
-
-        ch &lt;- dynmapTileRenderStatDesc
+</span>
+        <span class="cov8" title="1">ch &lt;- dynmapTileRenderStatDesc
         ch &lt;- dynmapChunkLoadingCountDesc
         ch &lt;- dynmapChunkLoadingDurationDesc
-
-        ch &lt;- tickTargetDesc
+</span>
+        <span class="cov8" title="1">ch &lt;- tickTargetDesc
         ch &lt;- tickAverageDesc
         ch &lt;- tickP50Desc
         ch &lt;- tickP95Desc
         ch &lt;- tickP99Desc
-}</span>
+</span>}
 
 // Implements the Collect function for prometheus.Collector
-func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov8" title="1">{
-        slog.Debug("Starting collection of minecraft metrics via RCON")
+func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) {
+        <span class="cov8" title="1">slog.Debug("Starting collection of minecraft metrics via RCON")
         commonLabels := []string{c.Instance}
-
-        players := c.rcon.GetPlayersOnline()
-        for _, player := range players </span><span class="cov8" title="1">{
-                ch &lt;- prometheus.MustNewConstMetric(mcPlayerOnlineDesc, prometheus.GaugeValue, 1, append(commonLabels, player)...)
-        }</span>
+</span>
+        <span class="cov8" title="1">players := c.rcon.GetPlayersOnline()
+        for _, player := range players </span>{
+                <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcPlayerOnlineDesc, prometheus.GaugeValue, 1, append(commonLabels, player)...)
+</span>        }
         <span class="cov8" title="1">switch c.ServerType </span>{
-        case config.SERVER_TYPE_FORGE, config.SERVER_TYPE_NEOFORGE:<span class="cov8" title="1">
-                slog.Debug("Gathering forge metrics")
+        case config.SERVER_TYPE_FORGE, config.SERVER_TYPE_NEOFORGE:
+                <span class="cov8" title="1">slog.Debug("Gathering forge metrics")
                 dimStats, overallStat, err := c.rcon.GetForgeTPS(c.ServerType)
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to collect forge tps stats", "err", err)
-                }</span> else<span class="cov8" title="1"> {
-                        for _, stat := range dimStats </span><span class="cov8" title="1">{
-                                labels := append(commonLabels, stat.ID, stat.Name)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to collect forge tps stats", "err", err)
+</span>                } else {
+                        <span class="cov8" title="1">for _, stat := range dimStats </span>{
+                                <span class="cov8" title="1">labels := append(commonLabels, stat.ID, stat.Name)
                                 ch &lt;- prometheus.MustNewConstMetric(forgeTPSDimDesc, prometheus.CounterValue, stat.TPS, labels...)
                                 ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeDimDesc, prometheus.CounterValue, stat.Ticktime, labels...)
-                        }</span>
+</span>                        }
                         <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(forgeTPSOverallDesc, prometheus.CounterValue, overallStat.TPS, commonLabels...)
                         ch &lt;- prometheus.MustNewConstMetric(forgeTicktimeOverallDesc, prometheus.CounterValue, overallStat.Ticktime, commonLabels...)</span>
                 }
                 <span class="cov8" title="1">entities, err := c.rcon.GetForgeEntities(c.ServerType)
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to retrieve forge entity list", "err", err)
-                }</span> else<span class="cov8" title="1"> {
-                        for _, entity := range entities </span><span class="cov8" title="1">{
-                                ch &lt;- prometheus.MustNewConstMetric(forgeEntitiesCountDesc, prometheus.CounterValue, float64(entity.Count), append(commonLabels, entity.Name)...)
-                        }</span>
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to retrieve forge entity list", "err", err)
+</span>                } else {
+                        <span class="cov8" title="1">for _, entity := range entities </span>{
+                                <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(forgeEntitiesCountDesc, prometheus.CounterValue, float64(entity.Count), append(commonLabels, entity.Name)...)
+</span>                        }
                 }
-        case config.SERVER_TYPE_PAPER:<span class="cov0" title="0">
-                slog.Debug("Gathering paper metrics")
+        case config.SERVER_TYPE_PAPER:
+                <span class="cov0" title="0">slog.Debug("Gathering paper metrics")
                 paperTPS, err := c.rcon.GetPaperTPS()
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to collect paper tps stats", "err", err)
-                }</span> else<span class="cov0" title="0"> {
-                        if len(paperTPS) == 3 </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(paperTPS1mDesc, prometheus.CounterValue, paperTPS[0], commonLabels...)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to collect paper tps stats", "err", err)
+</span>                } else {
+                        <span class="cov0" title="0">if len(paperTPS) == 3 </span>{
+                                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(paperTPS1mDesc, prometheus.CounterValue, paperTPS[0], commonLabels...)
                                 ch &lt;- prometheus.MustNewConstMetric(paperTPS5mDesc, prometheus.CounterValue, paperTPS[1], commonLabels...)
                                 ch &lt;- prometheus.MustNewConstMetric(paperTPS15mDesc, prometheus.CounterValue, paperTPS[2], commonLabels...)
-                        }</span>
+</span>                        }
                 }
         }
 
-        <span class="cov8" title="1">if c.DynmapEnabled </span><span class="cov0" title="0">{
-                slog.Debug("Gathering dynmap metrics")
+        <span class="cov8" title="1">if c.DynmapEnabled </span>{
+                <span class="cov0" title="0">slog.Debug("Gathering dynmap metrics")
                 render, chunks, err := c.rcon.GetDynmapStats()
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to collect dynmap stats", "err", err)
-                }</span> else<span class="cov0" title="0"> {
-                        for _, stat := range render </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Processed), append(commonLabels, "processed", stat.Dim)...)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to collect dynmap stats", "err", err)
+</span>                } else {
+                        <span class="cov0" title="0">for _, stat := range render </span>{
+                                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Processed), append(commonLabels, "processed", stat.Dim)...)
                                 ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Rendered), append(commonLabels, "rendered", stat.Dim)...)
                                 ch &lt;- prometheus.MustNewConstMetric(dynmapTileRenderStatDesc, prometheus.CounterValue, float64(stat.Updated), append(commonLabels, "updated", stat.Dim)...)
-                        }</span>
-                        <span class="cov0" title="0">for _, stat := range chunks </span><span class="cov0" title="0">{
-                                ch &lt;- prometheus.MustNewConstMetric(dynmapChunkLoadingCountDesc, prometheus.CounterValue, float64(stat.Count), append(commonLabels, stat.State)...)
+</span>                        }
+                        <span class="cov0" title="0">for _, stat := range chunks </span>{
+                                <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(dynmapChunkLoadingCountDesc, prometheus.CounterValue, float64(stat.Count), append(commonLabels, stat.State)...)
                                 ch &lt;- prometheus.MustNewConstMetric(dynmapChunkLoadingDurationDesc, prometheus.CounterValue, stat.Duration, append(commonLabels, stat.State)...)
-                        }</span>
+</span>                        }
                 }
         }
 
-        <span class="cov8" title="1">if c.rcon.V120() </span><span class="cov0" title="0">{
-                tickStats, err := c.rcon.GetTickQuery()
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to collect tick stats", "err", err)
-                }</span>
+        <span class="cov8" title="1">if c.rcon.V120() </span>{
+                <span class="cov0" title="0">tickStats, err := c.rcon.GetTickQuery()
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to collect tick stats", "err", err)
+</span>                }
 
                 <span class="cov0" title="0">ch &lt;- prometheus.MustNewConstMetric(tickTargetDesc, prometheus.CounterValue, tickStats.Target, commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(tickAverageDesc, prometheus.CounterValue, tickStats.Average, commonLabels...)
@@ -576,14 +576,14 @@ func (c *RCONCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
 }
 
 // Expose the RCON client
-func (c *RCONCollector) Client() *RCONClient <span class="cov8" title="1">{
-        return c.rcon
-}</span>
+func (c *RCONCollector) Client() *RCONClient {
+        <span class="cov8" title="1">return c.rcon
+</span>}
 
 // Close the RCON connection
-func (c *RCONCollector) Close() error <span class="cov8" title="1">{
-        return c.rcon.Close()
-}</span>
+func (c *RCONCollector) Close() error {
+        <span class="cov8" title="1">return c.rcon.Close()
+</span>}
 </pre>
 		
 		<pre class="file" id="file4" style="display: none">package rcon
@@ -592,55 +592,55 @@ import "fmt"
 
 type ErrRCONMissingHost struct{}
 
-func (e ErrRCONMissingHost) Error() string <span class="cov0" title="0">{
-        return "Missing target host for RCON"
-}</span>
+func (e ErrRCONMissingHost) Error() string {
+        <span class="cov0" title="0">return "Missing target host for RCON"
+</span>}
 
 type ErrRCONMissingPort struct{}
 
-func (e ErrRCONMissingPort) Error() string <span class="cov0" title="0">{
-        return "Missing target port for RCON"
-}</span>
+func (e ErrRCONMissingPort) Error() string {
+        <span class="cov0" title="0">return "Missing target port for RCON"
+</span>}
 
 type ErrRCONMissingPassword struct{}
 
-func (e ErrRCONMissingPassword) Error() string <span class="cov0" title="0">{
-        return "Missing password for RCON"
-}</span>
+func (e ErrRCONMissingPassword) Error() string {
+        <span class="cov0" title="0">return "Missing password for RCON"
+</span>}
 
 type ErrRCONConnectionTimeout struct{}
 
-func (e ErrRCONConnectionTimeout) Error() string <span class="cov0" title="0">{
-        return "Timed out waiting for a response"
-}</span>
+func (e ErrRCONConnectionTimeout) Error() string {
+        <span class="cov0" title="0">return "Timed out waiting for a response"
+</span>}
 
 type ErrForgeTPS struct{}
 
-func (e ErrForgeTPS) Error() string <span class="cov0" title="0">{
-        return "Failed to retrieve the overall tps stats"
-}</span>
+func (e ErrForgeTPS) Error() string {
+        <span class="cov0" title="0">return "Failed to retrieve the overall tps stats"
+</span>}
 
 type ErrPaperTPS struct {
         Text  string
         Count int
 }
 
-func NewErrPaperTPS(text string, count int) error <span class="cov8" title="1">{
-        return &amp;ErrPaperTPS{
+func NewErrPaperTPS(text string, count int) error {
+        <span class="cov8" title="1">return &amp;ErrPaperTPS{
                 Text:  text,
                 Count: count,
-        }
-}</span>
+</span>        }
+}
 
-func (e *ErrPaperTPS) Error() string <span class="cov0" title="0">{
-        return fmt.Sprintf("Expected at 3 values, got %d. Input: \"%s\"", e.Count, e.Text)
-}</span>
+func (e *ErrPaperTPS) Error() string {
+        <span class="cov0" title="0">return fmt.Sprintf("Expected at 3 values, got %d. Input: \"%s\"", e.Count, e.Text)
+</span>}
 
 type ErrVanillaTick struct{}
 
-func (e ErrVanillaTick) Error() string <span class="cov0" title="0">{
-        return "Failed to retrieve the tick statistics"
-}</span>
+func (e ErrVanillaTick) Error() string {
+        <span class="cov0" title="0">return "Failed to retrieve the tick statistics"
+</span>}
 </pre>
 		
 		<pre class="file" id="file5" style="display: none">package rcon
@@ -665,16 +665,16 @@ type RCONClient struct {
 }
 
 // Creates an RCON client, does not create a connection immediatly
-func NewRCONClient(host string, port int, password string) (*RCONClient, error) <span class="cov8" title="1">{
-        if host == "" </span><span class="cov8" title="1">{
-                return nil, ErrRCONMissingHost{}
-        }</span>
-        <span class="cov8" title="1">if port &lt;= 0 </span><span class="cov8" title="1">{
-                return nil, ErrRCONMissingPort{}
-        }</span>
-        <span class="cov8" title="1">if password == "" </span><span class="cov8" title="1">{
-                return nil, ErrRCONMissingPassword{}
-        }</span>
+func NewRCONClient(host string, port int, password string) (*RCONClient, error) {
+        <span class="cov8" title="1">if host == "" </span>{
+                <span class="cov8" title="1">return nil, ErrRCONMissingHost{}
+</span>        }
+        <span class="cov8" title="1">if port &lt;= 0 </span>{
+                <span class="cov8" title="1">return nil, ErrRCONMissingPort{}
+</span>        }
+        <span class="cov8" title="1">if password == "" </span>{
+                <span class="cov8" title="1">return nil, ErrRCONMissingPassword{}
+</span>        }
 
         <span class="cov8" title="1">addr := host + ":" + strconv.Itoa(port)
         return &amp;RCONClient{
@@ -684,161 +684,161 @@ func NewRCONClient(host string, port int, password string) (*RCONClient, error) 
 }
 
 // Create a RCON Connection with the minecraft server
-func (c *RCONClient) createConnection() error <span class="cov8" title="1">{
-        slog.Debug("Creating new RCON connection")
+func (c *RCONClient) createConnection() error {
+        <span class="cov8" title="1">slog.Debug("Creating new RCON connection")
         client, err := net.DialRCON(c.addr, c.password)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return err
+</span>        }
 
         <span class="cov8" title="1">c.conn = client
         return nil</span>
 }
 
 // Execute a remote command
-func (c *RCONClient) cmd(cmd string) (string, error) <span class="cov8" title="1">{
-        if c.conn == nil </span><span class="cov8" title="1">{
-                err := c.createConnection()
-                if err != nil </span><span class="cov0" title="0">{
-                        return "", err
-                }</span>
+func (c *RCONClient) cmd(cmd string) (string, error) {
+        <span class="cov8" title="1">if c.conn == nil </span>{
+                <span class="cov8" title="1">err := c.createConnection()
+                if err != nil </span>{
+                        <span class="cov0" title="0">return "", err
+</span>                }
         }
 
         <span class="cov8" title="1">slog.Debug("RCON: Running command", "cmd", cmd)
-
-        timeout := time.After(time.Second)
+</span>
+        <span class="cov8" title="1">timeout := time.After(time.Second)
         done := make(chan bool)
-
-        var err error
+</span>
+        <span class="cov8" title="1">var err error
         var res string
-
-        go func() </span><span class="cov8" title="1">{
-                defer func() </span><span class="cov8" title="1">{
-                        done &lt;- true
+</span>
+        <span class="cov8" title="1">go func() </span>{
+                <span class="cov8" title="1">defer func() </span>{
+                        <span class="cov8" title="1">done &lt;- true
                         close(done)
-                }</span>()
+</span>                }()
 
                 <span class="cov8" title="1">err = c.conn.Cmd(cmd)
-                if err != nil </span><span class="cov0" title="0">{
-                        _ = c.CloseConn()
+                if err != nil </span>{
+                        <span class="cov0" title="0">_ = c.CloseConn()
                         return
-                }</span>
+</span>                }
 
                 <span class="cov8" title="1">res, err = c.conn.Resp()
-                if err != nil </span><span class="cov8" title="1">{
-                        _ = c.CloseConn()
+                if err != nil </span>{
+                        <span class="cov8" title="1">_ = c.CloseConn()
                         return
-                }</span>
+</span>                }
                 <span class="cov8" title="1">slog.Debug("RCON: Received response", "cmd", cmd, "res", res)</span>
         }()
 
         <span class="cov8" title="1">select </span>{
-        case &lt;-timeout:<span class="cov8" title="1">
-                _ = c.CloseConn()
+        case &lt;-timeout:
+                <span class="cov8" title="1">_ = c.CloseConn()
                 done = nil
                 return "", ErrRCONConnectionTimeout{}</span>
-        case &lt;-done:<span class="cov8" title="1">
-                return res, err</span>
+        case &lt;-done:
+                <span class="cov8" title="1">return res, err</span>
         }
 }
 
 // Return a list of all players currently online
-func (c *RCONClient) GetPlayersOnline() []string <span class="cov8" title="1">{
-        list, err := c.cmd("list")
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to retrieve online players", "err", err)
+func (c *RCONClient) GetPlayersOnline() []string {
+        <span class="cov8" title="1">list, err := c.cmd("list")
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to retrieve online players", "err", err)
                 return []string{}
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">return parsePlayersOnline(list)</span>
 }
 
 // Get the TPS statistics returned from forge
-func (c *RCONClient) GetForgeTPS(variant string) ([]TPSStat, TPSStat, error) <span class="cov8" title="1">{
-        res, err := c.cmd(variant + " tps")
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, TPSStat{}, err
-        }</span>
+func (c *RCONClient) GetForgeTPS(variant string) ([]TPSStat, TPSStat, error) {
+        <span class="cov8" title="1">res, err := c.cmd(variant + " tps")
+        if err != nil </span>{
+                <span class="cov0" title="0">return nil, TPSStat{}, err
+</span>        }
 
         <span class="cov8" title="1">return parseForgeTPS(res)</span>
 }
 
 // Get the count and name of all loaded forge entities
-func (c *RCONClient) GetForgeEntities(variant string) ([]EntityCount, error) <span class="cov8" title="1">{
-        list, err := c.cmd(variant + " entity list")
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, err
-        }</span>
+func (c *RCONClient) GetForgeEntities(variant string) ([]EntityCount, error) {
+        <span class="cov8" title="1">list, err := c.cmd(variant + " entity list")
+        if err != nil </span>{
+                <span class="cov0" title="0">return nil, err
+</span>        }
 
         <span class="cov8" title="1">return parseForgeEntities(list)</span>
 }
 
 // Get the TPS statistics returned from paper
-func (c *RCONClient) GetPaperTPS() ([]float64, error) <span class="cov8" title="1">{
-        res, err := c.cmd("tps")
-        if err != nil </span><span class="cov0" title="0">{
-                return []float64{}, err
-        }</span>
+func (c *RCONClient) GetPaperTPS() ([]float64, error) {
+        <span class="cov8" title="1">res, err := c.cmd("tps")
+        if err != nil </span>{
+                <span class="cov0" title="0">return []float64{}, err
+</span>        }
 
         <span class="cov8" title="1">return parsePaperTPS(res)</span>
 }
 
 // Get the render statistics returned from Dynmap
-func (c *RCONClient) GetDynmapStats() ([]DynmapRenderStat, []DynmapChunkloadingStat, error) <span class="cov8" title="1">{
-        res, err := c.cmd("dynmap stats")
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, nil, err
-        }</span>
+func (c *RCONClient) GetDynmapStats() ([]DynmapRenderStat, []DynmapChunkloadingStat, error) {
+        <span class="cov8" title="1">res, err := c.cmd("dynmap stats")
+        if err != nil </span>{
+                <span class="cov0" title="0">return nil, nil, err
+</span>        }
 
         <span class="cov8" title="1">return parseDynmapStats(res)</span>
 }
 
 // Get the tick statistics returned from the "tick query" command.
 // The command has been added to Minecraft Java Edition in 1.20.3
-func (c *RCONClient) GetTickQuery() (TickStats, error) <span class="cov8" title="1">{
-        res, err := c.cmd("tick query")
-        if err != nil </span><span class="cov0" title="0">{
-                return TickStats{}, err
-        }</span>
+func (c *RCONClient) GetTickQuery() (TickStats, error) {
+        <span class="cov8" title="1">res, err := c.cmd("tick query")
+        if err != nil </span>{
+                <span class="cov0" title="0">return TickStats{}, err
+</span>        }
 
         <span class="cov8" title="1">return parseTickQuery(res)</span>
 }
 
 // Update the minecraft server version
 // Is concurrency safe
-func (c *RCONClient) UpdateVersion(new string) <span class="cov8" title="1">{
-        c.versionLock.Lock()
+func (c *RCONClient) UpdateVersion(new string) {
+        <span class="cov8" title="1">c.versionLock.Lock()
         defer c.versionLock.Unlock()
+</span>
+        <span class="cov8" title="1">c.version = new
+</span>}
 
-        c.version = new
-}</span>
-
-func (c *RCONClient) Version() string <span class="cov8" title="1">{
-        c.versionLock.RLock()
+func (c *RCONClient) Version() string {
+        <span class="cov8" title="1">c.versionLock.RLock()
         defer c.versionLock.RUnlock()
-
-        return c.version
-}</span>
+</span>
+        <span class="cov8" title="1">return c.version
+</span>}
 
 // Returns if the version is greater or equal 1.20.3
-func (c *RCONClient) V120() bool <span class="cov8" title="1">{
-        return utils.VersionGreaterOrEqual(utils.VERSION_1_20_3, c.Version())
-}</span>
+func (c *RCONClient) V120() bool {
+        <span class="cov8" title="1">return utils.VersionGreaterOrEqual(utils.VERSION_1_20_3, c.Version())
+</span>}
 
 // Closes the RCON Connection and sets it to nil
-func (c *RCONClient) CloseConn() error <span class="cov8" title="1">{
-        if c.conn != nil </span><span class="cov8" title="1">{
-                err := c.conn.Close()
+func (c *RCONClient) CloseConn() error {
+        <span class="cov8" title="1">if c.conn != nil </span>{
+                <span class="cov8" title="1">err := c.conn.Close()
                 c.conn = nil
                 return err
-        }</span>
+</span>        }
         <span class="cov8" title="1">return nil</span>
 }
 
 // Close the RCON connection if necessary
-func (c *RCONClient) Close() error <span class="cov8" title="1">{
-        return c.CloseConn()
-}</span>
+func (c *RCONClient) Close() error {
+        <span class="cov8" title="1">return c.CloseConn()
+</span>}
 </pre>
 		
 		<pre class="file" id="file6" style="display: none">package rcon
@@ -853,229 +853,229 @@ import (
 )
 
 // Parse the output of the list command
-func parsePlayersOnline(input string) []string <span class="cov8" title="1">{
-        s := strings.Split(input, "players online:")
-        if len(s) &lt; 2 </span><span class="cov0" title="0">{
-                return []string{}
-        }</span>
+func parsePlayersOnline(input string) []string {
+        <span class="cov8" title="1">s := strings.Split(input, "players online:")
+        if len(s) &lt; 2 </span>{
+                <span class="cov0" title="0">return []string{}
+</span>        }
 
         <span class="cov8" title="1">players := strings.TrimSpace(s[1])
-        if players == "" </span><span class="cov8" title="1">{
-                return []string{}
-        }</span>
+        if players == "" </span>{
+                <span class="cov8" title="1">return []string{}
+</span>        }
 
         <span class="cov8" title="1">return strings.Split(players, ", ")</span>
 }
 
 // Parse the TPS statistics returned from forge
-func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) <span class="cov8" title="1">{
-        input = text.StripEscape(input)
-
-        reg := regexp.MustCompile(`Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)`)
+func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) {
+        <span class="cov8" title="1">input = text.StripEscape(input)
+</span>
+        <span class="cov8" title="1">reg := regexp.MustCompile(`Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)`)
         stats := reg.FindAllStringSubmatch(input, -1)
-        if len(stats) == 0 </span><span class="cov8" title="1">{
+        if len(stats) == 0 </span>{
                 // Different regex for newer versions
-                reg = regexp.MustCompile(`(.*):\s(.*?)\sTPS\s\((\d*\.\d*)\sms/tick\)`)
+                <span class="cov8" title="1">reg = regexp.MustCompile(`(.*):\s(.*?)\sTPS\s\((\d*\.\d*)\sms/tick\)`)
                 stats = reg.FindAllStringSubmatch(input, -1)
-        }</span>
+</span>        }
         <span class="cov8" title="1">dimStats := make([]TPSStat, len(stats))
-        for i, stat := range stats </span><span class="cov8" title="1">{
-                if len(stat) == 4 </span><span class="cov8" title="1">{
+        for i, stat := range stats </span>{
+                <span class="cov8" title="1">if len(stat) == 4 </span>{
                         // When matching the 2nd regex need to re-order
-                        stat = []string{stat[0], "", stat[1], stat[3], stat[2]}
-                }</span>
+                        <span class="cov8" title="1">stat = []string{stat[0], "", stat[1], stat[3], stat[2]}
+</span>                }
                 <span class="cov8" title="1">ticktime, err := strconv.ParseFloat(stat[3], 64)
-                if err != nil </span><span class="cov8" title="1">{
-                        slog.Error("Failed to parse ticktime", "err", err, "value", stat[3])
+                if err != nil </span>{
+                        <span class="cov8" title="1">slog.Error("Failed to parse ticktime", "err", err, "value", stat[3])
                         return nil, TPSStat{}, err
-                }</span>
+</span>                }
                 <span class="cov8" title="1">tps, err := strconv.ParseFloat(stat[4], 64)
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to parse tps", "err", err, "value", stat[4])
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to parse tps", "err", err, "value", stat[4])
                         return nil, TPSStat{}, err
-                }</span>
+</span>                }
                 <span class="cov8" title="1">dimStats[i] = TPSStat{
                         ID:       stat[1],
                         Name:     stat[2],
                         Ticktime: ticktime,
                         TPS:      tps,
-                }</span>
+</span>                }
         }
 
-        <span class="cov8" title="1">if len(dimStats) &gt; 0 &amp;&amp; dimStats[len(dimStats)-1].Name == "Overall" </span><span class="cov8" title="1">{
-                overallTPS := dimStats[len(dimStats)-1]
+        <span class="cov8" title="1">if len(dimStats) &gt; 0 &amp;&amp; dimStats[len(dimStats)-1].Name == "Overall" </span>{
+                <span class="cov8" title="1">overallTPS := dimStats[len(dimStats)-1]
                 overallTPS.Name = ""
                 return dimStats[:len(dimStats)-1], overallTPS, nil
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">reg = regexp.MustCompile(`Overall\s?: Mean tick time: (.*) ms. Mean TPS: (.*)`)
         overallStat := reg.FindStringSubmatch(input)
-        if overallStat == nil </span><span class="cov8" title="1">{
-                return nil, TPSStat{}, ErrForgeTPS{}
-        }</span>
+        if overallStat == nil </span>{
+                <span class="cov8" title="1">return nil, TPSStat{}, ErrForgeTPS{}
+</span>        }
         <span class="cov8" title="1">ticktime, err := strconv.ParseFloat(overallStat[1], 64)
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to parse ticktime", "err", err, "value", overallStat[1])
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to parse ticktime", "err", err, "value", overallStat[1])
                 return nil, TPSStat{}, err
-        }</span>
+</span>        }
         <span class="cov8" title="1">tps, err := strconv.ParseFloat(overallStat[2], 64)
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to parse tps", "err", err, "value", overallStat[2])
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to parse tps", "err", err, "value", overallStat[2])
                 return nil, TPSStat{}, err
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">return dimStats, TPSStat{Ticktime: ticktime, TPS: tps}, nil</span>
 }
 
 // Parse the count and name of all loaded forge entities
-func parseForgeEntities(input string) ([]EntityCount, error) <span class="cov8" title="1">{
-        input = text.StripEscape(input)
-
-        reg := regexp.MustCompile(`(\d+): (.*?:.*?)\s`)
+func parseForgeEntities(input string) ([]EntityCount, error) {
+        <span class="cov8" title="1">input = text.StripEscape(input)
+</span>
+        <span class="cov8" title="1">reg := regexp.MustCompile(`(\d+): (.*?:.*?)\s`)
         matches := reg.FindAllStringSubmatch(input+" ", -1)
         res := make([]EntityCount, len(matches))
-        for i, s := range matches </span><span class="cov8" title="1">{
-                count, err := strconv.Atoi(s[1])
-                if err != nil </span><span class="cov0" title="0">{
-                        return nil, err
-                }</span>
+        for i, s := range matches </span>{
+                <span class="cov8" title="1">count, err := strconv.Atoi(s[1])
+                if err != nil </span>{
+                        <span class="cov0" title="0">return nil, err
+</span>                }
                 <span class="cov8" title="1">res[i] = EntityCount{
                         Name:  s[2],
                         Count: count,
-                }</span>
+</span>                }
         }
 
         <span class="cov8" title="1">return res, nil</span>
 }
 
 // Parse the TPS statistics returned from paper
-func parsePaperTPS(input string) ([]float64, error) <span class="cov8" title="1">{
+func parsePaperTPS(input string) ([]float64, error) {
         // Starting with 1.20, the output is colored
-        input = text.StripEscape(input)
-        for _, chars := range []string{"§6", "§a", "§r", "\n"} </span><span class="cov8" title="1">{
-                input = strings.ReplaceAll(input, chars, "")
-        }</span>
+        <span class="cov8" title="1">input = text.StripEscape(input)
+        for _, chars := range []string{"§6", "§a", "§r", "\n"} </span>{
+                <span class="cov8" title="1">input = strings.ReplaceAll(input, chars, "")
+</span>        }
 
         <span class="cov8" title="1">input = strings.TrimPrefix(input, "TPS from last 1m, 5m, 15m: ")
         s := strings.Split(input, ", ")
-        if len(s) != 3 </span><span class="cov8" title="1">{
-                return []float64{}, NewErrPaperTPS(input, len(s))
-        }</span>
+        if len(s) != 3 </span>{
+                <span class="cov8" title="1">return []float64{}, NewErrPaperTPS(input, len(s))
+</span>        }
 
         <span class="cov8" title="1">tps := make([]float64, 3)
-        for i := 0; i &lt; len(s); i++ </span><span class="cov8" title="1">{
-                var err error
+        for i := 0; i &lt; len(s); i++ </span>{
+                <span class="cov8" title="1">var err error
                 tps[i], err = strconv.ParseFloat(s[i], 64)
-                if err != nil </span><span class="cov8" title="1">{
-                        return []float64{}, err
-                }</span>
+                if err != nil </span>{
+                        <span class="cov8" title="1">return []float64{}, err
+</span>                }
         }
 
         <span class="cov8" title="1">return tps, nil</span>
 }
 
 // Parse the render statistics returned from Dynmap
-func parseDynmapStats(input string) ([]DynmapRenderStat, []DynmapChunkloadingStat, error) <span class="cov8" title="1">{
-        reg := regexp.MustCompile(`  (.*?): processed=(\d*), rendered=(\d*), updated=(\d*)`)
+func parseDynmapStats(input string) ([]DynmapRenderStat, []DynmapChunkloadingStat, error) {
+        <span class="cov8" title="1">reg := regexp.MustCompile(`  (.*?): processed=(\d*), rendered=(\d*), updated=(\d*)`)
         matches := reg.FindAllStringSubmatch(input, -1)
         renderStats := make([]DynmapRenderStat, len(matches))
-        for i, stat := range matches </span><span class="cov8" title="1">{
-                processed, err := strconv.Atoi(stat[2])
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to parse dynmap render stats", "err", err, "out", input)
+        for i, stat := range matches </span>{
+                <span class="cov8" title="1">processed, err := strconv.Atoi(stat[2])
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to parse dynmap render stats", "err", err, "out", input)
                         return nil, nil, err
-                }</span>
+</span>                }
                 <span class="cov8" title="1">rendered, err := strconv.Atoi(stat[3])
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to parse dynmap render stats", "err", err, "out", input)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to parse dynmap render stats", "err", err, "out", input)
                         return nil, nil, err
-                }</span>
+</span>                }
                 <span class="cov8" title="1">updated, err := strconv.Atoi(stat[4])
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to parse dynmap render stats", "err", err, "out", input)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to parse dynmap render stats", "err", err, "out", input)
                         return nil, nil, err
-                }</span>
+</span>                }
                 <span class="cov8" title="1">renderStats[i] = DynmapRenderStat{
                         Dim:       stat[1],
                         Processed: processed,
                         Rendered:  rendered,
                         Updated:   updated,
-                }</span>
+</span>                }
         }
 
         <span class="cov8" title="1">reg = regexp.MustCompile(`Chunks processed: (.*?): count=(\d*), (\d*.\d*)`)
         matches = reg.FindAllStringSubmatch(input, -1)
         chunkloadingStats := make([]DynmapChunkloadingStat, len(matches))
-        for i, stat := range matches </span><span class="cov8" title="1">{
-                count, err := strconv.Atoi(stat[2])
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to parse dynmap chunkloading stats", "err", err, "out", input)
+        for i, stat := range matches </span>{
+                <span class="cov8" title="1">count, err := strconv.Atoi(stat[2])
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to parse dynmap chunkloading stats", "err", err, "out", input)
                         return nil, nil, err
-                }</span>
+</span>                }
                 <span class="cov8" title="1">duration, err := strconv.ParseFloat(stat[3], 64)
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to parse dynmap chunkloading stats", "err", err, "out", input)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to parse dynmap chunkloading stats", "err", err, "out", input)
                         return nil, nil, err
-                }</span>
+</span>                }
                 <span class="cov8" title="1">chunkloadingStats[i] = DynmapChunkloadingStat{
                         State:    stat[1],
                         Count:    count,
                         Duration: duration,
-                }</span>
+</span>                }
         }
 
         <span class="cov8" title="1">return renderStats, chunkloadingStats, nil</span>
 }
 
 // Parse the stats returned by "tick query"
-func parseTickQuery(input string) (TickStats, error) <span class="cov8" title="1">{
-        input = strings.ReplaceAll(input, ",", ".")
-
-        reg := regexp.MustCompile(`Target tick rate: (\d*.\d*) per second.`)
+func parseTickQuery(input string) (TickStats, error) {
+        <span class="cov8" title="1">input = strings.ReplaceAll(input, ",", ".")
+</span>
+        <span class="cov8" title="1">reg := regexp.MustCompile(`Target tick rate: (\d*.\d*) per second.`)
         res := reg.FindStringSubmatch(input)
-        if len(res) != 2 </span><span class="cov8" title="1">{
-                slog.Error("Failed to find match for tick target", "out", input)
+        if len(res) != 2 </span>{
+                <span class="cov8" title="1">slog.Error("Failed to find match for tick target", "out", input)
                 return TickStats{}, ErrVanillaTick{}
-        }</span>
+</span>        }
         <span class="cov8" title="1">target, err := strconv.ParseFloat(res[1], 64)
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to parse tick target rate", "err", err, "out", input)
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to parse tick target rate", "err", err, "out", input)
                 return TickStats{}, err
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">reg = regexp.MustCompile(`Average time per tick: (\d*.\d*)ms`)
         res = reg.FindStringSubmatch(input)
-        if len(res) != 2 </span><span class="cov8" title="1">{
-                slog.Error("Failed to find match for time per tick", "out", input)
+        if len(res) != 2 </span>{
+                <span class="cov8" title="1">slog.Error("Failed to find match for time per tick", "out", input)
                 return TickStats{}, ErrVanillaTick{}
-        }</span>
+</span>        }
         <span class="cov8" title="1">average, err := strconv.ParseFloat(res[1], 64)
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to parse average time per tick", "err", err, "out", input)
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to parse average time per tick", "err", err, "out", input)
                 return TickStats{}, err
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">reg = regexp.MustCompile(`Percentiles: P50: (\d*.\d*)ms P95: (\d*.\d*)ms P99: (\d*.\d*)ms[,|.]`)
         res = reg.FindStringSubmatch(input)
-        if len(res) != 4 </span><span class="cov8" title="1">{
-                slog.Error("Failed to find match for tick time percentiles", "out", input)
+        if len(res) != 4 </span>{
+                <span class="cov8" title="1">slog.Error("Failed to find match for tick time percentiles", "out", input)
                 return TickStats{}, ErrVanillaTick{}
-        }</span>
+</span>        }
         <span class="cov8" title="1">p50, err := strconv.ParseFloat(res[1], 64)
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to parse percentile p50 from the tick stats", "err", err, "out", input)
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to parse percentile p50 from the tick stats", "err", err, "out", input)
                 return TickStats{}, err
-        }</span>
+</span>        }
         <span class="cov8" title="1">p95, err := strconv.ParseFloat(res[2], 64)
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to parse percentile p95 from the tick stats", "err", err, "out", input)
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to parse percentile p95 from the tick stats", "err", err, "out", input)
                 return TickStats{}, err
-        }</span>
+</span>        }
         <span class="cov8" title="1">p99, err := strconv.ParseFloat(res[3], 64)
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to parse percentile p99 from the tick stats", "err", err, "out", input)
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to parse percentile p99 from the tick stats", "err", err, "out", input)
                 return TickStats{}, err
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">return TickStats{
                 Target:  target,
@@ -1142,11 +1142,11 @@ var (
 //        path: The path of the minecraft world directory
 //        instance: The instance label to use for the metrics
 //        reduceMetrics: Indicate if the amount of metrics should be reduced
-func NewSaveCollector(path, instance string, reduceMetrics bool) (*SaveCollector, error) <span class="cov8" title="1">{
-        save, err := NewSave(path)
-        if err != nil </span><span class="cov8" title="1">{
-                return nil, err
-        }</span>
+func NewSaveCollector(path, instance string, reduceMetrics bool) (*SaveCollector, error) {
+        <span class="cov8" title="1">save, err := NewSave(path)
+        if err != nil </span>{
+                <span class="cov8" title="1">return nil, err
+</span>        }
 
         <span class="cov8" title="1">return &amp;SaveCollector{
                 save:          save,
@@ -1157,16 +1157,16 @@ func NewSaveCollector(path, instance string, reduceMetrics bool) (*SaveCollector
 }
 
 // Implements the Describe function for prometheus.Collector
-func (c *SaveCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov8" title="1">{
-        if c.ReduceMetrics </span><span class="cov8" title="1">{
-                ch &lt;- mcStatBlocksMinedReducedDesc
+func (c *SaveCollector) Describe(ch chan&lt;- *prometheus.Desc) {
+        <span class="cov8" title="1">if c.ReduceMetrics </span>{
+                <span class="cov8" title="1">ch &lt;- mcStatBlocksMinedReducedDesc
                 ch &lt;- mcStatBlocksPickedUpReducedDesc
                 ch &lt;- mcStatBlocksCraftedReducedDesc
-        }</span> else<span class="cov8" title="1"> {
-                ch &lt;- mcStatBlocksMinedDesc
+</span>        } else {
+                <span class="cov8" title="1">ch &lt;- mcStatBlocksMinedDesc
                 ch &lt;- mcStatBlocksPickedUpDesc
                 ch &lt;- mcStatBlocksCraftedDesc
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">ch &lt;- mcStatDeathsDesc
         ch &lt;- mcStatJumpsDesc
@@ -1187,46 +1187,46 @@ func (c *SaveCollector) Describe(ch chan&lt;- *prometheus.Desc) <span class="cov
 }
 
 // Implements the Collect function for prometheus.Collector
-func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov8" title="1">{
-        slog.Debug("Starting collection of minecraft metrics from savedata")
-
-        players, err := c.save.GetPlayers()
-        if err != nil </span><span class="cov0" title="0">{
-                slog.Error("Failed to get list of players", "err", err)
+func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) {
+        <span class="cov8" title="1">slog.Debug("Starting collection of minecraft metrics from savedata")
+</span>
+        <span class="cov8" title="1">players, err := c.save.GetPlayers()
+        if err != nil </span>{
+                <span class="cov0" title="0">slog.Error("Failed to get list of players", "err", err)
                 return
-        }</span>
+</span>        }
 
-        <span class="cov8" title="1">for _, player := range players </span><span class="cov8" title="1">{
-                name, err := c.uuidCache.GetNameFromUUID(player)
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to fetch name from uuid", "err", err, "player", player)
+        <span class="cov8" title="1">for _, player := range players </span>{
+                <span class="cov8" title="1">name, err := c.uuidCache.GetNameFromUUID(player)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to fetch name from uuid", "err", err, "player", player)
                         return
-                }</span>
+</span>                }
 
                 <span class="cov8" title="1">d, err := c.save.LoadPlayerData(player)
-                if err != nil </span><span class="cov0" title="0">{
-                        slog.Error("Failed to load data for player", "err", err, "player", player)
+                if err != nil </span>{
+                        <span class="cov0" title="0">slog.Error("Failed to load data for player", "err", err, "player", player)
                         return
-                }</span>
+</span>                }
 
                 <span class="cov8" title="1">commonLabels := []string{c.Instance, name}
-
-                if c.ReduceMetrics </span><span class="cov8" title="1">{
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksMinedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.Mined)), commonLabels...)
+</span>
+                <span class="cov8" title="1">if c.ReduceMetrics </span>{
+                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksMinedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.Mined)), commonLabels...)
                         ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksPickedUpReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.PickedUp)), commonLabels...)
                         ch &lt;- prometheus.MustNewConstMetric(mcStatBlocksCraftedReducedDesc, prometheus.CounterValue, float64(countTotal(d.Stats.CraftedItems)), commonLabels...)
-                }</span> else<span class="cov8" title="1"> {
-                        mapToMetrics(ch, mcStatBlocksMinedDesc, d.Stats.Mined, commonLabels)
+</span>                } else {
+                        <span class="cov8" title="1">mapToMetrics(ch, mcStatBlocksMinedDesc, d.Stats.Mined, commonLabels)
                         mapToMetrics(ch, mcStatBlocksPickedUpDesc, d.Stats.PickedUp, commonLabels)
                         mapToMetrics(ch, mcStatBlocksCraftedDesc, d.Stats.CraftedItems, commonLabels)
-                }</span>
+</span>                }
 
-                <span class="cov8" title="1">for key, value := range d.Stats.KilledBy </span><span class="cov8" title="1">{
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatDeathsDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
-                }</span>
+                <span class="cov8" title="1">for key, value := range d.Stats.KilledBy </span>{
+                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatDeathsDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
+</span>                }
                 <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatDeathsDesc, prometheus.CounterValue, float64(d.Stats.Custom.Deaths), append(commonLabels, "minecraft:deaths")...)
-
-                ch &lt;- prometheus.MustNewConstMetric(mcStatJumpsDesc, prometheus.CounterValue, float64(d.Stats.Custom.Jump), commonLabels...)
+</span>
+                <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatJumpsDesc, prometheus.CounterValue, float64(d.Stats.Custom.Jump), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Walk), append(commonLabels, "walking")...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Swim), append(commonLabels, "swimming")...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Sprint), append(commonLabels, "sprinting")...)
@@ -1236,49 +1236,49 @@ func (c *SaveCollector) Collect(ch chan&lt;- prometheus.Metric) <span class="cov
                 ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Boat), append(commonLabels, "boat")...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Horse), append(commonLabels, "Horse")...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatCMTraveledDesc, prometheus.CounterValue, float64(d.Stats.Custom.Climb), append(commonLabels, "climbing")...)
-
-                ch &lt;- prometheus.MustNewConstMetric(mcStatXPTotalDesc, prometheus.CounterValue, float64(d.PlayerData.XPTotal), commonLabels...)
+</span>
+                <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatXPTotalDesc, prometheus.CounterValue, float64(d.PlayerData.XPTotal), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatCurrentLevelDesc, prometheus.CounterValue, float64(d.PlayerData.XPLevel), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatFoodLevelDesc, prometheus.CounterValue, float64(d.PlayerData.FoodLevel), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatHealthDesc, prometheus.CounterValue, float64(d.PlayerData.Health), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatScoreDesc, prometheus.CounterValue, float64(d.PlayerData.Score), commonLabels...)
-
-                for key, value := range d.Stats.Killed </span><span class="cov8" title="1">{
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatEntitiesKilledDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
-                }</span>
+</span>
+                <span class="cov8" title="1">for key, value := range d.Stats.Killed </span>{
+                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatEntitiesKilledDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
+</span>                }
 
                 <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatDamageTakenDesc, prometheus.CounterValue, float64(d.Stats.Custom.DamageTaken), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatDamageDealtDesc, prometheus.CounterValue, float64(d.Stats.Custom.DamageDealt), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatPlaytimeDesc, prometheus.CounterValue, float64(d.Stats.Custom.Playtime), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatSleptDesc, prometheus.CounterValue, float64(d.Stats.Custom.Sleep), commonLabels...)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatUsedCraftingTableDesc, prometheus.CounterValue, float64(d.Stats.Custom.Crafted), commonLabels...)
-
-                advancements := countAdvancements(d.Advancements)
+</span>
+                <span class="cov8" title="1">advancements := countAdvancements(d.Advancements)
                 ch &lt;- prometheus.MustNewConstMetric(mcStatAdvancementsDesc, prometheus.CounterValue, float64(advancements), commonLabels...)
-
-                for key, value := range d.Stats.Custom.Custom </span><span class="cov8" title="1">{
-                        ch &lt;- prometheus.MustNewConstMetric(mcStatCustomDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
-                }</span>
+</span>
+                <span class="cov8" title="1">for key, value := range d.Stats.Custom.Custom </span>{
+                        <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(mcStatCustomDesc, prometheus.CounterValue, float64(value), append(commonLabels, key)...)
+</span>                }
         }
 
         <span class="cov8" title="1">c.updateRCONMinecraftVersion()
-
-        slog.Debug("Finished collection of minecraft metrics from savedata")</span>
+</span>
+        <span class="cov8" title="1">slog.Debug("Finished collection of minecraft metrics from savedata")</span>
 }
 
-func (c *SaveCollector) SetRCONClient(rc *rcon.RCONClient) error <span class="cov8" title="1">{
-        c.RCON = rc
-
-        c.updateRCONMinecraftVersion()
+func (c *SaveCollector) SetRCONClient(rc *rcon.RCONClient) error {
+        <span class="cov8" title="1">c.RCON = rc
+</span>
+        <span class="cov8" title="1">c.updateRCONMinecraftVersion()
         return nil
-}</span>
+</span>}
 
 // Update the game version in the rcon client
-func (c *SaveCollector) updateRCONMinecraftVersion() <span class="cov8" title="1">{
-        if c.RCON != nil &amp;&amp; c.RCON.Version() != c.save.Version.Name </span><span class="cov8" title="1">{
-                slog.Info("Minecraft Version", "version", c.save.Version.Name)
+func (c *SaveCollector) updateRCONMinecraftVersion() {
+        <span class="cov8" title="1">if c.RCON != nil &amp;&amp; c.RCON.Version() != c.save.Version.Name </span>{
+                <span class="cov8" title="1">slog.Info("Minecraft Version", "version", c.save.Version.Name)
                 c.RCON.UpdateVersion(c.save.Version.Name)
-        }</span>
+</span>        }
 }
 </pre>
 		
@@ -1290,31 +1290,31 @@ type ErrNoWorldDirectory struct {
         details string
 }
 
-func NewErrNoWorldDirectory(details string) *ErrNoWorldDirectory <span class="cov8" title="1">{
-        return &amp;ErrNoWorldDirectory{
+func NewErrNoWorldDirectory(details string) *ErrNoWorldDirectory {
+        <span class="cov8" title="1">return &amp;ErrNoWorldDirectory{
                 details: details,
-        }
-}</span>
+</span>        }
+}
 
-func (e *ErrNoWorldDirectory) Error() string <span class="cov8" title="1">{
-        return "No valid world directory provided: " + e.details
-}</span>
+func (e *ErrNoWorldDirectory) Error() string {
+        <span class="cov8" title="1">return "No valid world directory provided: " + e.details
+</span>}
 
-func NewErrFailedToParseStat(name string, value int) *ErrFailedToParseStat <span class="cov0" title="0">{
-        return &amp;ErrFailedToParseStat{
+func NewErrFailedToParseStat(name string, value int) *ErrFailedToParseStat {
+        <span class="cov0" title="0">return &amp;ErrFailedToParseStat{
                 Name:  name,
                 Value: value,
-        }
-}</span>
+</span>        }
+}
 
 type ErrFailedToParseStat struct {
         Name  string
         Value int
 }
 
-func (e *ErrFailedToParseStat) Error() string <span class="cov0" title="0">{
-        return fmt.Sprintf("Failed to parse the stat (\"%s\": %d)", e.Name, e.Value)
-}</span>
+func (e *ErrFailedToParseStat) Error() string {
+        <span class="cov0" title="0">return fmt.Sprintf("Failed to parse the stat (\"%s\": %d)", e.Name, e.Value)
+</span>}
 </pre>
 		
 		<pre class="file" id="file9" style="display: none">package save
@@ -1345,26 +1345,26 @@ type Save struct {
 }
 
 // Create a new save from the given path
-func NewSave(path string) (*Save, error) <span class="cov8" title="1">{
-        if !isDirectory(path) </span><span class="cov8" title="1">{
-                return nil, NewErrNoWorldDirectory("\"" + path + "\"" + " is not a directory")
-        }</span>
+func NewSave(path string) (*Save, error) {
+        <span class="cov8" title="1">if !isDirectory(path) </span>{
+                <span class="cov8" title="1">return nil, NewErrNoWorldDirectory("\"" + path + "\"" + " is not a directory")
+</span>        }
 
         <span class="cov8" title="1">version, err := getSaveVersion(path)
-        if err != nil </span><span class="cov8" title="1">{
-                return nil, NewErrNoWorldDirectory(fmt.Sprintf("Failed to read minecraft version: %v", err))
-        }</span>
+        if err != nil </span>{
+                <span class="cov8" title="1">return nil, NewErrNoWorldDirectory(fmt.Sprintf("Failed to read minecraft version: %v", err))
+</span>        }
 
         <span class="cov8" title="1">var statsDir, playerDir, advancementsDir string
-        if utils.VersionGreaterOrEqual(utils.VERSION_26, version.Name) </span><span class="cov8" title="1">{
-                statsDir = path + STATS_DIR
+        if utils.VersionGreaterOrEqual(utils.VERSION_26, version.Name) </span>{
+                <span class="cov8" title="1">statsDir = path + STATS_DIR
                 playerDir = path + PLAYER_DIR
                 advancementsDir = path + ADVANCEMENTS_DIR
-        }</span> else<span class="cov8" title="1"> {
-                statsDir = path + STATS_DIR_LEGACY
+</span>        } else {
+                <span class="cov8" title="1">statsDir = path + STATS_DIR_LEGACY
                 playerDir = path + PLAYER_DIR_LEGACY
                 advancementsDir = path + ADVANCEMENTS_DIR_LEGACY
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">s := &amp;Save{
                 worldDir:        path,
@@ -1373,55 +1373,55 @@ func NewSave(path string) (*Save, error) <span class="cov8" title="1">{
                 advancementsDir: advancementsDir,
 
                 Version: version,
-        }
-        if !isDirectory(s.statsDir) </span><span class="cov8" title="1">{
-                return nil, NewErrNoWorldDirectory("Failed to find player stats subdirectory")
-        }</span>
-        <span class="cov8" title="1">if !isDirectory(s.playerDir) </span><span class="cov8" title="1">{
-                return nil, NewErrNoWorldDirectory("Failed to find player data subdirectory")
-        }</span>
-        <span class="cov8" title="1">if !isDirectory(s.advancementsDir) </span><span class="cov8" title="1">{
-                return nil, NewErrNoWorldDirectory("Failed to find player advancements subdirectory")
-        }</span>
+</span>        }
+        <span class="cov8" title="1">if !isDirectory(s.statsDir) </span>{
+                <span class="cov8" title="1">return nil, NewErrNoWorldDirectory("Failed to find player stats subdirectory")
+</span>        }
+        <span class="cov8" title="1">if !isDirectory(s.playerDir) </span>{
+                <span class="cov8" title="1">return nil, NewErrNoWorldDirectory("Failed to find player data subdirectory")
+</span>        }
+        <span class="cov8" title="1">if !isDirectory(s.advancementsDir) </span>{
+                <span class="cov8" title="1">return nil, NewErrNoWorldDirectory("Failed to find player advancements subdirectory")
+</span>        }
 
         <span class="cov8" title="1">return s, nil</span>
 }
 
 // Return all players from the save
-func (s *Save) GetPlayers() ([]string, error) <span class="cov8" title="1">{
-        files, err := os.ReadDir(s.statsDir)
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, err
-        }</span>
+func (s *Save) GetPlayers() ([]string, error) {
+        <span class="cov8" title="1">files, err := os.ReadDir(s.statsDir)
+        if err != nil </span>{
+                <span class="cov0" title="0">return nil, err
+</span>        }
         <span class="cov8" title="1">players := make([]string, 0, len(files))
-        for _, f := range files </span><span class="cov8" title="1">{
-                if f.IsDir() </span><span class="cov0" title="0">{
-                        continue</span>
+        for _, f := range files </span>{
+                <span class="cov8" title="1">if f.IsDir() </span>{
+                        <span class="cov0" title="0">continue</span>
                 }
-                <span class="cov8" title="1">if player, ok := strings.CutSuffix(f.Name(), ".json"); ok </span><span class="cov8" title="1">{
-                        players = append(players, player)
-                }</span>
+                <span class="cov8" title="1">if player, ok := strings.CutSuffix(f.Name(), ".json"); ok </span>{
+                        <span class="cov8" title="1">players = append(players, player)
+</span>                }
         }
         <span class="cov8" title="1">return players, nil</span>
 }
 
 // Load all relevant data for the given player
-func (s *Save) LoadPlayerData(player string) (PlayerData, error) <span class="cov8" title="1">{
-        advancements, err := s.loadAdvancements(player)
-        if err != nil </span><span class="cov0" title="0">{
-                return PlayerData{}, err
-        }</span>
+func (s *Save) LoadPlayerData(player string) (PlayerData, error) {
+        <span class="cov8" title="1">advancements, err := s.loadAdvancements(player)
+        if err != nil </span>{
+                <span class="cov0" title="0">return PlayerData{}, err
+</span>        }
 
         <span class="cov8" title="1">stats, err := s.loadStats(player)
-        if err != nil </span><span class="cov0" title="0">{
-                return PlayerData{}, err
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return PlayerData{}, err
+</span>        }
 
         <span class="cov8" title="1">var data MinecraftPlayerData
         err = readNBT(filepath.Join(s.playerDir, player+".dat"), &amp;data)
-        if err != nil </span><span class="cov0" title="0">{
-                return PlayerData{}, err
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return PlayerData{}, err
+</span>        }
 
         <span class="cov8" title="1">return PlayerData{
                 Advancements: advancements,
@@ -1431,99 +1431,99 @@ func (s *Save) LoadPlayerData(player string) (PlayerData, error) <span class="co
 }
 
 // Load the advancements for the given player
-func (s *Save) loadAdvancements(player string) (map[string]Advancement, error) <span class="cov8" title="1">{
-        var result MinecraftAdvancements
+func (s *Save) loadAdvancements(player string) (map[string]Advancement, error) {
+        <span class="cov8" title="1">var result MinecraftAdvancements
         err := readJSON(filepath.Join(s.advancementsDir, player+".json"), &amp;result)
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, err
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return nil, err
+</span>        }
 
         <span class="cov8" title="1">return result.Advancements, nil</span>
 }
 
 // Load the stats for the given player
-func (s *Save) loadStats(player string) (Stats, error) <span class="cov8" title="1">{
-        if utils.VersionGreaterOrEqual(utils.VERSION_1_15, s.Version.Name) </span><span class="cov8" title="1">{
-                var stats MinecraftStats
+func (s *Save) loadStats(player string) (Stats, error) {
+        <span class="cov8" title="1">if utils.VersionGreaterOrEqual(utils.VERSION_1_15, s.Version.Name) </span>{
+                <span class="cov8" title="1">var stats MinecraftStats
                 err := readJSON(filepath.Join(s.statsDir, player+".json"), &amp;stats)
-                if err != nil </span><span class="cov0" title="0">{
-                        return Stats{}, err
-                }</span>
+                if err != nil </span>{
+                        <span class="cov0" title="0">return Stats{}, err
+</span>                }
                 <span class="cov8" title="1">return stats.Stats, err</span>
-        } else<span class="cov8" title="1"> {
-                return s.loadStatsPre115(player)
-        }</span>
+        } else {
+                <span class="cov8" title="1">return s.loadStatsPre115(player)
+</span>        }
 }
 
 // Loads stats from saves prior to 1.15 and parses them into the new format
-func (s *Save) loadStatsPre115(player string) (Stats, error) <span class="cov8" title="1">{
-        var tmp map[string]int
-
-        err := readJSON(filepath.Join(s.statsDir, player+".json"), &amp;tmp)
-        if err != nil </span><span class="cov0" title="0">{
-                return Stats{}, err
-        }</span>
+func (s *Save) loadStatsPre115(player string) (Stats, error) {
+        <span class="cov8" title="1">var tmp map[string]int
+</span>
+        <span class="cov8" title="1">err := readJSON(filepath.Join(s.statsDir, player+".json"), &amp;tmp)
+        if err != nil </span>{
+                <span class="cov0" title="0">return Stats{}, err
+</span>        }
 
         <span class="cov8" title="1">stats := NewStats()
-
-        for k, value := range tmp </span><span class="cov8" title="1">{
-                key := strings.Split(k, ".")
-                if key[0] != "stat" </span><span class="cov0" title="0">{
-                        continue</span>
+</span>
+        <span class="cov8" title="1">for k, value := range tmp </span>{
+                <span class="cov8" title="1">key := strings.Split(k, ".")
+                if key[0] != "stat" </span>{
+                        <span class="cov0" title="0">continue</span>
                 }
-                <span class="cov8" title="1">if len(key) &lt; 2 </span><span class="cov0" title="0">{
-                        return Stats{}, NewErrFailedToParseStat(k, value)
-                }</span>
+                <span class="cov8" title="1">if len(key) &lt; 2 </span>{
+                        <span class="cov0" title="0">return Stats{}, NewErrFailedToParseStat(k, value)
+</span>                }
                 <span class="cov8" title="1">switch key[1] </span>{
-                case "craftItem":<span class="cov8" title="1">
-                        name := strings.Join(key[2:], ":")
+                case "craftItem":
+                        <span class="cov8" title="1">name := strings.Join(key[2:], ":")
                         stats.CraftedItems[name] = value</span>
-                case "mineBlock":<span class="cov8" title="1">
-                        name := strings.Join(key[2:], ":")
+                case "mineBlock":
+                        <span class="cov8" title="1">name := strings.Join(key[2:], ":")
                         stats.Mined[name] = value</span>
-                case "pickup":<span class="cov8" title="1">
-                        name := strings.Join(key[2:], ":")
+                case "pickup":
+                        <span class="cov8" title="1">name := strings.Join(key[2:], ":")
                         stats.PickedUp[name] = value</span>
-                case "killEntity":<span class="cov8" title="1">
-                        name := strings.Join(key[2:], ":")
+                case "killEntity":
+                        <span class="cov8" title="1">name := strings.Join(key[2:], ":")
                         stats.Killed[name] = value</span>
-                case "entityKilledBy":<span class="cov0" title="0">
-                        name := strings.Join(key[2:], ":")
+                case "entityKilledBy":
+                        <span class="cov0" title="0">name := strings.Join(key[2:], ":")
                         stats.KilledBy[name] = value</span>
-                case "jump":<span class="cov8" title="1">
-                        stats.Custom.Jump = value</span>
-                case "deaths":<span class="cov8" title="1">
-                        stats.Custom.Deaths = value</span>
-                case "damageTaken":<span class="cov8" title="1">
-                        stats.Custom.DamageTaken = value</span>
-                case "damageDealt":<span class="cov8" title="1">
-                        stats.Custom.DamageDealt = value</span>
-                case "playOneMinute":<span class="cov8" title="1">
-                        stats.Custom.Playtime = value</span>
-                case "walkOneCm":<span class="cov8" title="1">
-                        stats.Custom.Walk = value</span>
-                case "swimOneCm":<span class="cov8" title="1">
-                        stats.Custom.Swim = value</span>
-                case "sprintOneCm":<span class="cov8" title="1">
-                        stats.Custom.Sprint = value</span>
-                case "diveOneCm":<span class="cov8" title="1">
-                        stats.Custom.Dive = value</span>
-                case "fallOneCm":<span class="cov8" title="1">
-                        stats.Custom.Fall = value</span>
-                case "flyOneCm":<span class="cov8" title="1">
-                        stats.Custom.Fly = value</span>
-                case "boatOneCm":<span class="cov0" title="0">
-                        stats.Custom.Boat = value</span>
-                case "horseOneCm":<span class="cov0" title="0">
-                        stats.Custom.Horse = value</span>
-                case "climbOneCm":<span class="cov8" title="1">
-                        stats.Custom.Climb = value</span>
-                case "sleepInBed":<span class="cov8" title="1">
-                        stats.Custom.Sleep = value</span>
-                case "craftingTableInteraction":<span class="cov8" title="1">
-                        stats.Custom.Crafted = value</span>
-                default:<span class="cov8" title="1">
-                        name := strings.Join(key[1:], ".")
+                case "jump":
+                        <span class="cov8" title="1">stats.Custom.Jump = value</span>
+                case "deaths":
+                        <span class="cov8" title="1">stats.Custom.Deaths = value</span>
+                case "damageTaken":
+                        <span class="cov8" title="1">stats.Custom.DamageTaken = value</span>
+                case "damageDealt":
+                        <span class="cov8" title="1">stats.Custom.DamageDealt = value</span>
+                case "playOneMinute":
+                        <span class="cov8" title="1">stats.Custom.Playtime = value</span>
+                case "walkOneCm":
+                        <span class="cov8" title="1">stats.Custom.Walk = value</span>
+                case "swimOneCm":
+                        <span class="cov8" title="1">stats.Custom.Swim = value</span>
+                case "sprintOneCm":
+                        <span class="cov8" title="1">stats.Custom.Sprint = value</span>
+                case "diveOneCm":
+                        <span class="cov8" title="1">stats.Custom.Dive = value</span>
+                case "fallOneCm":
+                        <span class="cov8" title="1">stats.Custom.Fall = value</span>
+                case "flyOneCm":
+                        <span class="cov8" title="1">stats.Custom.Fly = value</span>
+                case "boatOneCm":
+                        <span class="cov0" title="0">stats.Custom.Boat = value</span>
+                case "horseOneCm":
+                        <span class="cov0" title="0">stats.Custom.Horse = value</span>
+                case "climbOneCm":
+                        <span class="cov8" title="1">stats.Custom.Climb = value</span>
+                case "sleepInBed":
+                        <span class="cov8" title="1">stats.Custom.Sleep = value</span>
+                case "craftingTableInteraction":
+                        <span class="cov8" title="1">stats.Custom.Crafted = value</span>
+                default:
+                        <span class="cov8" title="1">name := strings.Join(key[1:], ".")
                         stats.Custom.Custom[name] = value</span>
                 }
         }
@@ -1534,7 +1534,8 @@ func (s *Save) loadStatsPre115(player string) (Stats, error) <span class="cov8" 
 		<pre class="file" id="file10" style="display: none">package save
 
 import (
-        "encoding/json"
+        "encoding/json/jsontext"
+        "encoding/json/v2"
 )
 
 type MinecraftLevelDat struct {
@@ -1561,19 +1562,19 @@ type MinecraftAdvancements struct {
 }
 
 // Implements Unmarshal, allows to drop "DataVersion"
-func (a *MinecraftAdvancements) UnmarshalJSON(data []byte) error <span class="cov8" title="1">{
-        var v map[string]json.RawMessage
-        if err := json.Unmarshal(data, &amp;v); err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+func (a *MinecraftAdvancements) UnmarshalJSON(data []byte) error {
+        <span class="cov8" title="1">var v map[string]jsontext.Value
+        if err := json.Unmarshal(data, &amp;v); err != nil </span>{
+                <span class="cov0" title="0">return err
+</span>        }
 
         <span class="cov8" title="1">a.Advancements = make(map[string]Advancement, len(v))
-        for key, value := range v </span><span class="cov8" title="1">{
-                if key != "DataVersion" </span><span class="cov8" title="1">{
-                        var advancement Advancement
-                        if err := json.Unmarshal(value, &amp;advancement); err != nil </span><span class="cov0" title="0">{
-                                return err
-                        }</span>
+        for key, value := range v </span>{
+                <span class="cov8" title="1">if key != "DataVersion" </span>{
+                        <span class="cov8" title="1">var advancement Advancement
+                        if err := json.Unmarshal(value, &amp;advancement); err != nil </span>{
+                                <span class="cov0" title="0">return err
+</span>                        }
                         <span class="cov8" title="1">a.Advancements[key] = advancement</span>
                 }
         }
@@ -1597,8 +1598,8 @@ type Stats struct {
         Custom       CustomStats    `json:"minecraft:custom"`
 }
 
-func NewStats() Stats <span class="cov8" title="1">{
-        return Stats{
+func NewStats() Stats {
+        <span class="cov8" title="1">return Stats{
                 CraftedItems: make(map[string]int),
                 Mined:        make(map[string]int),
                 PickedUp:     make(map[string]int),
@@ -1607,8 +1608,8 @@ func NewStats() Stats <span class="cov8" title="1">{
                 Custom: CustomStats{
                         Custom: make(map[string]int),
                 },
-        }
-}</span>
+</span>        }
+}
 
 type CustomStats struct {
         Jump        int
@@ -1631,49 +1632,49 @@ type CustomStats struct {
 }
 
 // Implements Unmarshal, allows unknown stats to be saved in map
-func (s *CustomStats) UnmarshalJSON(data []byte) error <span class="cov8" title="1">{
-        var v map[string]int
-        if err := json.Unmarshal(data, &amp;v); err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+func (s *CustomStats) UnmarshalJSON(data []byte) error {
+        <span class="cov8" title="1">var v map[string]int
+        if err := json.Unmarshal(data, &amp;v); err != nil </span>{
+                <span class="cov0" title="0">return err
+</span>        }
         <span class="cov8" title="1">s.Custom = make(map[string]int, len(v))
-
-        for key, value := range v </span><span class="cov8" title="1">{
-                switch key </span>{
-                case "minecraft:jump":<span class="cov8" title="1">
-                        s.Jump = value</span>
-                case "minecraft:deaths":<span class="cov8" title="1">
-                        s.Deaths = value</span>
-                case "minecraft:damage_taken":<span class="cov8" title="1">
-                        s.DamageTaken = value</span>
-                case "minecraft:damage_dealt":<span class="cov8" title="1">
-                        s.DamageDealt = value</span>
-                case "minecraft:play_time", "minecraft:play_one_minute":<span class="cov8" title="1">
-                        s.Playtime = value</span>
-                case "minecraft:walk_one_cm":<span class="cov8" title="1">
-                        s.Walk = value</span>
-                case "minecraft:walk_on_water_one_cm":<span class="cov8" title="1">
-                        s.Swim = value</span>
-                case "minecraft:sprint_one_cm":<span class="cov8" title="1">
-                        s.Sprint = value</span>
-                case "minecraft:walk_under_water_one_cm":<span class="cov8" title="1">
-                        s.Dive = value</span>
-                case "minecraft:fall_one_cm":<span class="cov8" title="1">
-                        s.Fall = value</span>
-                case "minecraft:fly_one_cm":<span class="cov8" title="1">
-                        s.Fly = value</span>
-                case "minecraft:boat_one_cm":<span class="cov8" title="1">
-                        s.Boat = value</span>
-                case "minecraft:horse_one_cm":<span class="cov8" title="1">
-                        s.Horse = value</span>
-                case "minecraft:climb_one_cm":<span class="cov8" title="1">
-                        s.Climb = value</span>
-                case "minecraft:sleep_in_bed":<span class="cov8" title="1">
-                        s.Sleep = value</span>
-                case "minecraft:interact_with_crafting_table":<span class="cov8" title="1">
-                        s.Crafted = value</span>
-                default:<span class="cov8" title="1">
-                        s.Custom[key] = value</span>
+</span>
+        <span class="cov8" title="1">for key, value := range v </span>{
+                <span class="cov8" title="1">switch key </span>{
+                case "minecraft:jump":
+                        <span class="cov8" title="1">s.Jump = value</span>
+                case "minecraft:deaths":
+                        <span class="cov8" title="1">s.Deaths = value</span>
+                case "minecraft:damage_taken":
+                        <span class="cov8" title="1">s.DamageTaken = value</span>
+                case "minecraft:damage_dealt":
+                        <span class="cov8" title="1">s.DamageDealt = value</span>
+                case "minecraft:play_time", "minecraft:play_one_minute":
+                        <span class="cov8" title="1">s.Playtime = value</span>
+                case "minecraft:walk_one_cm":
+                        <span class="cov8" title="1">s.Walk = value</span>
+                case "minecraft:walk_on_water_one_cm":
+                        <span class="cov8" title="1">s.Swim = value</span>
+                case "minecraft:sprint_one_cm":
+                        <span class="cov8" title="1">s.Sprint = value</span>
+                case "minecraft:walk_under_water_one_cm":
+                        <span class="cov8" title="1">s.Dive = value</span>
+                case "minecraft:fall_one_cm":
+                        <span class="cov8" title="1">s.Fall = value</span>
+                case "minecraft:fly_one_cm":
+                        <span class="cov8" title="1">s.Fly = value</span>
+                case "minecraft:boat_one_cm":
+                        <span class="cov8" title="1">s.Boat = value</span>
+                case "minecraft:horse_one_cm":
+                        <span class="cov8" title="1">s.Horse = value</span>
+                case "minecraft:climb_one_cm":
+                        <span class="cov8" title="1">s.Climb = value</span>
+                case "minecraft:sleep_in_bed":
+                        <span class="cov8" title="1">s.Sleep = value</span>
+                case "minecraft:interact_with_crafting_table":
+                        <span class="cov8" title="1">s.Crafted = value</span>
+                default:
+                        <span class="cov8" title="1">s.Custom[key] = value</span>
                 }
         }
         <span class="cov8" title="1">return nil</span>
@@ -1692,7 +1693,7 @@ type MinecraftPlayerData struct {
 
 import (
         "compress/gzip"
-        "encoding/json"
+        "encoding/json/v2"
         "io"
         "os"
         "path/filepath"
@@ -1702,93 +1703,93 @@ import (
 )
 
 // Check if the given path is a directory
-func isDirectory(path string) bool <span class="cov8" title="1">{
-        fileInfo, err := os.Stat(path)
-        if err != nil </span><span class="cov8" title="1">{
-                return false
-        }</span>
+func isDirectory(path string) bool {
+        <span class="cov8" title="1">fileInfo, err := os.Stat(path)
+        if err != nil </span>{
+                <span class="cov8" title="1">return false
+</span>        }
         <span class="cov8" title="1">return fileInfo.IsDir()</span>
 }
 
 // Count the total number of earned advancements
-func countAdvancements(advancements map[string]Advancement) uint <span class="cov8" title="1">{
-        var i uint
-        for _, value := range advancements </span><span class="cov8" title="1">{
-                if value.Done </span><span class="cov8" title="1">{
-                        i++
-                }</span>
+func countAdvancements(advancements map[string]Advancement) uint {
+        <span class="cov8" title="1">var i uint
+        for _, value := range advancements </span>{
+                <span class="cov8" title="1">if value.Done </span>{
+                        <span class="cov8" title="1">i++
+</span>                }
         }
         <span class="cov8" title="1">return i</span>
 }
 
 // Read a nbt file and parse it to the given struct.
 // Assumes the file is gzip compressed.
-func readNBT(path string, target interface{}) error <span class="cov8" title="1">{
+func readNBT(path string, target interface{}) error {
         // #nosec G304: Path is determined dynamically, with only a base directory provided by the user.
-        f, err := os.Open(path)
-        if err != nil </span><span class="cov8" title="1">{
-                return err
-        }</span>
+        <span class="cov8" title="1">f, err := os.Open(path)
+        if err != nil </span>{
+                <span class="cov8" title="1">return err
+</span>        }
         <span class="cov8" title="1">defer f.Close()
         fReader, err := gzip.NewReader(f)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return err
+</span>        }
         <span class="cov8" title="1">defer fReader.Close()
-
-        _, err = nbt.NewDecoder(fReader).Decode(target)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+</span>
+        <span class="cov8" title="1">_, err = nbt.NewDecoder(fReader).Decode(target)
+        if err != nil </span>{
+                <span class="cov0" title="0">return err
+</span>        }
 
         <span class="cov8" title="1">return nil</span>
 }
 
 // Read a json file and parse it to the given struct
-func readJSON(path string, target interface{}) error <span class="cov8" title="1">{
+func readJSON(path string, target interface{}) error {
         // #nosec G304: Path is determined dynamically, with only a base directory provided by the user.
-        f, err := os.Open(path)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+        <span class="cov8" title="1">f, err := os.Open(path)
+        if err != nil </span>{
+                <span class="cov0" title="0">return err
+</span>        }
         <span class="cov8" title="1">defer f.Close()
         b, err := io.ReadAll(f)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return err
+</span>        }
 
         <span class="cov8" title="1">err = json.Unmarshal(b, target)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return err
+</span>        }
 
         <span class="cov8" title="1">return nil</span>
 }
 
 // Count up all numbers of the map
-func countTotal(values map[string]int) int <span class="cov8" title="1">{
-        var total = 0
-
-        for _, v := range values </span><span class="cov8" title="1">{
-                total = total + v
-        }</span>
+func countTotal(values map[string]int) int {
+        <span class="cov8" title="1">var total = 0
+</span>
+        <span class="cov8" title="1">for _, v := range values </span>{
+                <span class="cov8" title="1">total = total + v
+</span>        }
         <span class="cov8" title="1">return total</span>
 }
 
 // Convert a given map to metrics
-func mapToMetrics(ch chan&lt;- prometheus.Metric, desc *prometheus.Desc, values map[string]int, labels []string) <span class="cov8" title="1">{
-        for k, v := range values </span><span class="cov8" title="1">{
-                ch &lt;- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, float64(v), append(labels, k)...)
-        }</span>
+func mapToMetrics(ch chan&lt;- prometheus.Metric, desc *prometheus.Desc, values map[string]int, labels []string) {
+        <span class="cov8" title="1">for k, v := range values </span>{
+                <span class="cov8" title="1">ch &lt;- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, float64(v), append(labels, k)...)
+</span>        }
 }
 
 // Return the Minecraft Version of the save from level.dat
-func getSaveVersion(path string) (MinecraftVersion, error) <span class="cov8" title="1">{
-        var data MinecraftLevelDat
+func getSaveVersion(path string) (MinecraftVersion, error) {
+        <span class="cov8" title="1">var data MinecraftLevelDat
         err := readNBT(filepath.Join(path, "level.dat"), &amp;data)
-        if err != nil </span><span class="cov8" title="1">{
-                return MinecraftVersion{}, err
-        }</span>
+        if err != nil </span>{
+                <span class="cov8" title="1">return MinecraftVersion{}, err
+</span>        }
         <span class="cov8" title="1">return data.Data.Version, nil</span>
 }
 </pre>
@@ -1810,23 +1811,23 @@ const (
 // Compares the choosen base version against the target version.
 // Returns true if the target is greater or equal.
 // Always returns false if the version string is not a proper semver version.
-func VersionGreaterOrEqual(base, target string) bool <span class="cov8" title="1">{
-        if base == "" || target == "" </span><span class="cov8" title="1">{
-                slog.Warn("Could not compare version strings, either the base or the target was empty", slog.String("base", base), slog.String("target", target))
+func VersionGreaterOrEqual(base, target string) bool {
+        <span class="cov8" title="1">if base == "" || target == "" </span>{
+                <span class="cov8" title="1">slog.Warn("Could not compare version strings, either the base or the target was empty", slog.String("base", base), slog.String("target", target))
                 return false
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">vBase, err := goversion.NewSemver(base)
-        if err != nil </span><span class="cov8" title="1">{
-                slog.Warn("Failed to convert base version to semver", "error", err)
+        if err != nil </span>{
+                <span class="cov8" title="1">slog.Warn("Failed to convert base version to semver", "error", err)
                 return false
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">vTarget, err := goversion.NewSemver(target)
-        if err != nil </span><span class="cov8" title="1">{
-                slog.Warn("Failed to convert target version to semver", "error", err)
+        if err != nil </span>{
+                <span class="cov8" title="1">slog.Warn("Failed to convert target version to semver", "error", err)
                 return false
-        }</span>
+</span>        }
 
         <span class="cov8" title="1">return vBase.LessThanOrEqual(vTarget)</span>
 }
@@ -1846,29 +1847,29 @@ type ErrHttpRequestFailed struct {
         Body       string
 }
 
-func NewErrHttpRequestFailed(status int, resBody io.ReadCloser) *ErrHttpRequestFailed <span class="cov8" title="1">{
-        var body string
+func NewErrHttpRequestFailed(status int, resBody io.ReadCloser) *ErrHttpRequestFailed {
+        <span class="cov8" title="1">var body string
         b, err := io.ReadAll(resBody)
-        if err != nil </span><span class="cov0" title="0">{
-                body = err.Error()
-        }</span> else<span class="cov8" title="1"> {
-                body = string(b)
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">body = err.Error()
+</span>        } else {
+                <span class="cov8" title="1">body = string(b)
+</span>        }
         <span class="cov8" title="1">return &amp;ErrHttpRequestFailed{
                 StatusCode: status,
                 Body:       body,
-        }</span>
+</span>        }
 }
 
-func (e *ErrHttpRequestFailed) Error() string <span class="cov0" title="0">{
-        return fmt.Sprintf("HTTP Request returned with Status Code %d, expected 200. Response body: %s", e.StatusCode, e.Body)
-}</span>
+func (e *ErrHttpRequestFailed) Error() string {
+        <span class="cov0" title="0">return fmt.Sprintf("HTTP Request returned with Status Code %d, expected 200. Response body: %s", e.StatusCode, e.Body)
+</span>}
 </pre>
 		
 		<pre class="file" id="file14" style="display: none">package uuid
 
 import (
-        "encoding/json"
+        "encoding/json/v2"
         "log/slog"
         "net/http"
         "time"
@@ -1890,56 +1891,56 @@ type MojanUUIDToProfileResponse struct {
 }
 
 // Returns a new UUID Cache
-func NewUUIDCache(cacheTime time.Duration) *UUIDCache <span class="cov8" title="1">{
-        return &amp;UUIDCache{
+func NewUUIDCache(cacheTime time.Duration) *UUIDCache {
+        <span class="cov8" title="1">return &amp;UUIDCache{
                 Items:     make(map[string]UUIDCacheItem),
                 CacheTime: cacheTime,
-        }
-}</span>
+</span>        }
+}
 
 // Either return the name from cache or fetch from the server if the name is either
 // not cached or the cache expired.
 // If the uuid is not known to mojang, return the uuid instead
-func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) <span class="cov8" title="1">{
-        now := time.Now()
-
-        item, ok := c.Items[uuid]
-        if ok </span><span class="cov8" title="1">{
-                if item.Timestamp.Add(c.CacheTime).After(now) </span><span class="cov8" title="1">{
-                        return item.Name, nil
-                }</span> else<span class="cov8" title="1"> {
-                        delete(c.Items, uuid)
-                }</span>
+func (c *UUIDCache) GetNameFromUUID(uuid string) (string, error) {
+        <span class="cov8" title="1">now := time.Now()
+</span>
+        <span class="cov8" title="1">item, ok := c.Items[uuid]
+        if ok </span>{
+                <span class="cov8" title="1">if item.Timestamp.Add(c.CacheTime).After(now) </span>{
+                        <span class="cov8" title="1">return item.Name, nil
+</span>                } else {
+                        <span class="cov8" title="1">delete(c.Items, uuid)
+</span>                }
         }
 
         <span class="cov8" title="1">res, err := http.Get("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid)
-        if err != nil </span><span class="cov0" title="0">{
-                return "", err
-        }</span>
+        if err != nil </span>{
+                <span class="cov0" title="0">return "", err
+</span>        }
         <span class="cov8" title="1">defer res.Body.Close()
-
-        var name string
+</span>
+        <span class="cov8" title="1">var name string
         switch res.StatusCode </span>{
-        case http.StatusOK:<span class="cov8" title="1">
-                var result MojanUUIDToProfileResponse
-                err = json.NewDecoder(res.Body).Decode(&amp;result)
-                if err != nil </span><span class="cov0" title="0">{
-                        return "", err
-                }</span>
+        case http.StatusOK:
+                <span class="cov8" title="1">var result MojanUUIDToProfileResponse
+                err = json.UnmarshalRead(res.Body, &amp;result)
+                if err != nil </span>{
+                        <span class="cov0" title="0">return "", err
+</span>                }
                 <span class="cov8" title="1">name = result.Name</span>
-        case http.StatusNoContent:<span class="cov8" title="1">
-                name = uuid
+        case http.StatusNoContent:
+                <span class="cov8" title="1">name = uuid
                 slog.Warn("Found no minecraft account for the uuid, falling back to using uuid as name", slog.String("uuid", uuid))</span>
-        default:<span class="cov0" title="0">
-                return "", NewErrHttpRequestFailed(res.StatusCode, res.Body)</span>
+        default:
+                <span class="cov0" title="0">return "", NewErrHttpRequestFailed(res.StatusCode, res.Body)</span>
         }
 
         <span class="cov8" title="1">c.Items[uuid] = UUIDCacheItem{
                 Name:      name,
                 Timestamp: now,
-        }
+</span>        }
 
-        return name, nil</span>
+        <span class="cov8" title="1">return name, nil</span>
 }
 </pre>
 		
@@ -1953,27 +1954,27 @@ import (
 const Name = "minecraft-exporter"
 
 // Return a formated string containing the version, git commit and go version the app was compiled with.
-func Version() string <span class="cov8" title="1">{
-        var commit string
+func Version() string {
+        <span class="cov8" title="1">var commit string
         buildinfo, _ := debug.ReadBuildInfo()
-        for _, item := range buildinfo.Settings </span><span class="cov8" title="1">{
-                if item.Key == "vcs.revision" </span><span class="cov0" title="0">{
-                        commit = item.Value
+        for _, item := range buildinfo.Settings </span>{
+                <span class="cov8" title="1">if item.Key == "vcs.revision" </span>{
+                        <span class="cov0" title="0">commit = item.Value
                         break</span>
                 }
         }
-        <span class="cov8" title="1">if len(commit) &gt; 7 </span><span class="cov0" title="0">{
-                commit = commit[:7]
-        }</span> else<span class="cov8" title="1"> if commit == "" </span><span class="cov8" title="1">{
-                commit = "Unknown"
-        }</span>
+        <span class="cov8" title="1">if len(commit) &gt; 7 </span>{
+                <span class="cov0" title="0">commit = commit[:7]
+</span>        } else <span class="cov8" title="1">if commit == "" </span>{
+                <span class="cov8" title="1">commit = "Unknown"
+</span>        }
 
         <span class="cov8" title="1">result := Name + ":\n"
         result += "    Version: " + buildinfo.Main.Version + "\n"
         result += "    Commit:  " + commit + "\n"
         result += "    Go:      " + runtime.Version() + "\n"
-
-        return result</span>
+</span>
+        <span class="cov8" title="1">return result</span>
 }
 </pre>
 		
