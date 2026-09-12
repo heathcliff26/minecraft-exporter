@@ -31,7 +31,7 @@ config:
     # RCON port configured in the server settings
     port: 25575
     # Password used for RCON
-    password: ""
+    password: "${MC_EXPORTER_RCON_PASSWORD}"
 
   # Configure remote_write behaviour
   remote:
@@ -44,8 +44,8 @@ config:
     # Name of job under which metrics will be pushed
     jobName: "minecraft-exporter"
     # Username and password for Basic Authentication. Leave empty when not required
-    username: ""
-    password: ""
+    username: "${MC_EXPORTER_REMOTE_USERNAME}"
+    password: "${MC_EXPORTER_REMOTE_PASSWORD}"
 
 # Container image configuration
 image:
@@ -61,6 +61,10 @@ imagePullSecrets: []
 # This is to override the chart name.
 nameOverride: ""
 fullnameOverride: ""
+
+# Configure the environment variables for the container
+env: []
+envFrom: []
 
 # This is for setting Kubernetes Annotations to a Pod.
 podAnnotations: {}

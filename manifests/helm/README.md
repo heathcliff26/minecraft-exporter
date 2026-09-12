@@ -40,12 +40,14 @@ See [values.yaml](./values.yaml) for all available configuration options.
 
 ### Key Parameters
 
-| Parameter                | Description                                         | Default                                   |
-| ------------------------ | --------------------------------------------------- | ----------------------------------------- |
-| `image.repository`       | Container image repository                          | `ghcr.io/heathcliff26/minecraft-exporter` |
-| `image.tag`              | Container image tag                                 | Same as chart version                     |
-| `ingress.enabled`        | Enable ingress                                      | `false`                                   |
-| `servicemonitor.enabled` | Create a ServiceMonitor for the Prometheus Operator | `false`                                   |
+| Parameter                | Description                                                    | Default                                   |
+| ------------------------ | -------------------------------------------------------------- | ----------------------------------------- |
+| `image.repository`       | Container image repository                                     | `ghcr.io/heathcliff26/minecraft-exporter` |
+| `image.tag`              | Container image tag                                            | Same as chart version                     |
+| `ingress.enabled`        | Enable ingress                                                 | `false`                                   |
+| `servicemonitor.enabled` | Create a ServiceMonitor for the Prometheus Operator            | `false`                                   |
+| `config`                 | Configure the app                                              | See [values.yaml](./values.yaml)          |
+| `env`                    | Additional environment variables, useful for injecting secrets | []                                        |
 
 ## Support
 
