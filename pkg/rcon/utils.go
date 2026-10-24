@@ -9,19 +9,49 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
+var minecraftColorCodePattern = regexp.MustCompile(`§x(?:§[0-9A-Fa-f]){6}|§[0-9A-Fa-fK-Ok-orR]`)
+var categoryPrefixPattern = regexp.MustCompile(`\b[a-zA-Z0-9_-]+:`)
+
 // Parse the output of the list command
 func parsePlayersOnline(input string) []string {
-	s := strings.Split(input, "players online:")
-	if len(s) < 2 {
+	normalized := minecraftColorCodePattern.ReplaceAllString(input, "")
+	normalized = strings.ReplaceAll(normalized, "\r", "\n")
+	normalized = strings.TrimSpace(normalized)
+
+	if idx := strings.Index(normalized, "players online:"); idx >= 0 {
+		rest := strings.TrimSpace(normalized[idx+len("players online:"):])
+		return splitPlayerList(rest)
+	}
+
+	if idx := strings.Index(normalized, "players online."); idx >= 0 {
+		rest := strings.TrimSpace(normalized[idx+len("players online."):])
+		rest = strings.TrimPrefix(rest, "default:")
+		return splitPlayerList(rest)
+	}
+
+	return []string{}
+}
+
+func splitPlayerList(raw string) []string {
+	raw = categoryPrefixPattern.ReplaceAllString(raw, "")
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
 		return []string{}
 	}
 
-	players := strings.TrimSpace(s[1])
-	if players == "" {
-		return []string{}
-	}
+	raw = strings.ReplaceAll(raw, "\n", ",")
+	raw = strings.ReplaceAll(raw, ";", ",")
+	parts := strings.Split(raw, ",")
 
-	return strings.Split(players, ", ")
+	players := make([]string, 0, len(parts))
+	for _, part := range parts {
+		name := strings.TrimSpace(part)
+		if name == "" {
+			continue
+		}
+		players = append(players, name)
+	}
+	return players
 }
 
 // Parse the TPS statistics returned from forge
