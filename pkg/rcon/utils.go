@@ -9,7 +9,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-var minecraftColorCodePattern = regexp.MustCompile(`§[0-9A-Fa-fK-Ok-orR]`)
+var minecraftColorCodePattern = regexp.MustCompile(`§x(?:§[0-9A-Fa-f]){6}|§[0-9A-Fa-fK-Ok-orR]`)
 
 // Parse the output of the list command
 func parsePlayersOnline(input string) []string {
