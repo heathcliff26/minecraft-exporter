@@ -10,6 +10,7 @@ import (
 )
 
 var minecraftColorCodePattern = regexp.MustCompile(`§x(?:§[0-9A-Fa-f]){6}|§[0-9A-Fa-fK-Ok-orR]`)
+var categoryPrefixPattern = regexp.MustCompile(`\b[a-zA-Z0-9_-]+:`)
 
 // Parse the output of the list command
 func parsePlayersOnline(input string) []string {
@@ -32,6 +33,7 @@ func parsePlayersOnline(input string) []string {
 }
 
 func splitPlayerList(raw string) []string {
+	raw = categoryPrefixPattern.ReplaceAllString(raw, "")
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return []string{}
@@ -44,11 +46,6 @@ func splitPlayerList(raw string) []string {
 	players := make([]string, 0, len(parts))
 	for _, part := range parts {
 		name := strings.TrimSpace(part)
-		if name == "" || name == "default:" {
-			continue
-		}
-		name = strings.TrimPrefix(name, "default:")
-		name = strings.TrimSpace(name)
 		if name == "" {
 			continue
 		}
