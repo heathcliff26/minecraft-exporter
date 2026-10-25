@@ -99,7 +99,7 @@ func (c *RCONClient) cmd(cmd string) (string, error) {
 
 // Return a list of all players currently online
 func (c *RCONClient) GetPlayersOnline() []string {
-	list, err := c.cmd("list")
+	list, err := c.cmd("minecraft:list")
 	if err != nil {
 		slog.Error("Failed to retrieve online players", "err", err)
 		return []string{}
