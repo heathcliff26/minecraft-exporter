@@ -11,6 +11,7 @@ import (
 
 // Parse the output of the list command
 func parsePlayersOnline(input string) []string {
+	input = stripEscapes(input)
 	s := strings.Split(input, "players online:")
 	if len(s) < 2 {
 		return []string{}
@@ -26,7 +27,7 @@ func parsePlayersOnline(input string) []string {
 
 // Parse the TPS statistics returned from forge
 func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) {
-	input = text.StripEscape(input)
+	input = stripEscapes(input)
 
 	reg := regexp.MustCompile(`Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)`)
 	stats := reg.FindAllStringSubmatch(input, -1)
@@ -86,7 +87,7 @@ func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) {
 
 // Parse the count and name of all loaded forge entities
 func parseForgeEntities(input string) ([]EntityCount, error) {
-	input = text.StripEscape(input)
+	input = stripEscapes(input)
 
 	reg := regexp.MustCompile(`(\d+): (.*?:.*?)\s`)
 	matches := reg.FindAllStringSubmatch(input+" ", -1)
@@ -108,10 +109,8 @@ func parseForgeEntities(input string) ([]EntityCount, error) {
 // Parse the TPS statistics returned from paper
 func parsePaperTPS(input string) ([]float64, error) {
 	// Starting with 1.20, the output is colored
-	input = text.StripEscape(input)
-	for _, chars := range []string{"§6", "§a", "§r", "\n"} {
-		input = strings.ReplaceAll(input, chars, "")
-	}
+	input = stripEscapes(input)
+	input = strings.ReplaceAll(input, "\n", "")
 
 	input = strings.TrimPrefix(input, "TPS from last 1m, 5m, 15m: ")
 	s := strings.Split(input, ", ")
@@ -241,4 +240,22 @@ func parseTickQuery(input string) (TickStats, error) {
 		P95:     p95,
 		P99:     p99,
 	}, nil
+}
+
+// Strip all escape sequences from the string
+func stripEscapes(str string) string {
+	// ANSI Escape sequences
+	str = text.StripEscape(str)
+
+	// Minecraft color and format codes
+	runes := []rune(str)
+	str = ""
+	for i := 0; i < len(runes); i++ {
+		if runes[i] == '§' {
+			i++
+			continue
+		}
+		str += string(runes[i])
+	}
+	return str
 }
