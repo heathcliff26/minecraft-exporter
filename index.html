@@ -67,7 +67,7 @@
 				
 				<option value="file5">github.com/heathcliff26/minecraft-exporter/pkg/rcon/rcon.go (86.1%)</option>
 				
-				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (79.3%)</option>
+				<option value="file6">github.com/heathcliff26/minecraft-exporter/pkg/rcon/utils.go (80.6%)</option>
 				
 				<option value="file7">github.com/heathcliff26/minecraft-exporter/pkg/save/collector.go (93.0%)</option>
 				
@@ -854,7 +854,8 @@ import (
 
 // Parse the output of the list command
 func parsePlayersOnline(input string) []string {
-        <span class="cov8" title="1">s := strings.Split(input, "players online:")
+        <span class="cov8" title="1">input = stripEscapes(input)
+        s := strings.Split(input, "players online:")
         if len(s) &lt; 2 </span>{
                 <span class="cov0" title="0">return []string{}
 </span>        }
@@ -869,7 +870,7 @@ func parsePlayersOnline(input string) []string {
 
 // Parse the TPS statistics returned from forge
 func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) {
-        <span class="cov8" title="1">input = text.StripEscape(input)
+        <span class="cov8" title="1">input = stripEscapes(input)
 </span>
         <span class="cov8" title="1">reg := regexp.MustCompile(`Dim\s*(-*\d*)\s\((.*?)\)\s:\sMean tick time:\s(.*?) ms\. Mean TPS: (\d*\.\d*)`)
         stats := reg.FindAllStringSubmatch(input, -1)
@@ -929,7 +930,7 @@ func parseForgeTPS(input string) ([]TPSStat, TPSStat, error) {
 
 // Parse the count and name of all loaded forge entities
 func parseForgeEntities(input string) ([]EntityCount, error) {
-        <span class="cov8" title="1">input = text.StripEscape(input)
+        <span class="cov8" title="1">input = stripEscapes(input)
 </span>
         <span class="cov8" title="1">reg := regexp.MustCompile(`(\d+): (.*?:.*?)\s`)
         matches := reg.FindAllStringSubmatch(input+" ", -1)
@@ -951,11 +952,9 @@ func parseForgeEntities(input string) ([]EntityCount, error) {
 // Parse the TPS statistics returned from paper
 func parsePaperTPS(input string) ([]float64, error) {
         // Starting with 1.20, the output is colored
-        <span class="cov8" title="1">input = text.StripEscape(input)
-        for _, chars := range []string{"§6", "§a", "§r", "\n"} </span>{
-                <span class="cov8" title="1">input = strings.ReplaceAll(input, chars, "")
-</span>        }
-
+        <span class="cov8" title="1">input = stripEscapes(input)
+        input = strings.ReplaceAll(input, "\n", "")
+</span>
         <span class="cov8" title="1">input = strings.TrimPrefix(input, "TPS from last 1m, 5m, 15m: ")
         s := strings.Split(input, ", ")
         if len(s) != 3 </span>{
@@ -1084,6 +1083,24 @@ func parseTickQuery(input string) (TickStats, error) {
                 P95:     p95,
                 P99:     p99,
         }, nil</span>
+}
+
+// Strip all escape sequences from the string
+func stripEscapes(str string) string {
+        // ANSI Escape sequences
+        <span class="cov8" title="1">str = text.StripEscape(str)
+</span>
+        // Minecraft color and format codes
+        <span class="cov8" title="1">runes := []rune(str)
+        str = ""
+        for i := 0; i &lt; len(runes); i++ </span>{
+                <span class="cov8" title="1">if runes[i] == '§' </span>{
+                        <span class="cov8" title="1">i++
+                        continue</span>
+                }
+                <span class="cov8" title="1">str += string(runes[i])</span>
+        }
+        <span class="cov8" title="1">return str</span>
 }
 </pre>
 		
