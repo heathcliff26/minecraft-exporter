@@ -33,6 +33,8 @@ There is zero compatibility to the other exporter.
   - [Dashboard](#dashboard)
     - [Minecraft - Server](#minecraft---server)
     - [Minecraft - Player](#minecraft---player)
+  - [Common Issues](#common-issues)
+    - [Trouble parsing player names](#trouble-parsing-player-names)
 
 ## Container Images
 
@@ -184,3 +186,19 @@ The dashboard can be imported from [json](dashboard/player.json) or from grafana
 
 Here is a preview:
 ![](images/dashboard-player.png)
+
+## Common Issues
+
+### Trouble parsing player names
+
+If no online players are shown, check if a plugin modifies the output of the `/list` command.
+
+Normal output of the `/list` command should be:
+```
+There are 0 of a max of 20 players online: Foo1234, Bar5678
+```
+without any colors.
+
+Should this be changed by a plugin, please either check if you can change this in the plugin settings, or try again without the plugin.
+
+For example, EssentialsX changes the output, but can be configured to ignore the `/list` command.
