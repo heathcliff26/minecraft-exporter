@@ -46,6 +46,15 @@ on:
       - "Dockerfile"
   pull_request:
     branches: ["main"]
+    paths:
+      - "go.mod"
+      - "go.sum"
+      - "*.go"
+      - "**/*.go"
+      - "Dockerfile"
+      - ".github/workflows/ci.yaml"
+      - "manifests/*"
+      - "manifests/**/*"
   merge_group:
     branches: ["main"]
 
