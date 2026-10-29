@@ -227,7 +227,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "dashed"
             }
           },
           "links": [],
@@ -241,7 +241,7 @@
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 50
               }
             ]
           },
