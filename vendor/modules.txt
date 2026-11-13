@@ -15,10 +15,10 @@ github.com/google/uuid
 # github.com/hashicorp/go-version v1.9.0
 ## explicit
 github.com/hashicorp/go-version
-# github.com/heathcliff26/promremote/v2 v2.0.7
+# github.com/heathcliff26/promremote/v2 v2.0.8
 ## explicit; go 1.27.0
 github.com/heathcliff26/promremote/v2/promremote
-# github.com/jedib0t/go-pretty/v6 v6.8.3
+# github.com/jedib0t/go-pretty/v6 v6.9.1
 ## explicit; go 1.18
 github.com/jedib0t/go-pretty/v6/text
 # github.com/klauspost/compress v1.20.1
@@ -41,7 +41,7 @@ github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/internal
 github.com/prometheus/client_golang/prometheus/promhttp
 github.com/prometheus/client_golang/prometheus/promhttp/internal
-# github.com/prometheus/client_golang/exp v0.0.0-20261008142031-a4329cfb379b
+# github.com/prometheus/client_golang/exp v0.0.0-20261105144753-f54d392372dc
 ## explicit; go 1.26.0
 github.com/prometheus/client_golang/exp/api/remote
 github.com/prometheus/client_golang/exp/api/remote/genproto/v2
